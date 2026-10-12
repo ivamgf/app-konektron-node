@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0 — 2026-10-13
+
+### Adicionado
+- Aba **Visão de Sistema** nos projetos de software (planos Standard e Master), com Visão geral,
+  Especificação, Casos de uso, BDD e Documento:
+  - casos de uso no formato de Guedes, com editor de cenários (ações do ator e do sistema);
+  - diagrama de casos de uso UML desenhado a partir dos dados (atores, fronteira do sistema,
+    `«include»`, `«extend»` e generalização), exportável em PlantUML, ao lado dos diagramas de
+    caso de uso já cadastrados;
+  - cenários BDD e arquivos `.feature` para baixar, em PT, EN ou ES;
+  - documento de especificação para imprimir/PDF, com matriz de rastreabilidade requisito × caso de uso.
+- Requisitos de domínio (RD) na Análise de Sistemas.
+- Campo de múltipla escolha nos formulários (vínculo de requisitos).
+
 ## 1.2.0 — 2026-10-12
 
 ### Adicionado

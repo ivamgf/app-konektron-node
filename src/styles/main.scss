@@ -1126,6 +1126,174 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   padding: 0.5rem 1rem;
 }
 
+// ---------- Visão de Sistema ----------
+.kt-sv-nav {
+  gap: 0.25rem;
+  .nav-link {
+    border-radius: 999px;
+    color: $brand-color-neutral;
+    padding: 0.35rem 0.9rem;
+    &.active {
+      background: $brand-color-primary-blue;
+      color: $white;
+    }
+  }
+}
+.kt-sv-gaps li {
+  margin-bottom: 0.25rem;
+}
+
+// Diagrama UML (SVG): as cores vêm de variáveis para funcionar nos dois temas
+.kt-uml {
+  --uml-stroke: #{$brand-color-neutral};
+  --uml-fill: #e6f5fa;
+  --uml-uc-stroke: #{$brand-color-primary-blue};
+  --uml-text: #{$body-color};
+  --uml-boundary: #{$white};
+  --uml-label-bg: #{$white};
+  width: 100%;
+  height: auto;
+  max-width: 900px;
+  display: block;
+  margin: 0 auto 1rem;
+  font-family: $font-other;
+  font-size: 12px;
+  text {
+    fill: var(--uml-text);
+  }
+  .kt-uml-boundary {
+    fill: var(--uml-boundary);
+    stroke: var(--uml-stroke);
+    stroke-width: 1.5;
+  }
+  .kt-uml-system {
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .kt-uml-uc ellipse {
+    fill: var(--uml-fill);
+    stroke: var(--uml-uc-stroke);
+    stroke-width: 1.5;
+  }
+  .kt-uml-code {
+    font-size: 10px;
+    font-weight: 700;
+    fill: $brand-color-primary-blue;
+  }
+  .kt-uml-actor {
+    circle,
+    line {
+      fill: none;
+      stroke: var(--uml-stroke);
+      stroke-width: 1.8;
+    }
+    text {
+      font-weight: 600;
+    }
+  }
+  .kt-uml-assoc line {
+    stroke: var(--uml-stroke);
+    stroke-width: 1.2;
+  }
+  .kt-uml-link path {
+    fill: none;
+    stroke: var(--uml-stroke);
+    stroke-width: 1.3;
+  }
+  .kt-uml-link.is-include path,
+  .kt-uml-link.is-extend path {
+    stroke-dasharray: 6 4;
+  }
+  .kt-uml-arrow {
+    fill: none;
+    stroke: var(--uml-stroke);
+    stroke-width: 1.4;
+  }
+  .kt-uml-triangle {
+    fill: var(--uml-boundary);
+    stroke: var(--uml-stroke);
+    stroke-width: 1.2;
+  }
+  .kt-uml-stereo {
+    font-size: 11px;
+    font-style: italic;
+    paint-order: stroke;
+    stroke: var(--uml-label-bg);
+    stroke-width: 4px;
+  }
+}
+
+// Tabelas no estilo da "Planilha de Análise" (cabeçalhos verdes)
+$sheet-green: #93c47d;
+$sheet-green-light: #b6d7a8;
+.kt-uc-table {
+  border: 1px solid $sheet-green;
+  th {
+    width: 26%;
+    background: rgba($sheet-green-light, 0.35);
+    font-weight: 600;
+  }
+}
+.kt-flow {
+  header {
+    background: $sheet-green;
+    color: $black;
+    padding: 0.3rem 0.6rem;
+  }
+  &.is-alternative header {
+    background: $sheet-green-light;
+  }
+  &.is-exception header {
+    background: #f4cccc;
+  }
+  .kt-flow-kind {
+    font-weight: 700;
+  }
+  .btn-link {
+    color: $black;
+  }
+}
+.kt-flow-table thead th,
+.kt-steps-editor thead th {
+  background: rgba($sheet-green-light, 0.45);
+}
+// colunas fixas, iguais em todos os cenários (como na planilha)
+.kt-flow-table {
+  table-layout: fixed;
+  th:nth-child(2),
+  th:nth-child(3) {
+    width: calc(50% - 1.5rem);
+  }
+}
+.kt-flow-table th:first-child,
+.kt-steps-editor th:first-child {
+  width: 3rem;
+}
+.kt-multicheck {
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+}
+.kt-matrix {
+  th,
+  td {
+    min-width: 3.5rem;
+  }
+  td {
+    color: $brand-color-primary-blue;
+  }
+}
+.kt-gherkin {
+  max-height: 28rem;
+}
+.kt-srs-uc {
+  break-inside: avoid-page;
+  margin-bottom: 1.5rem;
+}
+
 // ---------- Tema escuro (componentes próprios; o Bootstrap cuida dos dele) ----------
 $dark-bg: #0c171d;
 $dark-surface: #13232b;
@@ -1280,6 +1448,36 @@ $dark-link: #5cc6ec;
   }
   .kt-home-cta {
     box-shadow: 0 12px 30px rgba($black, 0.45);
+  }
+
+  // Visão de Sistema
+  .kt-sv-nav .nav-link {
+    color: $dark-muted;
+  }
+  .kt-uml {
+    --uml-stroke: #{$dark-muted};
+    --uml-fill: #{$dark-surface-2};
+    --uml-uc-stroke: #{$brand-color-primary-blue};
+    --uml-text: #{$dark-text};
+    --uml-boundary: #{$dark-surface};
+    --uml-label-bg: #{$dark-surface};
+  }
+  .kt-flow header,
+  .kt-flow.is-alternative header,
+  .kt-flow.is-exception header {
+    color: $dark-text;
+    .btn-link {
+      color: $dark-text;
+    }
+  }
+  .kt-flow header {
+    background: #2f4a25;
+  }
+  .kt-flow.is-alternative header {
+    background: #263b20;
+  }
+  .kt-flow.is-exception header {
+    background: #4a2626;
   }
 
   // Kanban

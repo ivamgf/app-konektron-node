@@ -2,7 +2,7 @@
 import { enumOptions } from '../../components/forms.jsx';
 
 export const ENUMS = {
-  requirementType: ['functional', 'non_functional', 'business_rule'],
+  requirementType: ['functional', 'non_functional', 'domain', 'business_rule'],
   requirementStatus: ['proposed', 'approved', 'implemented', 'rejected'],
   priority: ['must', 'should', 'could', 'wont'],
   storyStatus: ['backlog', 'ready', 'in_progress', 'done'],
@@ -18,6 +18,9 @@ export const ENUMS = {
   technique: ['classification', 'regression', 'clustering', 'association', 'time_series', 'anomaly_detection', 'nlp', 'computer_vision', 'other'],
   modelStatus: ['candidate', 'approved', 'rejected', 'deployed'],
   split: ['train', 'validation', 'test', 'cross_validation'],
+  useCaseStatus: ['draft', 'reviewed', 'approved'],
+  flowKind: ['main', 'alternative', 'exception'],
+  relationType: ['include', 'extend'],
 };
 
 const opts = (t, name) => enumOptions(t, name, ENUMS[name]);
@@ -107,6 +110,127 @@ export function diagramConfig(t) {
       { key: 'url', label: 'sa.url', render: (r) => (r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer">{t('common.open')}</a> : '—') },
     ],
     filters: [{ name: 'type', label: 'project.type', options: opts(t, 'diagramType') }],
+  };
+}
+
+/// ---------- Visão de Sistema ----------
+export function stakeholderConfig() {
+  return {
+    singular: 'sv.stakeholder',
+    fields: [
+      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpP', col: 'col-md-3' },
+      { name: 'name', label: 'sv.stakeholderName', required: true, maxLength: 200, col: 'col-md-5' },
+      { name: 'role', label: 'sv.role', maxLength: 200, col: 'col-md-4' },
+      { name: 'interest', label: 'sv.interest', type: 'textarea', maxLength: 5000, rows: 2 },
+      { name: 'responsibility', label: 'sv.responsibility', type: 'textarea', maxLength: 5000, rows: 2 },
+    ],
+    columns: [
+      { key: 'code', label: 'sa.code' },
+      { key: 'name', label: 'sv.stakeholderName' },
+      { key: 'role', label: 'sv.role' },
+      { key: 'interest', label: 'sv.interest', render: (r) => <span className="kt-prewrap small">{r.interest ?? '—'}</span> },
+    ],
+  };
+}
+
+export function glossaryConfig() {
+  return {
+    singular: 'sv.term',
+    fields: [
+      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpC', col: 'col-md-3' },
+      { name: 'term', label: 'sv.term', required: true, maxLength: 200, col: 'col-md-9' },
+      { name: 'definition', label: 'sv.definition', type: 'textarea', required: true, maxLength: 5000, rows: 3 },
+      { name: 'synonyms', label: 'sv.synonyms', maxLength: 2000, col: 'col-md-6' },
+      { name: 'relationships', label: 'sv.relationships', maxLength: 2000, col: 'col-md-6' },
+    ],
+    columns: [
+      { key: 'code', label: 'sa.code' },
+      { key: 'term', label: 'sv.term' },
+      { key: 'definition', label: 'sv.definition', render: (r) => <span className="kt-prewrap small">{r.definition}</span> },
+      { key: 'synonyms', label: 'sv.synonyms' },
+    ],
+    nameOf: (r) => r.term,
+  };
+}
+
+// Caso de uso no modelo de Guedes (UML 2, tab. 3.1) / aba "Casos de Uso" da planilha de análise
+export function ucFormConfig(t, { requirements = [], useCases = [] } = {}) {
+  const reqCode = Object.fromEntries(requirements.map((r) => [r.id, r.code]));
+  return {
+    singular: 'sv.useCase',
+    fields: [
+      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpUC', col: 'col-md-3' },
+      { name: 'name', label: 'sv.useCaseName', required: true, maxLength: 200, help: 'sv.useCaseNameHelp', col: 'col-md-9' },
+      { name: 'primaryActor', label: 'sv.primaryActor', required: true, maxLength: 200, col: 'col-md-6' },
+      { name: 'generalUseCaseId', label: 'sv.generalUseCase', type: 'select', col: 'col-md-6',
+        options: useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` })) },
+      { name: 'secondaryActors', label: 'sv.secondaryActors', type: 'textarea', rows: 2, maxLength: 2000, help: 'sv.onePerLine' },
+      { name: 'summary', label: 'sv.summary', type: 'textarea', rows: 2, maxLength: 5000 },
+      { name: 'preconditions', label: 'sv.preconditions', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.onePerLine', col: 'col-md-6' },
+      { name: 'postconditions', label: 'sv.postconditions', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.onePerLine', col: 'col-md-6' },
+      { name: 'restrictions', label: 'sv.restrictions', type: 'textarea', rows: 3, maxLength: 10000, help: 'sv.onePerLine' },
+      { name: 'requirementIds', label: 'sv.requirements', type: 'multicheck', emptyText: 'sv.noRequirements',
+        options: requirements.filter((r) => r.type !== 'non_functional').map((r) => ({ value: r.id, label: `${r.code} — ${r.title}` })) },
+      { name: 'priority', label: 'sa.priority', type: 'select', options: opts(t, 'priority'), col: 'col-md-6' },
+      { name: 'status', label: 'common.status', type: 'select', required: true, options: opts(t, 'useCaseStatus'), default: 'draft', col: 'col-md-6' },
+    ],
+    columns: [
+      { key: 'code', label: 'sa.code' },
+      { key: 'name', label: 'sv.useCaseName' },
+      { key: 'primaryActor', label: 'sv.primaryActor' },
+      { key: 'requirementIds', label: 'sv.requirements',
+        render: (r) => (r.requirementIds ?? []).map((id) => reqCode[id]).filter(Boolean).join(', ') || '—' },
+      { key: 'status', label: 'common.status',
+        render: (r) => badge(t(`enums.useCaseStatus.${r.status}`), r.status === 'approved' ? 'text-bg-success' : undefined) },
+    ],
+    nameOf: (r) => `${r.code} — ${r.name}`,
+  };
+}
+
+export function relationConfig(t, useCases = []) {
+  const options = useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` }));
+  const name = Object.fromEntries(useCases.map((u) => [u.id, `${u.code} — ${u.name}`]));
+  return {
+    singular: 'sv.relation',
+    fields: [
+      { name: 'fromUseCaseId', label: 'sv.relationFrom', type: 'select', required: true, options, col: 'col-md-5' },
+      { name: 'type', label: 'project.type', type: 'select', required: true, options: opts(t, 'relationType'), default: 'include', col: 'col-md-2' },
+      { name: 'toUseCaseId', label: 'sv.relationTo', type: 'select', required: true, options, col: 'col-md-5' },
+      { name: 'extensionPoint', label: 'sv.extensionPoint', maxLength: 200, col: 'col-md-6' },
+      { name: 'condition', label: 'sv.condition', maxLength: 2000, col: 'col-md-6' },
+    ],
+    columns: [
+      { key: 'fromUseCaseId', label: 'sv.relationFrom', render: (r) => name[r.fromUseCaseId] ?? '—' },
+      { key: 'type', label: 'project.type', render: (r) => <code>«{r.type}»</code> },
+      { key: 'toUseCaseId', label: 'sv.relationTo', render: (r) => name[r.toUseCaseId] ?? '—' },
+      { key: 'condition', label: 'sv.condition', render: (r) => r.condition ?? '—' },
+    ],
+    nameOf: (r) => `${name[r.fromUseCaseId] ?? ''} «${r.type}»`,
+  };
+}
+
+export function scenarioConfig(t, { stories = [], useCases = [] } = {}) {
+  const storyName = Object.fromEntries(stories.map((s) => [s.id, s.code]));
+  return {
+    singular: 'sv.scenario',
+    fields: [
+      { name: 'title', label: 'sa.title', required: true, maxLength: 200, col: 'col-md-8' },
+      { name: 'tags', label: 'sv.tags', maxLength: 200, help: 'sv.tagsHelp', col: 'col-md-4' },
+      { name: 'userStoryId', label: 'sv.feature', type: 'select', col: 'col-md-6',
+        options: stories.map((s) => ({ value: s.id, label: `${s.code} — ${s.title}` })) },
+      { name: 'useCaseId', label: 'sv.useCase', type: 'select', col: 'col-md-6',
+        options: useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` })) },
+      { name: 'given', label: 'sv.given', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.stepsHelp' },
+      { name: 'when', label: 'sv.when', type: 'textarea', rows: 2, maxLength: 5000 },
+      { name: 'then', label: 'sv.then', type: 'textarea', rows: 2, maxLength: 5000 },
+      { name: 'examples', label: 'sv.examples', type: 'code', rows: 3, maxLength: 5000, help: 'sv.examplesHelp' },
+    ],
+    columns: [
+      { key: 'title', label: 'sa.title' },
+      { key: 'userStoryId', label: 'sv.feature', render: (r) => storyName[r.userStoryId] ?? '—' },
+      { key: 'tags', label: 'sv.tags', render: (r) => (r.tags ? <code className="small">{r.tags}</code> : '—') },
+    ],
+    filters: [{ name: 'userStoryId', label: 'sv.feature', options: stories.map((s) => ({ value: s.id, label: s.code })) }],
   };
 }
 

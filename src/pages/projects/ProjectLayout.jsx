@@ -16,6 +16,7 @@ const TABS = {
     ['requirements', 'requirements', 'list-check'],
     ['user-stories', 'userStories', 'person-lines-fill'],
     ['diagrams', 'diagrams', 'diagram-3'],
+    ['system-view', 'systemView', 'diagram-2'],
     ['kanban', 'kanban', 'kanban'],
     ['report', 'report', 'file-earmark-pdf'],
   ],

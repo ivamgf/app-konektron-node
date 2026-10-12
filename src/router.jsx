@@ -10,6 +10,7 @@ import {
   DmDatasetDetail, DmDatasets, DmModelDetail, DmModels, DmObjectives, DmOverview, DmPhases, DmPreparation, DmReport,
 } from './pages/projects/CrispDm.jsx';
 import Kanban from './pages/projects/Kanban.jsx';
+import { SvBdd, SvDocument, SvLayout, SvOverview, SvSpec, SvUseCaseDetail, SvUseCases } from './pages/projects/SystemView.jsx';
 import ProjectLayout, { useProject } from './pages/projects/ProjectLayout.jsx';
 import { SaAnalysis, SaDiagrams, SaOverview, SaReport, SaRequirements, SaUserStories } from './pages/projects/SystemAnalysis.jsx';
 import { About, Contacts, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
@@ -82,6 +83,26 @@ export const routes = [
                     children: [
                       { index: true, element: <DmModels /> },
                       { id: 'model', path: ':modelId', element: <DmModelDetail />, handle: crumb('dm.modelName') },
+                    ],
+                  },
+                  // Visão de Sistema (software; extensão da Análise de Sistemas)
+                  {
+                    path: 'system-view',
+                    element: <SvLayout />,
+                    handle: crumb('project.tabs.systemView'),
+                    children: [
+                      { index: true, element: <SvOverview /> },
+                      { path: 'spec', element: <SvSpec />, handle: crumb('sv.nav.spec') },
+                      {
+                        path: 'use-cases',
+                        handle: crumb('sv.nav.useCases'),
+                        children: [
+                          { index: true, element: <SvUseCases /> },
+                          { id: 'useCase', path: ':useCaseId', element: <SvUseCaseDetail />, handle: crumb('sv.useCase') },
+                        ],
+                      },
+                      { path: 'bdd', element: <SvBdd />, handle: crumb('sv.nav.bdd') },
+                      { path: 'document', element: <SvDocument />, handle: crumb('sv.nav.document') },
                     ],
                   },
                   // Kanban (qualquer tipo de projeto)

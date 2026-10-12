@@ -13,9 +13,9 @@ export const PLAN_SECTIONS = {
   standard: ['system-analysis', 'system-view', 'bpm', 'crisp-dm', 'kanban'],
   master: SECTION_KEYS,
 };
-export const IMPLEMENTED = ['system-analysis', 'crisp-dm', 'kanban'];
+export const IMPLEMENTED = ['system-analysis', 'system-view', 'crisp-dm', 'kanban'];
 // Tipo de projeto exigido; ausente = qualquer tipo (Kanban)
-export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'crisp-dm': 'data_analysis' };
+export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'system-view': 'software', 'crisp-dm': 'data_analysis' };
 export const SECTION_ICONS = {
   'system-analysis': 'diagram-3',
   'system-view': 'window-stack',

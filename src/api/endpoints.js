@@ -45,6 +45,18 @@ export const crispdmApi = {
   updatePhase: (pid, phase, body) => api.patch(`/projects/${pid}/crisp-dm/phases/${phase}`, body),
 };
 
+// Visão de Sistema (projetos software, planos Standard/Master)
+export const systemViewApi = {
+  overview: (pid) => api.get(`/projects/${pid}/system-view`),
+  report: (pid) => api.get(`/projects/${pid}/system-view/report`),
+  features: (pid, lang) => api.get(`/projects/${pid}/system-view/features`, { lang }),
+  spec: (pid) => api.get(`/projects/${pid}/system-view/spec`),
+  updateSpec: (pid, body) => api.patch(`/projects/${pid}/system-view/spec`, body),
+  useCase: (pid, id) => api.get(`/projects/${pid}/system-view/use-cases/${id}`),
+  generateScenarios: (pid, id, lang, userStoryId) =>
+    api.post(`/projects/${pid}/system-view/use-cases/${id}/scenarios?lang=${encodeURIComponent(lang)}`, { userStoryId }),
+};
+
 // Kanban (qualquer tipo de projeto). Os movimentos devolvem o quadro atualizado.
 export const kanbanApi = {
   board: (pid) => api.get(`/projects/${pid}/kanban`),
