@@ -305,7 +305,7 @@ export default {
     technique: { classification: 'Classificação', regression: 'Regressão', clustering: 'Agrupamento', association: 'Associação', time_series: 'Séries temporais', anomaly_detection: 'Detecção de anomalias', nlp: 'PLN', computer_vision: 'Visão computacional', other: 'Outra' },
     modelStatus: { candidate: 'Candidato', approved: 'Aprovado', rejected: 'Rejeitado', deployed: 'Implantado' },
     split: { train: 'Treino', validation: 'Validação', test: 'Teste', cross_validation: 'Validação cruzada' },
-    locale: { en: 'English', 'pt-BR': 'Português (Brasil)' },
+    locale: { en: 'English', 'pt-BR': 'Português (Brasil)', es: 'Español' },
   },
   profile: {
     title: 'Perfil',

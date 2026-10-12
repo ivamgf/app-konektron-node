@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0 — 2026-10-12
+
+### Adicionado
+- Versão em espanhol (interface, Termos de Uso e tarefas do CRISP-DM).
+- Botão de idioma no cabeçalho (PT · EN · ES), em todas as páginas; o menu lateral e o perfil
+  também oferecem os três idiomas.
+
+### Alterado
+- Português (Brasil) é o idioma padrão, inclusive em navegadores configurados em outro idioma.
+  A escolha do usuário fica salva no navegador.
+
 ## 1.1.0 — 2026-10-12
 
 ### Adicionado

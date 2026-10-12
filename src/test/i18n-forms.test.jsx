@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { toFormValues, toPayload } from '../components/forms.jsx';
+import { TASK_LABELS } from '../content/crispdm.js';
+import { TERMS } from '../content/terms.js';
 import en from '../i18n/en.js';
-import { translate } from '../i18n/I18nProvider.jsx';
+import es from '../i18n/es.js';
+import { DEFAULT_LOCALE, LANGUAGES, LOCALES, translate } from '../i18n/I18nProvider.jsx';
 import ptBR from '../i18n/pt-BR.js';
 
 // Todas as chaves de um objeto de mensagens, em notação a.b.c
@@ -9,14 +12,29 @@ const keys = (obj, prefix = '') =>
   Object.entries(obj).flatMap(([k, v]) => (typeof v === 'object' ? keys(v, `${prefix}${k}.`) : [`${prefix}${k}`]));
 
 describe('i18n', () => {
-  it('pt-BR e en têm as mesmas chaves', () => {
-    expect(keys(ptBR).sort()).toEqual(keys(en).sort());
+  it('pt-BR, en e es têm as mesmas chaves', () => {
+    expect(keys(en).sort()).toEqual(keys(ptBR).sort());
+    expect(keys(es).sort()).toEqual(keys(ptBR).sort());
   });
 
-  it('interpola variáveis e cai para o inglês ou para a chave', () => {
+  it('português é o padrão; o seletor oferece os três idiomas', () => {
+    expect(DEFAULT_LOCALE).toBe('pt-BR');
+    expect(LANGUAGES.map((l) => l.code)).toEqual(Object.keys(LOCALES));
+    expect(LANGUAGES[0].code).toBe('pt-BR');
+  });
+
+  it('interpola variáveis e cai para o português ou para a chave', () => {
     expect(translate('pt-BR', 'dashboard.hello', { name: 'Ana' })).toBe('Olá, Ana!');
-    expect(translate('xx', 'nav.home')).toBe('Home');
+    expect(translate('es', 'dashboard.hello', { name: 'Ana' })).toBe('¡Hola, Ana!');
+    expect(translate('xx', 'nav.home')).toBe('Início');
     expect(translate('en', 'chave.inexistente')).toBe('chave.inexistente');
+  });
+
+  it('conteúdos (termos e tarefas do CRISP-DM) existem nos três idiomas', () => {
+    for (const code of Object.keys(LOCALES)) {
+      expect(TERMS[code]).toHaveLength(TERMS['pt-BR'].length);
+      expect(Object.keys(TASK_LABELS[code]).sort()).toEqual(Object.keys(TASK_LABELS.en).sort());
+    }
   });
 });
 

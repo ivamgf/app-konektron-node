@@ -6,7 +6,7 @@ import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { ContentCard, Loading, Modal } from '../../components/ui.jsx';
-import { useI18n } from '../../i18n/I18nProvider.jsx';
+import { LANGUAGES, useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync, useSubmit } from '../../lib/hooks.js';
 import { addressConfig } from '../projects/resources.jsx';
 import { VerifyBanner } from './Dashboard.jsx';
@@ -29,7 +29,7 @@ function PersonalTab({ profile, onSaved }) {
     { name: 'avatarUrl', label: 'profile.avatarUrl', type: 'url', maxLength: 500, col: 'col-md-8' },
     {
       name: 'locale', label: 'profile.locale', type: 'select', required: true, col: 'col-md-4',
-      options: [{ value: 'en', label: t('enums.locale.en') }, { value: 'pt-BR', label: t('enums.locale.pt-BR') }],
+      options: LANGUAGES.map(({ code }) => ({ value: code, label: t(`enums.locale.${code}`) })),
     },
   ];
   const [values, setValues] = useState(() => toFormValues(fields, profile));

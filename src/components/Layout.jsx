@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useMatches, useNavigate } from 'react-router';
 import { session } from '../api/client.js';
 import { useAuth } from '../auth/AuthProvider.jsx';
-import { useI18n } from '../i18n/I18nProvider.jsx';
+import { LANGUAGES, useI18n } from '../i18n/I18nProvider.jsx';
 import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
 
@@ -129,7 +129,7 @@ function SideMenu({ open, onClose }) {
           </nav>
           <div className="kt-sidemenu-sep" />
           <div className="kt-lang d-flex justify-content-end align-items-center gap-2" role="group" aria-label={t('nav.language')}>
-            {['en', 'pt-BR'].map((code) => (
+            {LANGUAGES.map(({ code, short }) => (
               <button
                 key={code}
                 type="button"
@@ -137,8 +137,9 @@ function SideMenu({ open, onClose }) {
                 aria-pressed={locale === code}
                 onClick={() => setLocale(code)}
                 lang={code}
+                title={t(`enums.locale.${code}`)}
               >
-                {code === 'en' ? 'EN' : 'PT'}
+                {short}
               </button>
             ))}
           </div>
@@ -153,6 +154,71 @@ function SideMenu({ open, onClose }) {
       </aside>
       {open && <div className="offcanvas-backdrop fade show" onClick={onClose} />}
     </>
+  );
+}
+
+// Seletor de idioma do cabeçalho: botão com o idioma atual e lista com os três
+function LanguageMenu() {
+  const { t, locale, setLocale } = useI18n();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+  const current = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e) => !rootRef.current?.contains(e.target) && setOpen(false);
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      rootRef.current?.querySelector('.kt-lang-toggle')?.focus();
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    rootRef.current?.querySelector('[aria-checked="true"]')?.focus();
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="kt-lang-menu" ref={rootRef}>
+      <button
+        type="button"
+        className="kt-lang-toggle"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-label={`${t('nav.language')}: ${t(`enums.locale.${current.code}`)}`}
+        title={t('nav.language')}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <i className="bi bi-globe2" aria-hidden="true" />
+        <span>{current.short}</span>
+        <i className="bi bi-chevron-down small" aria-hidden="true" />
+      </button>
+      {open && (
+        <ul className="kt-lang-list" role="menu" aria-label={t('nav.language')}>
+          {LANGUAGES.map(({ code, short }) => (
+            <li key={code} role="none">
+              <button
+                type="button"
+                role="menuitemradio"
+                aria-checked={locale === code}
+                lang={code}
+                onClick={() => {
+                  setLocale(code);
+                  setOpen(false);
+                }}
+              >
+                <span className="kt-lang-short">{short}</span>
+                {t(`enums.locale.${code}`)}
+                {locale === code && <i className="bi bi-check2 ms-auto" aria-hidden="true" />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 
@@ -231,7 +297,8 @@ export default function Layout() {
               KoneKtron
             </Link>
             <div className="d-flex align-items-center gap-3">
-              {user && <span className="kt-header-user d-none d-sm-inline">{user.email}</span>}
+              {user && <span className="kt-header-user d-none d-md-inline">{user.email}</span>}
+              <LanguageMenu />
               <button
                 type="button"
                 className="kt-menu-toggle"

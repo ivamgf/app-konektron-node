@@ -250,7 +250,7 @@ export function Contacts() {
 export function Terms() {
   const { t, locale } = useI18n();
   const navigate = useNavigate();
-  const items = TERMS[locale] ?? TERMS.en;
+  const items = TERMS[locale] ?? TERMS['pt-BR'];
   const [open, setOpen] = useState(0);
   const baseId = useId();
   return (
