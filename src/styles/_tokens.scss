@@ -1,0 +1,71 @@
+// Design System KonekTron 1.0.0 — tokens (nomes do documento do DS)
+
+// 2. Brand colors
+$brand-color-primary-blue: #019bcd;
+$brand-color-secondary-orange: #fe7d05;
+$brand-color-neutral: #454d50;
+
+// Analogous colors
+$analogous-color-a: #0b39d9;
+$analogous-color-b: #0b74e3;
+$analogous-color-c: #019bcd;
+$analogous-color-d: #0be3e0;
+$analogous-color-e: #0bd99c;
+
+// Color palette
+$color-palette-1: #019bcd;
+$color-palette-2: #22d6d5;
+$color-palette-3: #32edb8;
+$color-palette-4: #22d672;
+$color-palette-5: #28f74a;
+
+// 1. Colors Bootstrap
+$color-bootstrap-primary: #0d6efd;
+$color-bootstrap-secondary: #6c757d;
+$color-bootstrap-success: #198754;
+$color-bootstrap-info: #0dcaf0;
+$color-bootstrap-warning: #ffc107;
+$color-bootstrap-danger: #dc3545;
+$color-bootstrap-light: #f8f9fa;
+$color-bootstrap-dark: #212529;
+
+// Grey scale
+$color-grey-11: #1c1c1c;
+$color-grey-21: #363636;
+$color-grey-31: #4f4f4f;
+$color-dimgray: #696969;
+$color-gray: #808080;
+$color-darkgray: #a9a9a9;
+$color-silver: #c0c0c0;
+$color-lightgrey: #d3d3d3;
+$color-gainsboro: #dcdcdc;
+
+$base-color-black: #000;
+$base-color-white: #fff;
+
+// 3. Typography
+$font-sans: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-other: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+$font-mono: 'Roboto Mono', ui-monospace, 'Cascadia Code', monospace;
+
+// [tamanho, altura de linha, peso, espaçamento]
+$type-display: (
+  huge: (42px, 48px, 800, -0.3px),
+  large: (36px, 42px, 800, -0.3px),
+  small: (32px, 36px, 800, -0.3px),
+  tiny: (24px, 32px, 800, -0.3px),
+);
+$type-heading: (
+  1: (24px, 30px),
+  2: (20px, 28px),
+  3: (18px, 26px),
+  4: (16px, 24px),
+  5: (14px, 20px),
+  6: (12px, 18px),
+);
+$type-paragraph: (
+  large: (18px, 26px),
+  default: (16px, 24px),
+  small: (14px, 22px),
+  tiny: (12px, 18px),
+);
