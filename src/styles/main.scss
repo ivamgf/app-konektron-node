@@ -1,0 +1,599 @@
+@import 'tokens';
+
+// ---------- Bootstrap com os tokens do DS ----------
+$primary: $brand-color-primary-blue;
+$secondary: $color-bootstrap-secondary;
+$success: $color-bootstrap-success;
+$info: $color-bootstrap-info;
+$warning: $color-bootstrap-warning;
+$danger: $color-bootstrap-danger;
+$light: $color-bootstrap-light;
+$dark: $color-bootstrap-dark;
+$custom-theme-colors: (
+  'accent': $brand-color-secondary-orange,
+  'neutral': $brand-color-neutral,
+);
+
+// Texto de link: análoga B (contraste 4,7:1 no branco); o azul da marca fica para fundos
+$link-color: $analogous-color-b;
+$font-family-sans-serif: $font-other;
+$font-family-monospace: $font-mono;
+$headings-font-family: $font-sans;
+$headings-font-weight: 700;
+$h1-font-size: 1.5rem;
+$h2-font-size: 1.25rem;
+$h3-font-size: 1.125rem;
+$h4-font-size: 1rem;
+$h5-font-size: 0.875rem;
+$h6-font-size: 0.75rem;
+$border-radius: 0.25rem;
+$border-radius-lg: 0.375rem;
+$input-btn-focus-color: rgba($brand-color-primary-blue, 0.35);
+$breadcrumb-divider: quote('/');
+$breadcrumb-margin-bottom: 0;
+$enable-shadows: false;
+
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+$theme-colors: map-merge($theme-colors, $custom-theme-colors);
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/images';
+@import 'bootstrap/scss/containers';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/forms';
+@import 'bootstrap/scss/buttons';
+@import 'bootstrap/scss/transitions';
+@import 'bootstrap/scss/dropdown';
+@import 'bootstrap/scss/button-group';
+@import 'bootstrap/scss/nav';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/accordion';
+@import 'bootstrap/scss/breadcrumb';
+@import 'bootstrap/scss/pagination';
+@import 'bootstrap/scss/badge';
+@import 'bootstrap/scss/alert';
+@import 'bootstrap/scss/progress';
+@import 'bootstrap/scss/list-group';
+@import 'bootstrap/scss/close';
+@import 'bootstrap/scss/toasts';
+@import 'bootstrap/scss/modal';
+@import 'bootstrap/scss/offcanvas';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/helpers';
+@import 'bootstrap/scss/utilities/api';
+
+// Botões da marca com texto branco, como no protótipo
+.btn-primary {
+  @include button-variant(
+    $brand-color-primary-blue,
+    $brand-color-primary-blue,
+    $color: $white,
+    $hover-color: $white,
+    $active-color: $white,
+    $disabled-color: $white
+  );
+}
+.btn-accent {
+  @include button-variant(
+    $brand-color-secondary-orange,
+    $brand-color-secondary-orange,
+    $color: $white,
+    $hover-color: $white,
+    $active-color: $white
+  );
+}
+
+// ---------- Tipografia do DS ----------
+@each $name, $v in $type-display {
+  .display-#{$name} {
+    font-family: $font-sans;
+    font-size: nth($v, 1);
+    line-height: nth($v, 2);
+    font-weight: nth($v, 3);
+    letter-spacing: nth($v, 4);
+  }
+}
+@each $level, $v in $type-heading {
+  h#{$level},
+  .h#{$level} {
+    line-height: nth($v, 2);
+    letter-spacing: -0.2px;
+  }
+}
+@each $name, $v in $type-paragraph {
+  .text-#{$name} {
+    font-size: nth($v, 1);
+    line-height: nth($v, 2);
+  }
+}
+.ds-label {
+  font-family: $font-sans;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.ds-caption {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+// ---------- Estrutura da página ----------
+html,
+body,
+#root {
+  height: 100%;
+}
+.kt-app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.kt-main {
+  flex: 1 0 auto;
+  padding-bottom: 3.5rem;
+}
+// âncoras (ex.: /phases#evaluation) não ficam escondidas sob o cabeçalho fixo
+[id] {
+  scroll-margin-top: 75px;
+}
+
+.kt-header {
+  background: $brand-color-primary-blue;
+  color: $white;
+  height: 59px;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+
+  .kt-brand {
+    color: $white;
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+  .kt-header-user {
+    font-size: 0.875rem;
+    color: rgba($white, 0.9);
+  }
+  .kt-menu-toggle {
+    background: none;
+    border: 0;
+    color: $white;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0.125rem 0.25rem;
+  }
+}
+
+.kt-breadcrumbs {
+  padding: 0.75rem 1rem 0.5rem;
+  font-size: 0.9375rem;
+  .breadcrumb-item a {
+    text-decoration: underline;
+  }
+  .breadcrumb-item.active {
+    color: $color-dimgray;
+    text-decoration: underline;
+  }
+}
+
+// Menu lateral laranja (offcanvas do protótipo)
+.kt-sidemenu {
+  --bs-offcanvas-width: 253px;
+  --bs-offcanvas-bg: #{$brand-color-secondary-orange};
+  --bs-offcanvas-color: #{$white};
+  .offcanvas-header {
+    border-bottom: 1px solid rgba($white, 0.8);
+    margin: 0 1.25rem;
+    padding: 1rem 0 0.75rem;
+  }
+  .offcanvas-title {
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+  .btn-close {
+    filter: invert(1) grayscale(1) brightness(2);
+    opacity: 1;
+  }
+  .kt-sidemenu-nav a,
+  .kt-sidemenu-nav button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.4rem 0;
+    color: $white;
+    background: none;
+    border: 0;
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1.375rem;
+    text-decoration: none;
+    &:hover,
+    &:focus-visible,
+    &.active {
+      text-decoration: underline;
+    }
+    .bi {
+      font-size: 1.375rem;
+      width: 1.75rem;
+      text-align: center;
+    }
+  }
+  .kt-sidemenu-sep {
+    border-top: 1px solid rgba($white, 0.8);
+    margin: 0.75rem 0;
+  }
+  .kt-lang button {
+    color: $white;
+    border-color: rgba($white, 0.8);
+    &.active {
+      background: $white;
+      color: $brand-color-secondary-orange;
+    }
+  }
+}
+
+.kt-footer {
+  background: $brand-color-primary-blue;
+  color: $white;
+  padding: 2rem 1rem;
+  font-size: 1rem;
+  a {
+    color: $white;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  .kt-footer-divider {
+    border-left: 1px solid rgba($white, 0.7);
+    align-self: stretch;
+  }
+  .kt-footer-logo {
+    text-align: center;
+    img,
+    svg {
+      width: 80px;
+      height: 80px;
+      display: block;
+      margin: 0 auto 0.5rem;
+    }
+  }
+  .kt-credits {
+    font-style: italic;
+  }
+}
+
+// ---------- Componentes do protótipo ----------
+.kt-panel {
+  max-width: 650px;
+  margin: 0.5rem auto 0;
+  background: $white;
+  box-shadow: 0 3px 4px rgba($black, 0.25);
+  &.kt-panel-wide {
+    max-width: 1130px;
+  }
+  .kt-panel-header {
+    background: $brand-color-secondary-orange;
+    color: $white;
+    text-align: center;
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    padding: 0.875rem 1rem;
+    margin: 0;
+  }
+  .kt-panel-body {
+    padding: 1rem 2rem 2.5rem;
+  }
+  .kt-form {
+    max-width: 465px;
+    margin: 0 auto;
+  }
+  .kt-form-title {
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin: 1.5rem 0;
+  }
+}
+
+.kt-field-label {
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 1.375rem;
+  color: $black;
+  margin-bottom: 0.5rem;
+}
+.kt-input-icon {
+  .input-group-text {
+    background: $brand-color-primary-blue;
+    border-color: $brand-color-primary-blue;
+    color: $white;
+    min-width: 2.5rem;
+    justify-content: center;
+  }
+}
+.kt-auth-links {
+  font-size: 1.25rem;
+  letter-spacing: 0.3px;
+  // protótipo: links das telas de autenticação sem sublinhado (aparece no foco/hover)
+  a,
+  .btn-link {
+    text-decoration: none;
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+}
+
+.kt-mark {
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(1px 3px 2px rgba($black, 0.25));
+}
+
+// Cartão de conteúdo azul (About / Contacts / áreas logadas)
+.kt-card {
+  border: 0;
+  border-radius: 0;
+  box-shadow: 0 3px 4px rgba($black, 0.25);
+  margin-bottom: 2rem;
+  > .card-header {
+    background: $brand-color-primary-blue;
+    color: $white;
+    border-radius: 0;
+    border: 0;
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    .btn {
+      white-space: nowrap;
+    }
+    @include media-breakpoint-down(sm) {
+      padding: 1rem 1.25rem;
+      h1,
+      h2 {
+        font-size: 1.25rem;
+      }
+    }
+    h2,
+    h1 {
+      color: $white;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    .bi {
+      font-size: 2rem;
+    }
+  }
+  > .card-body {
+    padding: 1.75rem 2.25rem;
+    @include media-breakpoint-down(sm) {
+      padding: 1.25rem 1rem;
+    }
+  }
+  > .card-footer {
+    background: $brand-color-primary-blue;
+    color: $white;
+    border: 0;
+    border-radius: 0;
+    padding: 1.25rem 1.75rem;
+  }
+}
+
+.kt-hero {
+  background: linear-gradient(115deg, $brand-color-primary-blue 0 62%, #fff 62% 100%);
+  color: $white;
+  @include media-breakpoint-down(md) {
+    background: $brand-color-primary-blue;
+  }
+}
+.kt-wave {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 70px;
+  color: $brand-color-secondary-orange;
+}
+
+// Toasts no topo, sobre o cabeçalho (protótipo)
+.kt-toasts {
+  position: fixed;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(650px, calc(100% - 2rem));
+  z-index: 1090;
+  .toast {
+    width: 100%;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 6px rgba($black, 0.15);
+    font-size: 1rem;
+  }
+  .kt-toast-error {
+    background: #f6d8de;
+    color: #842029;
+    .bi {
+      color: $danger;
+    }
+  }
+  .kt-toast-success {
+    background: #d7f1f8;
+    color: #0b4f5c;
+    .bi {
+      color: $success;
+    }
+  }
+}
+
+.kt-loading {
+  text-align: center;
+  padding: 4rem 0;
+  .kt-loading-label {
+    font-family: $font-sans;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+  }
+  .kt-spinner {
+    width: 120px;
+    height: 120px;
+    border: 12px solid #f39b47;
+    border-right-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    animation: kt-spin 0.9s linear infinite;
+  }
+  &.kt-loading-sm {
+    padding: 1.5rem 0;
+    .kt-spinner {
+      width: 36px;
+      height: 36px;
+      border-width: 4px;
+    }
+    .kt-loading-label {
+      margin-bottom: 0.75rem;
+    }
+  }
+}
+@keyframes kt-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kt-loading .kt-spinner {
+    animation-duration: 3s;
+  }
+}
+
+// Acordeão dos Termos (cabeçalhos azuis)
+.kt-terms {
+  .accordion-item {
+    border: 0;
+    margin-bottom: 1px;
+  }
+  .accordion-button {
+    background: $brand-color-primary-blue;
+    color: $white;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    &::after {
+      filter: brightness(0) invert(1);
+      position: absolute;
+      right: 1.5rem;
+    }
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba($brand-color-secondary-orange, 0.6);
+    }
+  }
+}
+
+.kt-stat {
+  border-left: 4px solid $brand-color-primary-blue;
+  .kt-stat-value {
+    font-family: $font-sans;
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+}
+
+.kt-section-card {
+  height: 100%;
+  border-top: 4px solid $color-lightgrey;
+  &.is-available {
+    border-top-color: $brand-color-primary-blue;
+  }
+}
+
+.kt-progress {
+  height: 0.75rem;
+  .progress-bar {
+    background: $brand-color-secondary-orange;
+  }
+}
+
+.kt-table-actions {
+  white-space: nowrap;
+  width: 1%;
+}
+.kt-pre {
+  white-space: pre-wrap;
+  font-family: $font-mono;
+  font-size: 0.8125rem;
+  background: $color-bootstrap-light;
+  border: 1px solid $color-gainsboro;
+  padding: 0.75rem;
+  margin: 0;
+  max-height: 22rem;
+  overflow: auto;
+}
+.kt-prewrap {
+  white-space: pre-wrap;
+}
+
+.kt-tabs {
+  .nav-link {
+    color: $brand-color-neutral;
+    font-weight: 500;
+    &.active {
+      color: $analogous-color-b;
+      border-bottom: 3px solid $brand-color-secondary-orange;
+    }
+  }
+}
+
+.visually-hidden-focusable:focus {
+  position: fixed !important;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 2000;
+  background: $white;
+  padding: 0.5rem 1rem;
+}
+
+// ---------- Relatórios (impressão / PDF) ----------
+.kt-report {
+  h2 {
+    margin-top: 2rem;
+    border-bottom: 2px solid $brand-color-secondary-orange;
+    padding-bottom: 0.25rem;
+  }
+}
+@media print {
+  .kt-header,
+  .kt-footer,
+  .kt-breadcrumbs,
+  .kt-no-print,
+  .kt-toasts {
+    display: none !important;
+  }
+  .kt-main {
+    padding: 0;
+  }
+  .kt-report {
+    font-size: 11pt;
+  }
+  a[href]::after {
+    content: none;
+  }
+}
