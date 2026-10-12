@@ -2,7 +2,7 @@
 // (Planilha de Análise / ISO 29148, casos de uso como em Guedes, UML 2, tab. 3.1) e em BDD (Gherkin).
 import { useMemo, useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate, useOutletContext, useParams } from 'react-router';
-import { resourceApi, systemAnalysisApi, systemViewApi } from '../../api/endpoints.js';
+import { projectsApi, resourceApi, systemAnalysisApi, systemViewApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { enumOptions, FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
@@ -38,6 +38,8 @@ function Layout() {
   const context = useOutletContext();
   const allowed = useCanAccess();
   const { project } = context;
+  const [importing, setImporting] = useState(false);
+  const [version, setVersion] = useState(0); // remonta a subtela depois de importar
   if (!allowed) {
     return (
       <div className="kt-sv-locked text-center py-4">
@@ -50,8 +52,8 @@ function Layout() {
   }
   return (
     <>
-      <nav aria-label={t('sections.system-view.name')}>
-        <ul className="nav nav-pills kt-sv-nav mb-4">
+      <nav aria-label={t('sections.system-view.name')} className="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+        <ul className="nav nav-pills kt-sv-nav">
           {SUBNAV.map(([path, key, icon]) => (
             <li className="nav-item" key={key}>
               <NavLink to={path ? `${base(project)}/${path}` : base(project)} end={!path}
@@ -61,9 +63,132 @@ function Layout() {
             </li>
           ))}
         </ul>
+        <button type="button" className="btn btn-sm btn-accent kt-no-print" onClick={() => setImporting(true)}>
+          <i className="bi bi-box-arrow-in-down me-1" aria-hidden="true" />{t('sv.import.button')}
+        </button>
       </nav>
-      <Outlet context={context} />
+      <Outlet key={version} context={context} />
+      {importing && (
+        <ImportModal project={project} onClose={() => setImporting(false)}
+          onDone={() => { setImporting(false); setVersion((v) => v + 1); }} />
+      )}
     </>
+  );
+}
+
+// ---------- Importar da Análise de Sistemas ----------
+const IMPORT_PARTS = [
+  ['analysis', true], ['requirements', true], ['userStories', true], ['diagrams', true], ['systemView', true],
+  ['generateUseCases', false], ['generateStakeholders', false],
+]; // [chave, só faz sentido vindo de outro projeto]
+
+function ImportSummary({ result }) {
+  const { t } = useI18n();
+  const rows = [
+    ['requirements', result.requirements], ['userStories', result.userStories], ['diagrams', result.diagrams],
+    ['stakeholders', result.stakeholders], ['glossary', result.glossary], ['useCases', result.useCases],
+    ['relations', result.relations], ['scenarios', result.scenarios],
+  ].filter(([, c]) => c.created || c.skipped);
+  const generated = [...result.generatedUseCases, ...result.generatedStakeholders];
+  const fields = result.analysis + result.spec;
+  if (!rows.length && !generated.length && !fields && !result.flows) {
+    return <p className="mb-0 text-body-secondary">{t('sv.import.nothing')}</p>;
+  }
+  return (
+    <>
+      {rows.length > 0 && (
+        <table className="table table-sm mb-2">
+          <thead><tr><th scope="col">{t('sv.import.item')}</th><th scope="col" className="text-end">{t('sv.import.created')}</th><th scope="col" className="text-end">{t('sv.import.skipped')}</th></tr></thead>
+          <tbody>
+            {rows.map(([key, c]) => (
+              <tr key={key}><td>{t(`sv.import.items.${key}`)}</td><td className="text-end fw-semibold">{c.created}</td><td className="text-end text-body-secondary">{c.skipped}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {fields > 0 && <p className="small mb-1">{t('sv.import.fieldsFilled', { count: fields })}</p>}
+      {result.flows > 0 && <p className="small mb-1">{t('sv.import.flows', { count: result.flows })}</p>}
+      {result.generatedUseCases.length > 0 && <p className="small mb-1"><strong>{t('sv.import.generatedUseCases')}:</strong> {result.generatedUseCases.join(', ')}</p>}
+      {result.generatedStakeholders.length > 0 && <p className="small mb-0"><strong>{t('sv.import.generatedStakeholders')}:</strong> {result.generatedStakeholders.join(', ')}</p>}
+    </>
+  );
+}
+
+function ImportModal({ project, onClose, onDone }) {
+  const { t, locale } = useI18n();
+  const toast = useToast();
+  const projects = useAsync(() => projectsApi.list({ type: 'software', pageSize: 100 }), []);
+  const [sourceId, setSourceId] = useState(project.id);
+  const [parts, setParts] = useState(() => Object.fromEntries(IMPORT_PARTS.map(([k]) => [k, true])));
+  const [preview, setPreview] = useState(null);
+  const same = sourceId === project.id;
+  const body = (dryRun) => ({
+    sourceProjectId: sourceId, lang: locale, dryRun,
+    ...Object.fromEntries(IMPORT_PARTS.map(([k, otherOnly]) => [k, otherOnly && same ? false : parts[k]])),
+  });
+  const run = useSubmit((dryRun) => systemViewApi.importFrom(project.id, body(dryRun)), {
+    onSuccess: (result) => {
+      if (result.dryRun) return setPreview(result);
+      toast.success(t('sv.import.done'));
+      onDone(result);
+    },
+  });
+  const change = (fn) => {
+    fn();
+    setPreview(null); // qualquer mudança invalida a prévia
+  };
+  const options = (projects.data?.data ?? []).filter((p) => p.id !== project.id);
+
+  return (
+    <Modal title={t('sv.import.title')} onClose={onClose} size="modal-lg"
+      footer={
+        <>
+          <button type="button" className="btn btn-outline-secondary" onClick={onClose}>{t('common.cancel')}</button>
+          <button type="button" className="btn btn-outline-primary" disabled={run.busy} onClick={() => run.submit(true)}>
+            <i className="bi bi-eye me-1" aria-hidden="true" />{t('sv.import.preview')}
+          </button>
+          <button type="button" className="btn btn-primary" disabled={run.busy || !preview} onClick={() => run.submit(false)}
+            title={preview ? undefined : t('sv.import.previewFirst')}>
+            <i className="bi bi-box-arrow-in-down me-1" aria-hidden="true" />{run.busy ? t('common.saving') : t('sv.import.run')}
+          </button>
+        </>
+      }>
+      <p className="small text-body-secondary">{t('sv.import.intro')}</p>
+      <label className="form-label fw-semibold" htmlFor="kt-import-source">{t('sv.import.source')}</label>
+      <select id="kt-import-source" className="form-select mb-1" value={sourceId} onChange={(e) => change(() => setSourceId(e.target.value))}>
+        <option value={project.id}>{project.name} — {t('sv.import.thisProject')}</option>
+        {options.map((p) => <option key={p.id} value={p.id}>{p.name} · v{p.version}</option>)}
+      </select>
+      <p className="form-text mt-0 mb-3">{t(same ? 'sv.import.sameHelp' : 'sv.import.otherHelp')}</p>
+
+      <fieldset className="mb-3">
+        <legend className="form-label fw-semibold fs-6">{t('sv.import.parts')}</legend>
+        <div className="row">
+          {IMPORT_PARTS.map(([key, otherOnly]) => {
+            const disabled = otherOnly && same;
+            return (
+              <div className="col-md-6" key={key}>
+                <div className="form-check mb-2">
+                  <input className="form-check-input" type="checkbox" id={`kt-import-${key}`} disabled={disabled}
+                    checked={!disabled && parts[key]} onChange={(e) => change(() => setParts((p) => ({ ...p, [key]: e.target.checked })))} />
+                  <label className={`form-check-label ${disabled ? 'text-body-secondary' : ''}`} htmlFor={`kt-import-${key}`}>
+                    {t(`sv.import.partsLabels.${key}`)}
+                    <span className="d-block small text-body-secondary">{t(`sv.import.partsHelp.${key}`)}</span>
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      {preview && (
+        <section className="kt-import-preview" aria-live="polite">
+          <h3 className="h5">{t('sv.import.previewTitle', { name: preview.source.name })}</h3>
+          <ImportSummary result={preview} />
+        </section>
+      )}
+    </Modal>
   );
 }
 
@@ -104,7 +229,9 @@ function Overview() {
       </div>
 
       <h3 className="h3">{t('sv.traceability')}</h3>
-      {noGaps ? (
+      {counts.requirements === 0 && counts.userStories === 0 ? (
+        <p className="text-body-secondary"><i className="bi bi-lightbulb me-1" aria-hidden="true" />{t('sv.emptyHint')}</p>
+      ) : noGaps ? (
         <p className="text-success"><i className="bi bi-check-circle me-1" aria-hidden="true" />{t('sv.noGaps')}</p>
       ) : (
         <ul className="kt-sv-gaps mb-4">

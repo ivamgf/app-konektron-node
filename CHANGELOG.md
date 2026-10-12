@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0 — 2026-10-13
+
+### Adicionado
+- Botão **"Importar da Análise de Sistemas"** na Visão de Sistema: escolha o projeto de origem (este ou
+  outro projeto de software), marque o que trazer, veja a prévia (novos × já existentes, casos de uso e
+  stakeholders gerados) e importe. Projetos vazios sugerem a importação na visão geral.
+
 ## 1.3.0 — 2026-10-13
 
 ### Adicionado

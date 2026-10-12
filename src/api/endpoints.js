@@ -53,6 +53,7 @@ export const systemViewApi = {
   spec: (pid) => api.get(`/projects/${pid}/system-view/spec`),
   updateSpec: (pid, body) => api.patch(`/projects/${pid}/system-view/spec`, body),
   useCase: (pid, id) => api.get(`/projects/${pid}/system-view/use-cases/${id}`),
+  importFrom: (pid, body) => api.post(`/projects/${pid}/system-view/import`, body),
   generateScenarios: (pid, id, lang, userStoryId) =>
     api.post(`/projects/${pid}/system-view/use-cases/${id}/scenarios?lang=${encodeURIComponent(lang)}`, { userStoryId }),
 };
