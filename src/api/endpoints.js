@@ -45,6 +45,19 @@ export const crispdmApi = {
   updatePhase: (pid, phase, body) => api.patch(`/projects/${pid}/crisp-dm/phases/${phase}`, body),
 };
 
+// Kanban (qualquer tipo de projeto). Os movimentos devolvem o quadro atualizado.
+export const kanbanApi = {
+  board: (pid) => api.get(`/projects/${pid}/kanban`),
+  createColumn: (pid, body) => api.post(`/projects/${pid}/kanban/columns`, body),
+  updateColumn: (pid, id, body) => api.patch(`/projects/${pid}/kanban/columns/${id}`, body),
+  removeColumn: (pid, id) => api.del(`/projects/${pid}/kanban/columns/${id}`),
+  moveColumn: (pid, id, position) => api.post(`/projects/${pid}/kanban/columns/${id}/move`, { position }),
+  createCard: (pid, body) => api.post(`/projects/${pid}/kanban/cards`, body),
+  updateCard: (pid, id, body) => api.patch(`/projects/${pid}/kanban/cards/${id}`, body),
+  removeCard: (pid, id) => api.del(`/projects/${pid}/kanban/cards/${id}`),
+  moveCard: (pid, id, columnId, position) => api.post(`/projects/${pid}/kanban/cards/${id}/move`, { columnId, position }),
+};
+
 // CRUD genérico para os recursos que seguem o crudRouter da API
 export const resourceApi = (basePath) => ({
   list: (query) => api.get(basePath, query),

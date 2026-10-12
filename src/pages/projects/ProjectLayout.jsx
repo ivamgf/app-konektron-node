@@ -16,6 +16,7 @@ const TABS = {
     ['requirements', 'requirements', 'list-check'],
     ['user-stories', 'userStories', 'person-lines-fill'],
     ['diagrams', 'diagrams', 'diagram-3'],
+    ['kanban', 'kanban', 'kanban'],
     ['report', 'report', 'file-earmark-pdf'],
   ],
   data_analysis: [
@@ -25,6 +26,7 @@ const TABS = {
     ['datasets', 'datasets', 'table'],
     ['preparation', 'preparation', 'funnel'],
     ['models', 'models', 'cpu'],
+    ['kanban', 'kanban', 'kanban'],
     ['report', 'report', 'file-earmark-pdf'],
   ],
 };

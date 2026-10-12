@@ -4,21 +4,12 @@ import { useAuth } from '../../auth/AuthProvider.jsx';
 import { ContentCard, Loading } from '../../components/ui.jsx';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync } from '../../lib/hooks.js';
-import { SECTION_KEYS } from '../public/PublicPages.jsx';
+import { IMPLEMENTED, SECTION_ICONS as ICONS, SECTION_KEYS, SECTION_PROJECT_TYPE } from '../public/PublicPages.jsx';
 
-const ICONS = {
-  'system-analysis': 'diagram-3',
-  'system-view': 'window-stack',
-  ontologies: 'diagram-2',
-  bpm: 'bezier2',
-  'function-point': 'calculator',
-  commonkads: 'journal-richtext',
-  'crisp-dm': 'bar-chart-steps',
-};
 const STATIC = SECTION_KEYS.map((key) => ({
   key,
-  implemented: ['system-analysis', 'crisp-dm'].includes(key),
-  projectType: { 'system-analysis': 'software', 'crisp-dm': 'data_analysis' }[key] ?? null,
+  implemented: IMPLEMENTED.includes(key),
+  projectType: SECTION_PROJECT_TYPE[key] ?? null,
 }));
 
 function SectionGrid({ sections, authed }) {

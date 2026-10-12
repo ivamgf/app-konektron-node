@@ -398,11 +398,498 @@ body,
   }
 }
 
-.kt-hero {
-  background: linear-gradient(115deg, $brand-color-primary-blue 0 62%, #fff 62% 100%);
+// ---------- Home: faixas coloridas alternadas ----------
+$home-blue-dark: #016f93;
+$home-blue-deep: #015f80;
+$home-blue-night: #01405a;
+$home-ice: #d3eef8;
+$home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG AA)
+
+.kt-home {
+  margin-bottom: -3.5rem; // a última faixa encosta no rodapé
+  padding-bottom: 3.5rem;
+  background: #eaf6fb;
+
+  h3 {
+    font-family: $font-sans;
+  }
+}
+
+.kt-home-hero {
+  position: relative;
+  overflow: hidden;
   color: $white;
-  @include media-breakpoint-down(md) {
-    background: $brand-color-primary-blue;
+  background:
+    radial-gradient(circle at 85% 40%, rgba($brand-color-secondary-orange, 0.35), transparent 40%),
+    linear-gradient(135deg, $brand-color-primary-blue, $home-blue-dark);
+  // grade técnica sutil
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba($white, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba($white, 0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+}
+.kt-home-hero-shape {
+  position: absolute;
+  right: -6%;
+  top: -20%;
+  width: 46%;
+  height: 140%;
+  background: $brand-color-secondary-orange;
+  transform: skewX(-18deg);
+  opacity: 0.9;
+}
+.kt-home-eyebrow {
+  display: inline-block;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba($white, 0.15);
+  border: 1px solid rgba($white, 0.35);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+}
+.kt-home-title {
+  color: $white;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+}
+.kt-home-lead {
+  font-size: 1.125rem;
+  max-width: 560px;
+}
+.kt-home-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  > div {
+    border-left: 3px solid $brand-color-secondary-orange;
+    padding-left: 0.75rem;
+  }
+  dt {
+    font-family: $font-sans;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  dd {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+.kt-home-tile {
+  position: relative;
+  z-index: 1;
+  background: $white;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba($black, 0.25);
+  transform: rotate(-3deg);
+  animation: kt-float 6s ease-in-out infinite;
+  .kt-mark {
+    filter: none;
+  }
+}
+@keyframes kt-float {
+  50% {
+    transform: rotate(-3deg) translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kt-home-tile {
+    animation: none;
+  }
+}
+
+.kt-home-band {
+  padding: 3.5rem 0;
+}
+.kt-home-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+  &::before {
+    content: '';
+    width: 6px;
+    height: 1.6rem;
+    border-radius: 2px;
+    background: $brand-color-secondary-orange;
+  }
+}
+.kt-home-sub {
+  color: $brand-color-neutral;
+  margin-bottom: 1.75rem;
+}
+.kt-on-color {
+  color: $white;
+  .kt-home-heading {
+    color: $white;
+    &::before {
+      background: $white;
+    }
+  }
+  .kt-home-sub {
+    color: rgba($white, 0.88);
+  }
+}
+
+// Como funciona: faixa laranja com passos numerados
+.kt-home-steps {
+  background: linear-gradient(120deg, $home-orange-text-bg, #e8730a);
+  ol {
+    counter-reset: kt-step;
+  }
+}
+.kt-home-step {
+  position: relative;
+  height: 100%;
+  padding: 1.25rem 1.25rem 1.25rem 4.5rem;
+  border-radius: 0.5rem;
+  color: $body-color;
+  background: $white;
+  box-shadow: 0 8px 18px rgba($black, 0.15);
+  &::before {
+    counter-increment: kt-step;
+    content: counter(kt-step);
+    position: absolute;
+    left: 1.25rem;
+    top: 1.25rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: $brand-color-secondary-orange;
+    color: $white;
+    font-family: $font-sans;
+    font-weight: 900;
+    font-size: 1.25rem;
+    display: grid;
+    place-items: center;
+  }
+  h3 {
+    font-size: 1.0625rem;
+    margin-bottom: 0.25rem;
+  }
+  p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: $brand-color-neutral;
+  }
+}
+
+// Seções: faixa azul-clara; disponíveis em azul, futuras em laranja-claro
+.kt-home-sections {
+  background: $home-ice;
+}
+.kt-home-card {
+  position: relative;
+  display: block;
+  height: 100%;
+  padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  background: $white;
+  border: 1px solid #cfe6ef;
+  border-radius: 0.5rem;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: #ffd2a6;
+  }
+  h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.35rem;
+    padding-right: 5.5rem;
+  }
+  p {
+    font-size: 0.875rem;
+    color: $brand-color-neutral;
+    margin: 0;
+  }
+  .kt-home-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 0.5rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.35rem;
+    margin-bottom: 0.9rem;
+    background: #fff4e8;
+    color: #c25e00;
+  }
+  .kt-home-tag {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    background: #fff4e8;
+    color: #a34f00;
+    border: 1px solid #ffd2a6;
+  }
+  &.is-available {
+    background: linear-gradient(160deg, $white 55%, #f4fafd);
+    box-shadow: 0 6px 16px rgba($brand-color-primary-blue, 0.15);
+    &::before {
+      background: $brand-color-primary-blue;
+    }
+    .kt-home-icon {
+      background: $brand-color-primary-blue;
+      color: $white;
+    }
+    .kt-home-tag {
+      background: $home-blue-deep;
+      color: $white;
+      border-color: $home-blue-deep;
+    }
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 26px rgba($brand-color-primary-blue, 0.28);
+    }
+  }
+  .kt-home-more {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $analogous-color-b;
+  }
+}
+
+// Planos: faixa azul-escura com cartões; o recomendado em laranja
+.kt-home-plans {
+  background: linear-gradient(160deg, $home-blue-deep, $home-blue-night);
+}
+.kt-home-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: $body-color;
+  background: $white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 24px rgba($black, 0.25);
+  header {
+    padding: 1.25rem 1.5rem;
+    background: #f4fafd;
+    border-bottom: 1px solid #cfe6ef;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  h3 {
+    font-size: 1.375rem;
+    margin: 0;
+  }
+  small {
+    color: $brand-color-neutral;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+  }
+  li {
+    padding: 0.3rem 0;
+    font-size: 0.925rem;
+    .bi-check-circle-fill {
+      color: $brand-color-primary-blue;
+    }
+    &.is-off {
+      color: $color-dimgray;
+      .bi {
+        color: $color-darkgray;
+      }
+    }
+  }
+  footer {
+    padding: 0 1.5rem 1.5rem;
+  }
+  &.is-featured {
+    outline: 2px solid $brand-color-secondary-orange;
+    @include media-breakpoint-up(md) {
+      transform: translateY(-10px);
+    }
+    header {
+      background: $home-orange-text-bg;
+      border-color: $home-orange-text-bg;
+      color: $white;
+      small {
+        color: $white;
+      }
+    }
+  }
+}
+.kt-home-ribbon {
+  position: absolute;
+  top: -12px;
+  right: 1rem;
+  background: $color-bootstrap-dark;
+  color: $white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+.kt-home-note {
+  color: rgba($white, 0.85);
+  font-size: 0.875rem;
+}
+
+// Chamada final
+.kt-home-cta {
+  position: relative;
+  overflow: hidden;
+  color: $white;
+  border-radius: 0.75rem;
+  background: linear-gradient(110deg, $home-orange-text-bg 0 55%, $home-blue-dark 55%);
+  box-shadow: 0 12px 30px rgba($black, 0.18);
+  &::after {
+    content: '';
+    position: absolute;
+    right: -40px;
+    top: -40px;
+    width: 200px;
+    height: 200px;
+    border: 28px solid rgba($white, 0.15);
+    pointer-events: none;
+  }
+}
+
+// ---------- Kanban ----------
+.kt-kanban {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+}
+.kt-kb-col {
+  flex: 0 0 290px;
+  display: flex;
+  flex-direction: column;
+  max-height: 75vh;
+  background: #eaf6fb;
+  border: 1px solid #cfe6ef;
+  border-top: 4px solid $brand-color-primary-blue;
+  border-radius: 0.5rem;
+  &.is-over {
+    border-top-color: $danger;
+  }
+  &.is-target {
+    background: #dff1f9;
+  }
+}
+.kt-kb-col-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.5rem 0.4rem 0.85rem;
+  h3 {
+    min-width: 0;
+  }
+}
+.kt-kb-col-actions .btn,
+.kt-kb-arrows .btn {
+  padding: 0.1rem 0.3rem;
+  color: $brand-color-neutral;
+  &:hover {
+    color: $analogous-color-b;
+  }
+}
+.kt-kb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0.6rem;
+  overflow-y: auto;
+  min-height: 3rem;
+  flex: 1;
+}
+.kt-kb-card {
+  position: relative;
+  background: $white;
+  border: 1px solid $color-gainsboro;
+  border-left: 4px solid $color-lightgrey;
+  border-radius: 0.375rem;
+  padding: 0.6rem 0.6rem 0.35rem 0.75rem;
+  margin-bottom: 0.6rem;
+  box-shadow: 0 1px 2px rgba($black, 0.08);
+  cursor: grab;
+  &.is-low {
+    border-left-color: $color-silver;
+  }
+  &.is-medium {
+    border-left-color: $brand-color-primary-blue;
+  }
+  &.is-high {
+    border-left-color: $brand-color-secondary-orange;
+  }
+  &.is-urgent {
+    border-left-color: $danger;
+  }
+  &.is-dragging {
+    opacity: 0.45;
+  }
+}
+.kt-kb-card-title {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-weight: 600;
+  color: $body-color;
+  overflow-wrap: anywhere;
+  &:hover,
+  &:focus-visible {
+    color: $analogous-color-b;
+    text-decoration: underline;
+  }
+}
+.kt-kb-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+  margin-top: 0.4rem;
+  font-size: 0.8125rem;
+  color: $brand-color-neutral;
+}
+.kt-kb-arrows {
+  display: flex;
+  justify-content: flex-end;
+}
+.kt-kb-drop {
+  height: 0.35rem;
+  margin: -0.2rem 0 0.4rem;
+  border-radius: 999px;
+  background: $brand-color-secondary-orange;
+}
+.kt-kb-add {
+  margin: 0 0.6rem 0.6rem;
+  color: $analogous-color-b;
+  text-align: left;
+  &:hover {
+    background: rgba($brand-color-primary-blue, 0.1);
   }
 }
 .kt-wave {
@@ -571,6 +1058,196 @@ body,
   padding: 0.5rem 1rem;
 }
 
+// ---------- Tema escuro (componentes próprios; o Bootstrap cuida dos dele) ----------
+$dark-bg: #0c171d;
+$dark-surface: #13232b;
+$dark-surface-2: #182c36;
+$dark-border: #24414e;
+$dark-text: #e4eef3;
+$dark-muted: #9db3bf;
+$dark-chrome: #0b2633; // cabeçalho e rodapé
+$dark-link: #5cc6ec;
+
+[data-bs-theme='dark'] {
+  --bs-body-bg: #{$dark-bg};
+  --bs-body-color: #{$dark-text};
+  --bs-secondary-color: #{$dark-muted};
+  --bs-border-color: #{$dark-border};
+  --bs-link-color: #{$dark-link};
+  --bs-link-color-rgb: 92, 198, 236;
+  --bs-link-hover-color: #87d5f1;
+  --bs-link-hover-color-rgb: 135, 213, 241;
+  --bs-tertiary-bg: #{$dark-surface};
+  color-scheme: dark;
+
+  // o rodapé fica no azul da marca: o logo da OrkneyTech é um PNG com esse fundo
+  .kt-header {
+    background: $dark-chrome;
+  }
+  .kt-footer {
+    border-top: 4px solid $brand-color-secondary-orange;
+  }
+  .kt-breadcrumbs .breadcrumb-item.active {
+    color: $dark-muted;
+  }
+
+  .kt-panel {
+    background: $dark-surface;
+    box-shadow: 0 3px 8px rgba($black, 0.5);
+  }
+  .kt-field-label {
+    color: $dark-text;
+  }
+  .kt-card {
+    --bs-card-bg: #{$dark-surface};
+    box-shadow: 0 3px 8px rgba($black, 0.5);
+    > .card-header,
+    > .card-footer {
+      background: #015a78;
+    }
+  }
+  .card {
+    --bs-card-bg: #{$dark-surface};
+  }
+  .kt-pre {
+    background: $dark-surface-2;
+    border-color: $dark-border;
+  }
+  .kt-tabs .nav-link {
+    color: $dark-muted;
+    &.active {
+      color: $dark-link;
+    }
+  }
+
+  // Home
+  .kt-home {
+    background: $dark-bg;
+  }
+  .kt-home-hero {
+    background:
+      radial-gradient(circle at 85% 40%, rgba($brand-color-secondary-orange, 0.25), transparent 40%),
+      linear-gradient(135deg, #015a78, $dark-chrome);
+  }
+  .kt-home-hero-shape {
+    opacity: 0.55;
+  }
+  .kt-home-tile {
+    background: $dark-surface;
+  }
+  .kt-home-sub {
+    color: $dark-muted;
+  }
+  .kt-home-steps {
+    background: linear-gradient(120deg, #7a3a00, #3a2208);
+  }
+  .kt-home-step {
+    color: $dark-text;
+    background: $dark-surface;
+    p {
+      color: $dark-muted;
+    }
+  }
+  .kt-home-sections {
+    background: #0f1f27;
+  }
+  .kt-home-card {
+    background: $dark-surface;
+    border-color: $dark-border;
+    p {
+      color: $dark-muted;
+    }
+    &::before {
+      background: #5a3612;
+    }
+    .kt-home-icon,
+    .kt-home-tag {
+      background: #2b1e12;
+      color: #ffb067;
+      border-color: #5a3612;
+    }
+    &.is-available {
+      background: linear-gradient(160deg, $dark-surface 55%, $dark-surface-2);
+      &::before {
+        background: $brand-color-primary-blue;
+      }
+      .kt-home-icon {
+        background: $brand-color-primary-blue;
+        color: $white;
+      }
+      .kt-home-tag {
+        background: #015a78;
+        color: $white;
+        border-color: #015a78;
+      }
+    }
+    .kt-home-more {
+      color: $dark-link;
+    }
+  }
+  .kt-home-plans {
+    background: linear-gradient(160deg, #08141a, #050d11);
+  }
+  .kt-home-plan {
+    color: $dark-text;
+    background: $dark-surface;
+    border: 1px solid $dark-border;
+    header {
+      background: $dark-surface-2;
+      border-color: $dark-border;
+    }
+    small {
+      color: $dark-muted;
+    }
+    li.is-off {
+      color: #7f95a1;
+      .bi {
+        color: #5d717c;
+      }
+    }
+  }
+  .kt-home-ribbon {
+    background: $dark-text;
+    color: $dark-bg;
+  }
+  .kt-home-cta {
+    box-shadow: 0 12px 30px rgba($black, 0.45);
+  }
+
+  // Kanban
+  .kt-kb-col {
+    background: $dark-surface;
+    border-color: $dark-border;
+    border-top-color: $brand-color-primary-blue;
+    &.is-over {
+      border-top-color: $danger;
+    }
+    &.is-target {
+      background: #16303b;
+    }
+  }
+  .kt-kb-card {
+    background: $dark-surface-2;
+    border-color: $dark-border;
+    box-shadow: 0 1px 2px rgba($black, 0.4);
+  }
+  .kt-kb-card-title {
+    color: $dark-text;
+    &:hover,
+    &:focus-visible {
+      color: $dark-link;
+    }
+  }
+  .kt-kb-meta,
+  .kt-kb-col-actions .btn,
+  .kt-kb-arrows .btn {
+    color: $dark-muted;
+  }
+  .kt-kb-add {
+    color: $dark-link;
+  }
+}
+
 // ---------- Relatórios (impressão / PDF) ----------
 .kt-report {
   h2 {
@@ -580,6 +1257,15 @@ body,
   }
 }
 @media print {
+  // relatório impresso sempre claro, mesmo no tema escuro
+  [data-bs-theme='dark'] {
+    --bs-body-bg: #{$white};
+    --bs-body-color: #{$body-color};
+    .kt-card,
+    .card {
+      --bs-card-bg: #{$white};
+    }
+  }
   .kt-header,
   .kt-footer,
   .kt-breadcrumbs,

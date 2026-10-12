@@ -9,6 +9,7 @@ import { Recover, ResetPassword, Signin, Signup, VerifyEmail } from './pages/aut
 import {
   DmDatasetDetail, DmDatasets, DmModelDetail, DmModels, DmObjectives, DmOverview, DmPhases, DmPreparation, DmReport,
 } from './pages/projects/CrispDm.jsx';
+import Kanban from './pages/projects/Kanban.jsx';
 import ProjectLayout, { useProject } from './pages/projects/ProjectLayout.jsx';
 import { SaAnalysis, SaDiagrams, SaOverview, SaReport, SaRequirements, SaUserStories } from './pages/projects/SystemAnalysis.jsx';
 import { About, Contacts, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
@@ -83,6 +84,8 @@ export const routes = [
                       { id: 'model', path: ':modelId', element: <DmModelDetail />, handle: crumb('dm.modelName') },
                     ],
                   },
+                  // Kanban (qualquer tipo de projeto)
+                  { path: 'kanban', element: <Kanban />, handle: crumb('project.tabs.kanban') },
                   {
                     path: 'report',
                     handle: crumb('project.tabs.report'),

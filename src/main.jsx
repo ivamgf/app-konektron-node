@@ -14,7 +14,11 @@ import './styles/main.scss';
 import { AuthProvider } from './auth/AuthProvider.jsx';
 import { ToastProvider } from './components/Toasts.jsx';
 import { I18nProvider } from './i18n/I18nProvider.jsx';
+import { applyTheme, initialTheme } from './lib/theme.js';
 import { router } from './router.jsx';
+
+// antes de renderizar, para a página não abrir clara e depois escurecer
+applyTheme(initialTheme());
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
