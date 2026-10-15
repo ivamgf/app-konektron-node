@@ -60,7 +60,7 @@ export function Panel({ title, wide = false, children }) {
 }
 
 // Cartão azul com ícone (About, Contacts e áreas logadas)
-export function ContentCard({ icon, title, footer, actions, children, as: Heading = 'h2' }) {
+export function ContentCard({ icon, title, footer, actions, children, bodyClassName = '', as: Heading = 'h2' }) {
   return (
     <section className="card kt-card">
       <div className="card-header">
@@ -68,7 +68,7 @@ export function ContentCard({ icon, title, footer, actions, children, as: Headin
         <Heading className="flex-grow-1">{title}</Heading>
         {actions}
       </div>
-      <div className="card-body">{children}</div>
+      <div className={`card-body ${bodyClassName}`}>{children}</div>
       {footer && <div className="card-footer">{footer}</div>}
     </section>
   );

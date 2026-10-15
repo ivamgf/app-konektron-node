@@ -45,18 +45,29 @@ export const crispdmApi = {
   updatePhase: (pid, phase, body) => api.patch(`/projects/${pid}/crisp-dm/phases/${phase}`, body),
 };
 
-// Visão de Sistema (projetos software, planos Standard/Master)
-export const systemViewApi = {
-  overview: (pid) => api.get(`/projects/${pid}/system-view`),
-  report: (pid) => api.get(`/projects/${pid}/system-view/report`),
-  features: (pid, lang) => api.get(`/projects/${pid}/system-view/features`, { lang }),
-  spec: (pid) => api.get(`/projects/${pid}/system-view/spec`),
-  updateSpec: (pid, body) => api.patch(`/projects/${pid}/system-view/spec`, body),
-  useCase: (pid, id) => api.get(`/projects/${pid}/system-view/use-cases/${id}`),
-  importFrom: (pid, body) => api.post(`/projects/${pid}/system-view/import`, body),
-  generateScenarios: (pid, id, lang, userStoryId) =>
-    api.post(`/projects/${pid}/system-view/use-cases/${id}/scenarios?lang=${encodeURIComponent(lang)}`, { userStoryId }),
+// Seções para qualquer tipo de projeto. Os cadastros usam resourceApi (abaixo).
+export const ontologiesApi = {
+  summary: (pid) => api.get(`/projects/${pid}/ontologies/summary`),
 };
+
+export const bpmApi = {
+  overview: (pid) => api.get(`/projects/${pid}/bpm`),
+};
+
+export const commonkadsApi = {
+  overview: (pid) => api.get(`/projects/${pid}/commonkads`),
+  report: (pid) => api.get(`/projects/${pid}/commonkads/report`),
+  worksheets: (pid) => api.get(`/projects/${pid}/commonkads/worksheets`),
+  worksheet: (pid, key) => api.get(`/projects/${pid}/commonkads/worksheets/${key}`),
+  updateWorksheet: (pid, key, body) => api.patch(`/projects/${pid}/commonkads/worksheets/${key}`, body),
+};
+
+// Arquivo anexado a um registro (ontologia, diagrama BPMN): <caminho do registro>/file
+export const fileApi = (itemPath) => ({
+  upload: (file) => api.upload(`${itemPath}/file`, file),
+  download: () => api.blob(`${itemPath}/file`),
+  remove: () => api.del(`${itemPath}/file`),
+});
 
 // Kanban (qualquer tipo de projeto). Os movimentos devolvem o quadro atualizado.
 export const kanbanApi = {

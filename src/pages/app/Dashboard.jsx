@@ -10,6 +10,40 @@ import { formatDate, useAsync, useSubmit } from '../../lib/hooks.js';
 
 const PAGE_SIZE = 12;
 
+// Cor e ícone por tipo de projeto (as mesmas da Análise de Sistemas e do CRISP-DM em Engenharia)
+export const PROJECT_TYPE_STYLE = {
+  software: { color: '#0189b6', icon: 'diagram-3', section: 'system-analysis' },
+  data_analysis: { color: '#11866a', icon: 'bar-chart-steps', section: 'crisp-dm' },
+};
+
+function ProjectTile({ project: p }) {
+  const { t, locale } = useI18n();
+  const style = PROJECT_TYPE_STYLE[p.type];
+  return (
+    <Link to={`/projects/${p.id}`} className="kt-tile is-available text-decoration-none" style={{ '--sec': style.color }}>
+      <header>
+        <span className="kt-tile-icon"><i className={`bi bi-${style.icon}`} aria-hidden="true" /></span>
+        <h2 className="h3 mb-0" title={p.name}>{p.name}</h2>
+        <span className="kt-tile-tag">v{p.version}</span>
+      </header>
+      <div className="kt-tile-body">
+        <p className="kt-tile-text">{p.description || t(`sections.${style.section}.name`)}</p>
+        <div className="d-flex flex-wrap gap-2 mb-3">
+          <span className="kt-tile-chip">
+            <i className="bi bi-folder2 me-1" aria-hidden="true" />{t(`project.types.${p.type}`)}
+          </span>
+          <span className="kt-tile-chip is-muted">
+            <i className="bi bi-clock-history me-1" aria-hidden="true" />{formatDate(p.updatedAt, locale)}
+          </span>
+        </div>
+        <span className="btn btn-sm kt-tile-cta">
+          {t('dashboard.open')} <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 export function VerifyBanner() {
   const { t } = useI18n();
   const { user } = useAuth();
@@ -80,7 +114,7 @@ function NewProjectModal({ onClose, canDataAnalysis }) {
 }
 
 export default function Dashboard() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [type, setType] = useState('');
@@ -102,9 +136,22 @@ export default function Dashboard() {
           </button>
         }
         footer={<Link to="/engineering" className="text-white">{t('dashboard.engineering')} →</Link>}
+        bodyClassName="kt-tinted"
       >
-        <p className="text-large">{t('dashboard.hello', { name: user?.email })}</p>
-        <div className="d-flex justify-content-end mb-3">
+        <p className="text-large mb-3">{t('dashboard.hello', { name: user?.email })}</p>
+        <div className="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+          <div className="d-flex flex-wrap gap-2">
+            {projects.data && (
+              <span className="kt-pill is-on">
+                <i className="bi bi-folder2-open me-1" aria-hidden="true" />{t('dashboard.count', { count: projects.data.total })}
+              </span>
+            )}
+            {Object.entries(PROJECT_TYPE_STYLE).map(([key, st]) => (
+              <span key={key} className="kt-pill is-type" style={{ '--sec': st.color }}>
+                <i className={`bi bi-${st.icon} me-1`} aria-hidden="true" />{t(`project.types.${key}`)}
+              </span>
+            ))}
+          </div>
           <div>
             <label className="form-label small mb-1" htmlFor="flt-type">{t('dashboard.typeFilter')}</label>
             <select id="flt-type" className="form-select form-select-sm" value={type}
@@ -121,26 +168,13 @@ export default function Dashboard() {
           <EmptyState>{t('dashboard.noProjects')}</EmptyState>
         ) : (
           <>
-            <div className="row g-3">
+            <ul className="row g-4 list-unstyled mb-0">
               {projects.data.data.map((p) => (
-                <div className="col-md-6 col-xl-4" key={p.id}>
-                  <Link to={`/projects/${p.id}`} className="card h-100 text-decoration-none text-body shadow-sm">
-                    <div className="card-body">
-                      <div className="d-flex justify-content-between gap-2 mb-2">
-                        <h2 className="h3 mb-0 text-truncate">{p.name}</h2>
-                        <span className={`badge ${p.type === 'software' ? 'text-bg-primary' : 'text-bg-accent'}`}>
-                          {t(`project.types.${p.type}`)}
-                        </span>
-                      </div>
-                      {p.description && <p className="text-small text-body-secondary mb-2 text-truncate">{p.description}</p>}
-                      <p className="ds-caption text-body-secondary mb-0">
-                        v{p.version} · {t('common.updatedAt')} {formatDate(p.updatedAt, locale)}
-                      </p>
-                    </div>
-                  </Link>
-                </div>
+                <li className="col-md-6 col-xl-4" key={p.id}>
+                  <ProjectTile project={p} />
+                </li>
               ))}
-            </div>
+            </ul>
             <Pagination page={page} pageSize={PAGE_SIZE} total={projects.data.total} onChange={setPage} />
           </>
         )}

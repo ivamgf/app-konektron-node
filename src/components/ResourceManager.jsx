@@ -19,6 +19,7 @@ import { EmptyState, Loading, Modal } from './ui.jsx';
  * @param {string} p.singular     chave i18n do nome do recurso
  * @param {Function} [p.transform] ajusta o corpo antes de enviar (ex.: texto -> número)
  * @param {Function} [p.onChange] chamado após criar/editar/excluir
+ * @param {Function} [p.afterCreate] (registro) => void, ex.: abrir o detalhe para enviar o arquivo
  */
 export default function ResourceManager({
   path,
@@ -30,6 +31,7 @@ export default function ResourceManager({
   singular,
   transform = (payload) => payload,
   onChange,
+  afterCreate,
 }) {
   const { t } = useI18n();
   const toast = useToast();
@@ -50,9 +52,11 @@ export default function ResourceManager({
   const save = useSubmit(
     (payload) => (editing === 'new' ? api.create(payload) : api.update(editing.id, payload)),
     {
-      onSuccess: async () => {
+      onSuccess: async (saved) => {
+        const created = editing === 'new';
         toast.success(t('common.saved'));
         close();
+        if (created && afterCreate) return afterCreate(saved);
         await list.reload();
         onChange?.();
       },

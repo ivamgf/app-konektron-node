@@ -7,18 +7,20 @@ import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 
 // Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
-export const SECTION_KEYS = ['system-analysis', 'system-view', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'kanban'];
+export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'kanban'];
 export const PLAN_SECTIONS = {
   free: ['system-analysis', 'kanban'],
-  standard: ['system-analysis', 'system-view', 'bpm', 'crisp-dm', 'kanban'],
+  standard: ['system-analysis', 'bpm', 'crisp-dm', 'kanban'],
   master: SECTION_KEYS,
 };
-export const IMPLEMENTED = ['system-analysis', 'system-view', 'crisp-dm', 'kanban'];
-// Tipo de projeto exigido; ausente = qualquer tipo (Kanban)
-export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'system-view': 'software', 'crisp-dm': 'data_analysis' };
+export const IMPLEMENTED = ['system-analysis', 'ontologies', 'bpm', 'commonkads', 'crisp-dm', 'kanban'];
+// Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Kanban)
+export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'crisp-dm': 'data_analysis' };
+// Administradores acessam todas as seções
+export const canAccessSection = (user, section) =>
+  user?.role === 'admin' || (PLAN_SECTIONS[user?.plan] ?? []).includes(section);
 export const SECTION_ICONS = {
   'system-analysis': 'diagram-3',
-  'system-view': 'window-stack',
   ontologies: 'diagram-2',
   bpm: 'bezier2',
   'function-point': 'calculator',

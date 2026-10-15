@@ -1,4 +1,4 @@
-// Configuração dos recursos (espelha os schemas da API: systemAnalysis.* e crispdm.*)
+// Configuração dos recursos (espelha os schemas da API: systemAnalysis.*, crispdm.*, ontologies.*, bpm.*)
 import { enumOptions } from '../../components/forms.jsx';
 
 export const ENUMS = {
@@ -18,14 +18,26 @@ export const ENUMS = {
   technique: ['classification', 'regression', 'clustering', 'association', 'time_series', 'anomaly_detection', 'nlp', 'computer_vision', 'other'],
   modelStatus: ['candidate', 'approved', 'rejected', 'deployed'],
   split: ['train', 'validation', 'test', 'cross_validation'],
-  useCaseStatus: ['draft', 'reviewed', 'approved'],
-  flowKind: ['main', 'alternative', 'exception'],
-  relationType: ['include', 'extend'],
+  ontologyFormat: ['rdf_xml', 'owl_xml', 'turtle', 'n_triples', 'n3', 'json_ld', 'rdfa', 'owl_functional', 'manchester', 'obo', 'xml', 'other'],
+  vocabulary: ['rdf', 'rdfs', 'owl', 'schema', 'rdfa', 'skos', 'dublin_core', 'foaf', 'prov', 'dcat', 'shacl', 'geo', 'vcard', 'org', 'sioc', 'other'],
+  principle: ['fair', 'care', 'five_star', 'trust', 'other'],
+  ontologyStatus: ['draft', 'in_review', 'published', 'deprecated'],
+  processLevel: ['macroprocess', 'process', 'subprocess', 'activity'],
+  processStatus: ['identified', 'mapped', 'analyzed', 'improved'],
+  diagramState: ['as_is', 'to_be'],
+  diagramNotation: ['bpmn', 'image', 'pdf', 'other'],
+  agentKind: ['human', 'information_system', 'other'],
+  itemRole: ['core', 'support'],
+  communicationType: ['request', 'require', 'order', 'propose', 'offer', 'agree', 'reject', 'ask', 'reply', 'report', 'inform'],
 };
 
-const opts = (t, name) => enumOptions(t, name, ENUMS[name]);
+// Extensões aceitas no upload (iguais às da API)
+export const ONTOLOGY_FILES = '.owl,.rdf,.owx,.xml,.ttl,.nt,.nq,.n3,.trig,.jsonld,.json,.obo,.ofn,.omn,.html';
+export const BPM_FILES = '.bpmn,.xml,.svg,.png,.jpg,.jpeg,.webp,.pdf';
+
+export const opts = (t, name) => enumOptions(t, name, ENUMS[name]);
 const label = (t, name) => (row, key) => (row[key] ? t(`enums.${name}.${row[key]}`) : '—');
-const badge = (text, cls = 'text-bg-light border') => <span className={`badge ${cls}`}>{text}</span>;
+export const badge = (text, cls = 'text-bg-light border') => <span className={`badge ${cls}`}>{text}</span>;
 
 // ---------- Análise de Sistemas ----------
 export function requirementConfig(t) {
@@ -110,127 +122,6 @@ export function diagramConfig(t) {
       { key: 'url', label: 'sa.url', render: (r) => (r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer">{t('common.open')}</a> : '—') },
     ],
     filters: [{ name: 'type', label: 'project.type', options: opts(t, 'diagramType') }],
-  };
-}
-
-/// ---------- Visão de Sistema ----------
-export function stakeholderConfig() {
-  return {
-    singular: 'sv.stakeholder',
-    fields: [
-      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpP', col: 'col-md-3' },
-      { name: 'name', label: 'sv.stakeholderName', required: true, maxLength: 200, col: 'col-md-5' },
-      { name: 'role', label: 'sv.role', maxLength: 200, col: 'col-md-4' },
-      { name: 'interest', label: 'sv.interest', type: 'textarea', maxLength: 5000, rows: 2 },
-      { name: 'responsibility', label: 'sv.responsibility', type: 'textarea', maxLength: 5000, rows: 2 },
-    ],
-    columns: [
-      { key: 'code', label: 'sa.code' },
-      { key: 'name', label: 'sv.stakeholderName' },
-      { key: 'role', label: 'sv.role' },
-      { key: 'interest', label: 'sv.interest', render: (r) => <span className="kt-prewrap small">{r.interest ?? '—'}</span> },
-    ],
-  };
-}
-
-export function glossaryConfig() {
-  return {
-    singular: 'sv.term',
-    fields: [
-      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpC', col: 'col-md-3' },
-      { name: 'term', label: 'sv.term', required: true, maxLength: 200, col: 'col-md-9' },
-      { name: 'definition', label: 'sv.definition', type: 'textarea', required: true, maxLength: 5000, rows: 3 },
-      { name: 'synonyms', label: 'sv.synonyms', maxLength: 2000, col: 'col-md-6' },
-      { name: 'relationships', label: 'sv.relationships', maxLength: 2000, col: 'col-md-6' },
-    ],
-    columns: [
-      { key: 'code', label: 'sa.code' },
-      { key: 'term', label: 'sv.term' },
-      { key: 'definition', label: 'sv.definition', render: (r) => <span className="kt-prewrap small">{r.definition}</span> },
-      { key: 'synonyms', label: 'sv.synonyms' },
-    ],
-    nameOf: (r) => r.term,
-  };
-}
-
-// Caso de uso no modelo de Guedes (UML 2, tab. 3.1) / aba "Casos de Uso" da planilha de análise
-export function ucFormConfig(t, { requirements = [], useCases = [] } = {}) {
-  const reqCode = Object.fromEntries(requirements.map((r) => [r.id, r.code]));
-  return {
-    singular: 'sv.useCase',
-    fields: [
-      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'sv.codeHelpUC', col: 'col-md-3' },
-      { name: 'name', label: 'sv.useCaseName', required: true, maxLength: 200, help: 'sv.useCaseNameHelp', col: 'col-md-9' },
-      { name: 'primaryActor', label: 'sv.primaryActor', required: true, maxLength: 200, col: 'col-md-6' },
-      { name: 'generalUseCaseId', label: 'sv.generalUseCase', type: 'select', col: 'col-md-6',
-        options: useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` })) },
-      { name: 'secondaryActors', label: 'sv.secondaryActors', type: 'textarea', rows: 2, maxLength: 2000, help: 'sv.onePerLine' },
-      { name: 'summary', label: 'sv.summary', type: 'textarea', rows: 2, maxLength: 5000 },
-      { name: 'preconditions', label: 'sv.preconditions', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.onePerLine', col: 'col-md-6' },
-      { name: 'postconditions', label: 'sv.postconditions', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.onePerLine', col: 'col-md-6' },
-      { name: 'restrictions', label: 'sv.restrictions', type: 'textarea', rows: 3, maxLength: 10000, help: 'sv.onePerLine' },
-      { name: 'requirementIds', label: 'sv.requirements', type: 'multicheck', emptyText: 'sv.noRequirements',
-        options: requirements.filter((r) => r.type !== 'non_functional').map((r) => ({ value: r.id, label: `${r.code} — ${r.title}` })) },
-      { name: 'priority', label: 'sa.priority', type: 'select', options: opts(t, 'priority'), col: 'col-md-6' },
-      { name: 'status', label: 'common.status', type: 'select', required: true, options: opts(t, 'useCaseStatus'), default: 'draft', col: 'col-md-6' },
-    ],
-    columns: [
-      { key: 'code', label: 'sa.code' },
-      { key: 'name', label: 'sv.useCaseName' },
-      { key: 'primaryActor', label: 'sv.primaryActor' },
-      { key: 'requirementIds', label: 'sv.requirements',
-        render: (r) => (r.requirementIds ?? []).map((id) => reqCode[id]).filter(Boolean).join(', ') || '—' },
-      { key: 'status', label: 'common.status',
-        render: (r) => badge(t(`enums.useCaseStatus.${r.status}`), r.status === 'approved' ? 'text-bg-success' : undefined) },
-    ],
-    nameOf: (r) => `${r.code} — ${r.name}`,
-  };
-}
-
-export function relationConfig(t, useCases = []) {
-  const options = useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` }));
-  const name = Object.fromEntries(useCases.map((u) => [u.id, `${u.code} — ${u.name}`]));
-  return {
-    singular: 'sv.relation',
-    fields: [
-      { name: 'fromUseCaseId', label: 'sv.relationFrom', type: 'select', required: true, options, col: 'col-md-5' },
-      { name: 'type', label: 'project.type', type: 'select', required: true, options: opts(t, 'relationType'), default: 'include', col: 'col-md-2' },
-      { name: 'toUseCaseId', label: 'sv.relationTo', type: 'select', required: true, options, col: 'col-md-5' },
-      { name: 'extensionPoint', label: 'sv.extensionPoint', maxLength: 200, col: 'col-md-6' },
-      { name: 'condition', label: 'sv.condition', maxLength: 2000, col: 'col-md-6' },
-    ],
-    columns: [
-      { key: 'fromUseCaseId', label: 'sv.relationFrom', render: (r) => name[r.fromUseCaseId] ?? '—' },
-      { key: 'type', label: 'project.type', render: (r) => <code>«{r.type}»</code> },
-      { key: 'toUseCaseId', label: 'sv.relationTo', render: (r) => name[r.toUseCaseId] ?? '—' },
-      { key: 'condition', label: 'sv.condition', render: (r) => r.condition ?? '—' },
-    ],
-    nameOf: (r) => `${name[r.fromUseCaseId] ?? ''} «${r.type}»`,
-  };
-}
-
-export function scenarioConfig(t, { stories = [], useCases = [] } = {}) {
-  const storyName = Object.fromEntries(stories.map((s) => [s.id, s.code]));
-  return {
-    singular: 'sv.scenario',
-    fields: [
-      { name: 'title', label: 'sa.title', required: true, maxLength: 200, col: 'col-md-8' },
-      { name: 'tags', label: 'sv.tags', maxLength: 200, help: 'sv.tagsHelp', col: 'col-md-4' },
-      { name: 'userStoryId', label: 'sv.feature', type: 'select', col: 'col-md-6',
-        options: stories.map((s) => ({ value: s.id, label: `${s.code} — ${s.title}` })) },
-      { name: 'useCaseId', label: 'sv.useCase', type: 'select', col: 'col-md-6',
-        options: useCases.map((u) => ({ value: u.id, label: `${u.code} — ${u.name}` })) },
-      { name: 'given', label: 'sv.given', type: 'textarea', rows: 2, maxLength: 5000, help: 'sv.stepsHelp' },
-      { name: 'when', label: 'sv.when', type: 'textarea', rows: 2, maxLength: 5000 },
-      { name: 'then', label: 'sv.then', type: 'textarea', rows: 2, maxLength: 5000 },
-      { name: 'examples', label: 'sv.examples', type: 'code', rows: 3, maxLength: 5000, help: 'sv.examplesHelp' },
-    ],
-    columns: [
-      { key: 'title', label: 'sa.title' },
-      { key: 'userStoryId', label: 'sv.feature', render: (r) => storyName[r.userStoryId] ?? '—' },
-      { key: 'tags', label: 'sv.tags', render: (r) => (r.tags ? <code className="small">{r.tags}</code> : '—') },
-    ],
-    filters: [{ name: 'userStoryId', label: 'sv.feature', options: stories.map((s) => ({ value: s.id, label: s.code })) }],
   };
 }
 
@@ -364,6 +255,137 @@ export function metricConfig(t) {
       { key: 'value', label: 'dm.value' },
       { key: 'split', label: 'dm.split', render: (r) => t(`enums.split.${r.split}`) },
     ],
+  };
+}
+
+// ---------- Ontologias ----------
+const fileMark = (t, row) =>
+  row.fileName ? <i className="bi bi-file-earmark-check text-success" title={row.fileName} aria-label={row.fileName} /> : '—';
+
+export function ontologyFields(t) {
+  const count = (name, help) => ({ name, label: `on.${name}`, type: 'integer', min: 0, help, col: 'col-6 col-md-3' });
+  return [
+    { name: 'title', label: 'on.title', required: true, maxLength: 200, col: 'col-md-8' },
+    { name: 'status', label: 'common.status', type: 'select', required: true, options: opts(t, 'ontologyStatus'), default: 'draft', col: 'col-md-4' },
+    { name: 'description', label: 'project.description', type: 'textarea', maxLength: 10000, rows: 3 },
+    { name: 'format', label: 'on.format', type: 'select', options: opts(t, 'ontologyFormat'), col: 'col-md-4' },
+    { name: 'version', label: 'on.version', maxLength: 50, col: 'col-md-2' },
+    { name: 'iri', label: 'on.iri', type: 'url', maxLength: 1000, col: 'col-md-6' },
+    { name: 'domain', label: 'on.domain', maxLength: 200, col: 'col-md-6' },
+    { name: 'languages', label: 'on.languages', maxLength: 100, help: 'on.languagesHelp', col: 'col-md-3' },
+    { name: 'license', label: 'on.license', maxLength: 200, col: 'col-md-3' },
+    { name: 'keywords', label: 'on.keywords', maxLength: 500 },
+    { name: 'creators', label: 'on.creators', type: 'textarea', rows: 2, maxLength: 2000, help: 'on.creatorsHelp' },
+    count('classCount'),
+    count('relationshipCount', 'on.relationshipHelp'),
+    count('propertyCount', 'on.propertyHelp'),
+    count('objectCount', 'on.objectHelp'),
+    { name: 'vocabularies', label: 'on.vocabularies', type: 'multicheck', options: opts(t, 'vocabulary'), col: 'col-md-6' },
+    { name: 'principles', label: 'on.principles', type: 'multicheck', options: opts(t, 'principle'), col: 'col-md-6' },
+    { name: 'otherVocabularies', label: 'on.otherVocabularies', maxLength: 500, col: 'col-md-6' },
+    { name: 'principlesNotes', label: 'on.principlesNotes', type: 'textarea', rows: 2, maxLength: 5000, col: 'col-md-6' },
+    { name: 'publicationUrl', label: 'on.publicationUrl', type: 'url', maxLength: 1000, col: 'col-md-6' },
+    { name: 'repositoryUrl', label: 'on.repositoryUrl', type: 'url', maxLength: 1000, col: 'col-md-6' },
+    { name: 'competencyQuestions', label: 'on.competencyQuestions', type: 'textarea', rows: 4, maxLength: 20000, help: 'on.competencyHelp' },
+    { name: 'notes', label: 'sa.notes', type: 'textarea', rows: 2, maxLength: 10000 },
+  ];
+}
+
+export function ontologyConfig(t) {
+  const quick = ['title', 'status', 'description', 'format', 'version', 'iri', 'publicationUrl'];
+  const num = (key) => (r) => (r[key] == null ? '—' : r[key].toLocaleString());
+  return {
+    singular: 'on.ontology',
+    // o cadastro rápido; o restante (métricas, vocabulários, arquivo) fica na página da ontologia
+    fields: ontologyFields(t).filter((f) => quick.includes(f.name)),
+    columns: [
+      { key: 'title', label: 'on.title' },
+      { key: 'format', label: 'on.format', render: (r) => (r.format ? t(`enums.ontologyFormat.${r.format}`) : '—') },
+      { key: 'classCount', label: 'on.classCount', render: num('classCount') },
+      { key: 'relationshipCount', label: 'on.relationshipCount', render: num('relationshipCount') },
+      { key: 'propertyCount', label: 'on.propertyCount', render: num('propertyCount') },
+      { key: 'objectCount', label: 'on.objectCount', render: num('objectCount') },
+      { key: 'status', label: 'common.status',
+        render: (r) => badge(t(`enums.ontologyStatus.${r.status}`), r.status === 'published' ? 'text-bg-success' : undefined) },
+      { key: 'fileName', label: 'on.file', render: (r) => fileMark(t, r) },
+    ],
+    filters: [
+      { name: 'format', label: 'on.format', options: opts(t, 'ontologyFormat') },
+      { name: 'status', label: 'common.status', options: opts(t, 'ontologyStatus') },
+    ],
+    nameOf: (r) => r.title,
+  };
+}
+
+// ---------- BPM ----------
+export function processConfig(t, processes = []) {
+  const options = processes.map((p) => ({ value: p.id, label: `${p.code} — ${p.name}` }));
+  const code = Object.fromEntries(processes.map((p) => [p.id, p.code]));
+  return {
+    singular: 'bpm.process',
+    fields: [
+      { name: 'code', label: 'sa.code', required: true, maxLength: 20, help: 'bpm.codeHelp', col: 'col-md-3' },
+      { name: 'name', label: 'bpm.name', required: true, maxLength: 200, col: 'col-md-9' },
+      { name: 'level', label: 'bpm.level', type: 'select', required: true, options: opts(t, 'processLevel'), default: 'process', col: 'col-md-4' },
+      { name: 'parentId', label: 'bpm.parent', type: 'select', options, col: 'col-md-4' },
+      { name: 'status', label: 'common.status', type: 'select', required: true, options: opts(t, 'processStatus'), default: 'identified', col: 'col-md-4' },
+      { name: 'owner', label: 'bpm.owner', maxLength: 200, col: 'col-md-6' },
+      { name: 'trigger', label: 'bpm.trigger', maxLength: 2000, col: 'col-md-6' },
+      { name: 'objective', label: 'bpm.objective', type: 'textarea', rows: 2, maxLength: 5000 },
+      { name: 'description', label: 'project.description', type: 'textarea', rows: 3, maxLength: 10000 },
+    ],
+    columns: [
+      { key: 'code', label: 'sa.code' },
+      { key: 'name', label: 'bpm.name' },
+      { key: 'level', label: 'bpm.level', render: (r) => t(`enums.processLevel.${r.level}`) },
+      { key: 'parentId', label: 'bpm.parent', render: (r) => code[r.parentId] ?? '—' },
+      { key: 'owner', label: 'bpm.owner' },
+      { key: 'status', label: 'common.status', render: (r) => t(`enums.processStatus.${r.status}`) },
+    ],
+    filters: [
+      { name: 'level', label: 'bpm.level', options: opts(t, 'processLevel') },
+      { name: 'status', label: 'common.status', options: opts(t, 'processStatus') },
+    ],
+    nameOf: (r) => `${r.code} — ${r.name}`,
+  };
+}
+
+// SIPOC e diagnóstico (página do processo)
+export const SIPOC_FIELDS = ['suppliers', 'inputs', 'steps', 'outputs', 'customers'];
+export const processDetailFields = () => [
+  ...SIPOC_FIELDS.map((name) => ({ name, label: `bpm.${name}`, type: 'textarea', rows: 5, maxLength: 10000, col: 'col-md' })),
+  ...['indicators', 'problems', 'improvements'].map((name) => ({
+    name, label: `bpm.${name}`, type: 'textarea', rows: 4, maxLength: 10000, help: 'bpm.sipocHelp', col: 'col-md-4',
+  })),
+];
+
+export function bpmDiagramConfig(t, processes = []) {
+  const options = processes.map((p) => ({ value: p.id, label: `${p.code} — ${p.name}` }));
+  const code = Object.fromEntries(processes.map((p) => [p.id, p.code]));
+  return {
+    singular: 'bpm.diagram',
+    fields: [
+      { name: 'title', label: 'sa.title', required: true, maxLength: 200, col: 'col-md-8' },
+      { name: 'state', label: 'bpm.state', type: 'select', required: true, options: opts(t, 'diagramState'), default: 'as_is', col: 'col-md-4' },
+      { name: 'processId', label: 'bpm.process', type: 'select', options, col: 'col-md-6' },
+      { name: 'notation', label: 'bpm.notation', type: 'select', options: opts(t, 'diagramNotation'), col: 'col-md-3' },
+      { name: 'version', label: 'bpm.version', maxLength: 20, col: 'col-md-3' },
+      { name: 'tool', label: 'bpm.tool', maxLength: 100, help: 'bpm.toolHelp', col: 'col-md-6' },
+      { name: 'url', label: 'bpm.url', type: 'url', maxLength: 1000, col: 'col-md-6' },
+      { name: 'description', label: 'project.description', type: 'textarea', rows: 2, maxLength: 10000 },
+    ],
+    columns: [
+      { key: 'title', label: 'sa.title' },
+      { key: 'processId', label: 'bpm.process', render: (r) => code[r.processId] ?? '—' },
+      { key: 'state', label: 'bpm.state', render: (r) => badge(t(`enums.diagramState.${r.state}`), r.state === 'to_be' ? 'text-bg-primary' : undefined) },
+      { key: 'notation', label: 'bpm.notation', render: (r) => (r.notation ? t(`enums.diagramNotation.${r.notation}`) : '—') },
+      { key: 'fileName', label: 'on.file', render: (r) => fileMark(t, r) },
+    ],
+    filters: [
+      { name: 'processId', label: 'bpm.process', options: processes.map((p) => ({ value: p.id, label: p.code })) },
+      { name: 'state', label: 'bpm.state', options: opts(t, 'diagramState') },
+    ],
+    nameOf: (r) => r.title,
   };
 }
 

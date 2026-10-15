@@ -60,21 +60,26 @@ function buildUrl(path, query) {
   return qs ? `${url}?${qs}` : url;
 }
 
-async function send(path, { method = 'GET', body, query, token } = {}) {
-  const headers = { Accept: 'application/json' };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+// `file` envia o arquivo bruto (upload); `blob` devolve o corpo como Blob (download)
+async function send(path, { method = 'GET', body, file, query, token, blob = false } = {}) {
+  const headers = { Accept: blob ? '*/*' : 'application/json' };
+  if (file) {
+    headers['Content-Type'] = 'application/octet-stream';
+    headers['X-File-Name'] = encodeURIComponent(file.name);
+  } else if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
   let res;
   try {
     res = await fetch(buildUrl(path, query), {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: file ?? (body !== undefined ? JSON.stringify(body) : undefined),
     });
   } catch {
     throw new ApiError('network', 0);
   }
   if (res.status === 204) return { res, data: null };
+  if (blob && res.ok) return { res, data: await res.blob() };
   const data = await res.json().catch(() => null);
   return { res, data };
 }
@@ -129,4 +134,6 @@ export const api = {
   post: (path, body, opts) => request(path, { ...opts, method: 'POST', body: body ?? {} }),
   patch: (path, body, opts) => request(path, { ...opts, method: 'PATCH', body }),
   del: (path, body, opts) => request(path, { ...opts, method: 'DELETE', body }),
+  upload: (path, file) => request(path, { method: 'PUT', file }),
+  blob: (path) => request(path, { blob: true }),
 };

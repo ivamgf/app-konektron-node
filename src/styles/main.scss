@@ -1072,14 +1072,6 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   }
 }
 
-.kt-section-card {
-  height: 100%;
-  border-top: 4px solid $color-lightgrey;
-  &.is-available {
-    border-top-color: $brand-color-primary-blue;
-  }
-}
-
 .kt-progress {
   height: 0.75rem;
   .progress-bar {
@@ -1126,8 +1118,8 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   padding: 0.5rem 1rem;
 }
 
-// ---------- Visão de Sistema ----------
-.kt-sv-nav {
+// ---------- Seções com sub-navegação (Ontologias, BPM, CommonKADS) ----------
+.kt-subnav {
   gap: 0.25rem;
   .nav-link {
     border-radius: 999px;
@@ -1139,136 +1131,8 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
     }
   }
 }
-.kt-sv-gaps li {
+.kt-gaps li {
   margin-bottom: 0.25rem;
-}
-
-// Diagrama UML (SVG): as cores vêm de variáveis para funcionar nos dois temas
-.kt-uml {
-  --uml-stroke: #{$brand-color-neutral};
-  --uml-fill: #e6f5fa;
-  --uml-uc-stroke: #{$brand-color-primary-blue};
-  --uml-text: #{$body-color};
-  --uml-boundary: #{$white};
-  --uml-label-bg: #{$white};
-  width: 100%;
-  height: auto;
-  max-width: 900px;
-  display: block;
-  margin: 0 auto 1rem;
-  font-family: $font-other;
-  font-size: 12px;
-  text {
-    fill: var(--uml-text);
-  }
-  .kt-uml-boundary {
-    fill: var(--uml-boundary);
-    stroke: var(--uml-stroke);
-    stroke-width: 1.5;
-  }
-  .kt-uml-system {
-    font-family: $font-sans;
-    font-weight: 700;
-    font-size: 14px;
-  }
-  .kt-uml-uc ellipse {
-    fill: var(--uml-fill);
-    stroke: var(--uml-uc-stroke);
-    stroke-width: 1.5;
-  }
-  .kt-uml-code {
-    font-size: 10px;
-    font-weight: 700;
-    fill: $brand-color-primary-blue;
-  }
-  .kt-uml-actor {
-    circle,
-    line {
-      fill: none;
-      stroke: var(--uml-stroke);
-      stroke-width: 1.8;
-    }
-    text {
-      font-weight: 600;
-    }
-  }
-  .kt-uml-assoc line {
-    stroke: var(--uml-stroke);
-    stroke-width: 1.2;
-  }
-  .kt-uml-link path {
-    fill: none;
-    stroke: var(--uml-stroke);
-    stroke-width: 1.3;
-  }
-  .kt-uml-link.is-include path,
-  .kt-uml-link.is-extend path {
-    stroke-dasharray: 6 4;
-  }
-  .kt-uml-arrow {
-    fill: none;
-    stroke: var(--uml-stroke);
-    stroke-width: 1.4;
-  }
-  .kt-uml-triangle {
-    fill: var(--uml-boundary);
-    stroke: var(--uml-stroke);
-    stroke-width: 1.2;
-  }
-  .kt-uml-stereo {
-    font-size: 11px;
-    font-style: italic;
-    paint-order: stroke;
-    stroke: var(--uml-label-bg);
-    stroke-width: 4px;
-  }
-}
-
-// Tabelas no estilo da "Planilha de Análise" (cabeçalhos verdes)
-$sheet-green: #93c47d;
-$sheet-green-light: #b6d7a8;
-.kt-uc-table {
-  border: 1px solid $sheet-green;
-  th {
-    width: 26%;
-    background: rgba($sheet-green-light, 0.35);
-    font-weight: 600;
-  }
-}
-.kt-flow {
-  header {
-    background: $sheet-green;
-    color: $black;
-    padding: 0.3rem 0.6rem;
-  }
-  &.is-alternative header {
-    background: $sheet-green-light;
-  }
-  &.is-exception header {
-    background: #f4cccc;
-  }
-  .kt-flow-kind {
-    font-weight: 700;
-  }
-  .btn-link {
-    color: $black;
-  }
-}
-.kt-flow-table thead th,
-.kt-steps-editor thead th {
-  background: rgba($sheet-green-light, 0.45);
-}
-// colunas fixas, iguais em todos os cenários (como na planilha)
-.kt-flow-table {
-  table-layout: fixed;
-  th:nth-child(2),
-  th:nth-child(3) {
-    width: calc(50% - 1.5rem);
-  }
-}
-.kt-flow-table th:first-child,
-.kt-steps-editor th:first-child {
-  width: 3rem;
 }
 .kt-multicheck {
   max-height: 12rem;
@@ -1277,21 +1141,524 @@ $sheet-green-light: #b6d7a8;
   border-radius: 0.375rem;
   padding: 0.5rem 0.75rem;
 }
-.kt-matrix {
-  th,
-  td {
-    min-width: 3.5rem;
+
+// Planilhas no estilo dos modelos CommonKADS (cabeçalho verde)
+$sheet-green: #6aa84f;
+$sheet-green-light: #d9ead3;
+.kt-sheet {
+  border: 1px solid $sheet-green;
+  > thead > tr > th {
+    background: $sheet-green-light;
+    color: $black;
+  }
+  > thead > tr.kt-sheet-title > th {
+    background: $sheet-green;
+  }
+  .kt-sheet-n {
+    width: 2.5rem;
+    text-align: right;
+    color: var(--bs-secondary-color);
+  }
+  .kt-sheet-item {
+    width: 20%;
+    font-weight: 600;
+  }
+  .kt-sheet-guide {
+    width: 32%;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--bs-secondary-color);
   }
   td {
-    color: $brand-color-primary-blue;
+    vertical-align: top;
   }
 }
-.kt-gherkin {
-  max-height: 28rem;
+.kt-sheet-guide-inline {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.25rem;
 }
-.kt-srs-uc {
+.kt-sipoc {
+  table-layout: fixed;
+  th {
+    width: 20%;
+    text-align: center;
+    background: rgba($sheet-green-light, 0.6);
+  }
+  td {
+    vertical-align: top;
+  }
+}
+
+// Árvore de processos (BPM)
+.kt-tree {
+  list-style: none;
+  padding-left: 0;
+  ul {
+    list-style: none;
+    padding-left: 1.25rem;
+    margin-left: 0.5rem;
+    border-left: 1px dashed var(--bs-border-color);
+  }
+  li {
+    padding: 0.2rem 0;
+  }
+}
+
+// Envio de arquivo (arrastar e soltar ou escolher)
+.kt-file-drop {
+  border: 2px dashed var(--bs-border-color);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  text-align: center;
+  &.is-over {
+    border-color: $brand-color-primary-blue;
+    background: rgba($brand-color-primary-blue, 0.06);
+  }
+}
+.kt-file-preview {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  background: $white;
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+}
+.kt-doc-block {
   break-inside: avoid-page;
   margin-bottom: 1.5rem;
+}
+
+// ---------- Telas internas com a linguagem visual da Home ----------
+// Fundo azul-gelo, cabeçalhos com o gradiente e a grade técnica do hero, acentos laranja
+// e cartões claros com borda e sombra azuladas.
+$page-ice: #eaf6fb;
+$card-line: #cfe6ef;
+$card-tint: #f4fafd;
+$thead-tint: #e3f3fa;
+// cores dos acentos alternados (cartões de métricas)
+$kt-accents: ($brand-color-primary-blue, $brand-color-secondary-orange, #11866a, $analogous-color-b);
+
+@mixin kt-hero($from, $to, $glow: 0.35) {
+  background-color: $to;
+  background-image:
+    linear-gradient(rgba($white, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba($white, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 92% 20%, rgba($brand-color-secondary-orange, $glow), transparent 38%),
+    linear-gradient(135deg, $from, $to);
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto,
+    auto;
+}
+
+.kt-header {
+  background: linear-gradient(90deg, $brand-color-primary-blue, $home-blue-dark);
+  box-shadow: inset 0 -3px 0 $brand-color-secondary-orange;
+}
+.kt-main {
+  background: linear-gradient(180deg, $home-ice 0, $page-ice 24rem);
+}
+.kt-breadcrumbs {
+  background: $home-ice;
+}
+
+// Cartão principal das páginas: cabeçalho como o hero da Home
+.kt-card {
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 30px rgba($brand-color-primary-blue, 0.14);
+  > .card-header {
+    @include kt-hero($brand-color-primary-blue, $home-blue-dark);
+    border-radius: 0.75rem 0.75rem 0 0;
+    border-bottom: 4px solid $brand-color-secondary-orange;
+  }
+  > .card-footer {
+    background: linear-gradient(160deg, $home-blue-deep, $home-blue-night);
+    border-radius: 0 0 0.75rem 0.75rem;
+  }
+}
+
+// Cartões internos (detalhes, arquivos, planilhas de registro, projetos)
+// a cor vai na variável: bordas de destaque (barras laterais e superiores) continuam valendo
+.kt-main .card:not(.kt-card) {
+  --bs-card-border-color: #{$card-line};
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 16px rgba($brand-color-primary-blue, 0.1);
+  > .card-header {
+    background: $card-tint;
+    border-bottom-color: $card-line;
+    border-left: 4px solid $brand-color-secondary-orange;
+    color: $home-blue-deep;
+  }
+}
+// cartões que são links (lista de projetos): levantam no hover, como na Home
+.kt-main a.card {
+  border-left: 4px solid $brand-color-primary-blue;
+  background: linear-gradient(160deg, $white 55%, $card-tint);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  &:hover,
+  &:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 26px rgba($brand-color-primary-blue, 0.22);
+  }
+}
+
+// Métricas: cada cartão tingido com a sua cor (--acc, alternada entre as cores da marca)
+.kt-stat {
+  --acc: #{$brand-color-primary-blue};
+  border: 1px solid color-mix(in srgb, var(--acc) 25%, #{$white});
+  border-left: 5px solid var(--acc);
+  background: linear-gradient(150deg, color-mix(in srgb, var(--acc) 6%, #{$white}) 40%, color-mix(in srgb, var(--acc) 18%, #{$white}));
+  .kt-stat-value {
+    color: color-mix(in srgb, var(--acc) 75%, #{$black});
+  }
+  > .card-body > .bi {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    color: $white !important;
+    background: var(--acc);
+    margin-bottom: 0.25rem;
+  }
+}
+@for $i from 1 through length($kt-accents) {
+  .row > :nth-child(#{length($kt-accents)}n + #{$i}) > .kt-stat {
+    --acc: #{nth($kt-accents, $i)};
+  }
+}
+
+// Painel de contagem (tabelas das visões gerais): cabeçalho colorido
+.kt-count-panel {
+  --acc: #{$brand-color-primary-blue};
+  height: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: $white;
+  border: 1px solid color-mix(in srgb, var(--acc) 25%, #{$white});
+  box-shadow: 0 6px 16px rgba($brand-color-primary-blue, 0.1);
+  > h3,
+  > h4 {
+    margin: 0;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    color: $white;
+    background: linear-gradient(135deg, var(--acc), color-mix(in srgb, var(--acc) 60%, #{$home-blue-night}));
+  }
+  .table {
+    margin: 0;
+    td {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+  }
+  > p {
+    padding: 0.75rem 1rem;
+    margin: 0;
+  }
+}
+@for $i from 1 through length($kt-accents) {
+  .row > :nth-child(#{length($kt-accents)}n + #{$i}) > .kt-count-panel {
+    --acc: #{nth($kt-accents, $i)};
+  }
+}
+
+// Fases do CRISP-DM coloridas pela situação
+.kt-phase {
+  border-left: 5px solid $color-silver !important;
+  &.is-in_progress {
+    border-left-color: $brand-color-secondary-orange !important;
+    background: #fff7ef;
+  }
+  &.is-completed {
+    border-left-color: $color-bootstrap-success !important;
+    background: #f0faf4;
+  }
+}
+
+// Cartões coloridos (seções de engenharia, projetos...): cada um com a sua cor (--sec) e cabeçalho no estilo do hero da Home
+.kt-tinted {
+  background: linear-gradient(180deg, $page-ice, $home-ice);
+}
+.kt-pill.is-type {
+  background: color-mix(in srgb, var(--sec) 12%, #{$white});
+  color: color-mix(in srgb, var(--sec) 75%, #{$black});
+  border: 1px solid color-mix(in srgb, var(--sec) 30%, #{$white});
+}
+// cartão inteiro clicável (projetos): o texto não herda a cor de link
+a.kt-tile {
+  color: inherit;
+}
+// títulos longos quebram em até duas linhas
+.kt-tile > header h2 {
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.kt-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  &.is-on {
+    background: $brand-color-primary-blue;
+    color: $white;
+  }
+  &.is-soon {
+    background: #fff4e8;
+    color: #a34f00;
+    border: 1px solid #ffd2a6;
+  }
+}
+.kt-tile {
+  --sec: #{$brand-color-primary-blue};
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: $white;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 20px rgba($brand-color-primary-blue, 0.14);
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+  > header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.1rem 1.25rem;
+    padding-right: 6.5rem;
+    color: $white;
+    background-color: var(--sec);
+    background-image:
+      linear-gradient(rgba($white, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba($white, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 95% 10%, rgba($brand-color-secondary-orange, 0.45), transparent 45%),
+      linear-gradient(135deg, var(--sec), color-mix(in srgb, var(--sec) 55%, #{$home-blue-night}));
+    background-size:
+      24px 24px,
+      24px 24px,
+      auto,
+      auto;
+    border-bottom: 4px solid $brand-color-secondary-orange;
+    h2 {
+      color: $white;
+      font-size: 1.15rem;
+    }
+  }
+  .kt-tile-icon {
+    flex: 0 0 auto;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.6rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    background: $white;
+    color: var(--sec);
+    box-shadow: 0 4px 10px rgba($black, 0.2);
+  }
+  .kt-tile-tag {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    background: rgba($white, 0.2);
+    border: 1px solid rgba($white, 0.55);
+  }
+  .kt-tile-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 1.1rem 1.25rem 1.25rem;
+    background: linear-gradient(170deg, $white 50%, color-mix(in srgb, var(--sec) 8%, $white));
+    p {
+      flex: 1;
+      font-size: 0.9rem;
+      color: $brand-color-neutral;
+    }
+  }
+  .kt-tile-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    background: color-mix(in srgb, var(--sec) 12%, $white);
+    color: color-mix(in srgb, var(--sec) 75%, $black);
+    &.is-on {
+      background: #d7f2e3;
+      color: #146c43;
+    }
+    &.is-off,
+    &.is-muted {
+      background: #eceff1;
+      color: $color-dimgray;
+    }
+  }
+  .kt-tile-cta {
+    align-self: flex-start;
+    color: $white;
+    background: var(--sec);
+    border-color: var(--sec);
+    font-weight: 600;
+    &:hover,
+    &:focus-visible {
+      color: $white;
+      background: color-mix(in srgb, var(--sec) 80%, $black);
+    }
+  }
+  &.is-available:hover,
+  &.is-available:focus-within {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 30px rgba($brand-color-primary-blue, 0.25);
+  }
+  // fora do plano: cor mantida, mas mais discreta
+  &.is-locked > header {
+    filter: saturate(0.6);
+  }
+  // em breve: cabeçalho cinza-azulado, cartão tracejado
+  &.is-soon {
+    box-shadow: none;
+    border: 2px dashed #ffd2a6;
+    > header {
+      background-image:
+        linear-gradient(rgba($white, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba($white, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, #8a9aa3, #5f707a);
+      border-bottom-color: #ffd2a6;
+    }
+    .kt-tile-icon {
+      color: #5f707a;
+    }
+  }
+}
+
+// Abas do projeto em uma faixa azul-gelo
+.kt-tabs {
+  background: $page-ice;
+  border: 1px solid $card-line;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  .nav-link:hover,
+  .nav-link.active {
+    color: $home-blue-deep;
+  }
+}
+.kt-subnav .nav-link:not(.active) {
+  background: $white;
+  border: 1px solid $card-line;
+  &:hover {
+    background: $home-ice;
+    color: $home-blue-deep;
+  }
+}
+
+// Tabelas: cabeçalho azul-gelo (as planilhas CommonKADS mantêm o verde)
+.table:not(.kt-sheet) > thead > tr > th {
+  background-color: $thead-tint;
+  color: $home-blue-night;
+}
+.table {
+  --bs-table-hover-bg: #{rgba($brand-color-primary-blue, 0.06)};
+}
+.list-group-item {
+  border-color: $card-line;
+}
+.badge.text-bg-light {
+  background-color: $thead-tint !important;
+  color: $home-blue-deep !important;
+  border-color: $card-line !important;
+}
+
+// Modais com o cabeçalho da marca
+.modal-content {
+  border: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba($black, 0.25);
+}
+.modal-header {
+  @include kt-hero($brand-color-primary-blue, $home-blue-dark, 0.3);
+  border-bottom: 3px solid $brand-color-secondary-orange;
+  color: $white;
+  .modal-title {
+    color: $white;
+  }
+  .btn-close {
+    filter: invert(1) grayscale(1) brightness(2);
+    opacity: 0.9;
+  }
+}
+.modal-footer {
+  background: $card-tint;
+  border-top-color: $card-line;
+}
+
+// Telas de entrada/cadastro: cabeçalho laranja como a faixa "Como funciona"
+.kt-panel {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba($brand-color-primary-blue, 0.16);
+  .kt-panel-header {
+    background: linear-gradient(120deg, $home-orange-text-bg, #e8730a);
+  }
+}
+
+// ---------- Navegação e usabilidade ----------
+// Voltar: sempre no mesmo lugar, antes das migalhas de pão
+.kt-back {
+  border-radius: 999px;
+  padding: 0.2rem 0.85rem;
+  font-weight: 600;
+  background: $white;
+}
+// o foco vai para o conteúdo a cada navegação; o contorno não ajuda ali
+.kt-main:focus {
+  outline: none;
+}
+.kt-to-top {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1020;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: $white;
+  background: $brand-color-secondary-orange;
+  box-shadow: 0 8px 18px rgba($black, 0.25);
+  &:hover,
+  &:focus-visible {
+    color: $white;
+    background: $home-orange-text-bg;
+  }
+}
+.kt-dot {
+  font-size: 0.5rem;
+  vertical-align: middle;
 }
 
 // ---------- Tema escuro (componentes próprios; o Bootstrap cuida dos dele) ----------
@@ -1317,9 +1684,6 @@ $dark-link: #5cc6ec;
   color-scheme: dark;
 
   // o rodapé fica no azul da marca: o logo da OrkneyTech é um PNG com esse fundo
-  .kt-header {
-    background: $dark-chrome;
-  }
   .kt-footer {
     border-top: 4px solid $brand-color-secondary-orange;
   }
@@ -1334,17 +1698,6 @@ $dark-link: #5cc6ec;
   .kt-field-label {
     color: $dark-text;
   }
-  .kt-card {
-    --bs-card-bg: #{$dark-surface};
-    box-shadow: 0 3px 8px rgba($black, 0.5);
-    > .card-header,
-    > .card-footer {
-      background: #015a78;
-    }
-  }
-  .card {
-    --bs-card-bg: #{$dark-surface};
-  }
   .kt-pre {
     background: $dark-surface-2;
     border-color: $dark-border;
@@ -1354,6 +1707,192 @@ $dark-link: #5cc6ec;
     &.active {
       color: $dark-link;
     }
+  }
+
+  // Telas internas: a mesma linguagem da Home no escuro
+  .kt-header {
+    background: linear-gradient(90deg, $dark-chrome, #082029);
+  }
+  .kt-main {
+    background: linear-gradient(180deg, #0f1f27 0, $dark-bg 24rem);
+  }
+  .kt-breadcrumbs {
+    background: #0f1f27;
+  }
+  .kt-card {
+    --bs-card-bg: #{$dark-surface};
+    border: 1px solid $dark-border;
+    box-shadow: 0 12px 30px rgba($black, 0.45);
+    > .card-header {
+      @include kt-hero(#015a78, $dark-chrome, 0.25);
+    }
+    > .card-footer {
+      background: linear-gradient(160deg, #013f55, $dark-chrome);
+    }
+  }
+  .card {
+    --bs-card-bg: #{$dark-surface};
+  }
+  .kt-main .card:not(.kt-card) {
+    --bs-card-border-color: #{$dark-border};
+    box-shadow: 0 6px 16px rgba($black, 0.35);
+    > .card-header {
+      background: $dark-surface-2;
+      border-bottom-color: $dark-border;
+      color: $dark-text;
+    }
+  }
+  .kt-main a.card {
+    background: linear-gradient(160deg, $dark-surface 55%, $dark-surface-2);
+    &:hover,
+    &:focus-visible {
+      box-shadow: 0 14px 26px rgba($black, 0.5);
+    }
+  }
+  .kt-stat {
+    border-color: color-mix(in srgb, var(--acc) 35%, #{$dark-surface});
+    border-left-color: var(--acc);
+    background: linear-gradient(150deg, $dark-surface 40%, color-mix(in srgb, var(--acc) 22%, #{$dark-surface}));
+    .kt-stat-value {
+      color: color-mix(in srgb, var(--acc) 45%, #{$white});
+    }
+  }
+  .kt-count-panel {
+    background: $dark-surface;
+    border-color: color-mix(in srgb, var(--acc) 35%, #{$dark-surface});
+    box-shadow: 0 6px 16px rgba($black, 0.35);
+    > h3,
+    > h4 {
+      background: linear-gradient(135deg, color-mix(in srgb, var(--acc) 70%, #{$dark-chrome}), $dark-chrome);
+    }
+  }
+  .kt-phase {
+    &.is-in_progress {
+      background: #2b1e12;
+    }
+    &.is-completed {
+      background: #12291e;
+    }
+  }
+  .kt-pill.is-type {
+    background: color-mix(in srgb, var(--sec) 22%, #{$dark-surface});
+    color: color-mix(in srgb, var(--sec) 45%, $white);
+    border-color: color-mix(in srgb, var(--sec) 40%, #{$dark-surface});
+  }
+  .kt-tinted {
+    background: linear-gradient(180deg, $dark-surface, #0f1f27);
+  }
+  .kt-pill.is-soon {
+    background: #2b1e12;
+    color: #ffb067;
+    border-color: #5a3612;
+  }
+  .kt-tile {
+    background: $dark-surface;
+    border: 1px solid $dark-border;
+    box-shadow: 0 8px 20px rgba($black, 0.4);
+    > header {
+      background-image:
+        linear-gradient(rgba($white, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba($white, 0.06) 1px, transparent 1px),
+        radial-gradient(circle at 95% 10%, rgba($brand-color-secondary-orange, 0.3), transparent 45%),
+        linear-gradient(135deg, color-mix(in srgb, var(--sec) 75%, #{$dark-chrome}), $dark-chrome);
+    }
+    .kt-tile-icon {
+      background: $dark-surface-2;
+      color: color-mix(in srgb, var(--sec) 55%, $white);
+    }
+    .kt-tile-body {
+      background: linear-gradient(170deg, $dark-surface 50%, color-mix(in srgb, var(--sec) 12%, #{$dark-surface}));
+      p {
+        color: $dark-muted;
+      }
+    }
+    .kt-tile-chip {
+      background: color-mix(in srgb, var(--sec) 22%, #{$dark-surface});
+      color: color-mix(in srgb, var(--sec) 45%, $white);
+      &.is-on {
+        background: #143a2a;
+        color: #7fdcac;
+      }
+      &.is-off,
+      &.is-muted {
+        background: $dark-surface-2;
+        color: $dark-muted;
+      }
+    }
+    &.is-available:hover,
+    &.is-available:focus-within {
+      box-shadow: 0 16px 30px rgba($black, 0.55);
+    }
+    &.is-soon {
+      border-color: #5a3612;
+      > header {
+        background-image:
+          linear-gradient(rgba($white, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba($white, 0.06) 1px, transparent 1px),
+          linear-gradient(135deg, #3c4b53, #26333a);
+      }
+      .kt-tile-icon {
+        color: $dark-muted;
+      }
+    }
+  }
+  .kt-tabs {
+    background: #0f1f27;
+    border-color: $dark-border;
+    .nav-link:hover,
+    .nav-link.active {
+      color: $dark-link;
+    }
+  }
+  .kt-subnav .nav-link.active {
+    color: $white;
+  }
+  .kt-subnav .nav-link:not(.active) {
+    background: $dark-surface;
+    border-color: $dark-border;
+    &:hover {
+      background: $dark-surface-2;
+      color: $dark-text;
+    }
+  }
+  .table:not(.kt-sheet) > thead > tr > th {
+    background-color: $dark-surface-2;
+    color: $dark-text;
+  }
+  .table {
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: #{rgba($brand-color-primary-blue, 0.1)};
+  }
+  .list-group-item {
+    border-color: $dark-border;
+  }
+  .badge.text-bg-light {
+    background-color: #16303b !important;
+    color: $dark-link !important;
+    border-color: $dark-border !important;
+  }
+  .modal-content {
+    background: $dark-surface;
+    box-shadow: 0 20px 40px rgba($black, 0.6);
+  }
+  .modal-header {
+    @include kt-hero(#015a78, $dark-chrome, 0.22);
+  }
+  .modal-footer {
+    background: $dark-surface-2;
+    border-top-color: $dark-border;
+  }
+  .kt-panel .kt-panel-header {
+    background: linear-gradient(120deg, #a14c00, #6b3203);
+  }
+
+  .kt-back {
+    background: $dark-surface;
+  }
+  .kt-to-top {
+    box-shadow: 0 8px 18px rgba($black, 0.5);
   }
 
   // Home
@@ -1450,34 +1989,28 @@ $dark-link: #5cc6ec;
     box-shadow: 0 12px 30px rgba($black, 0.45);
   }
 
-  // Visão de Sistema
-  .kt-sv-nav .nav-link {
+  // Seções com sub-navegação e planilhas
+  .kt-subnav .nav-link {
     color: $dark-muted;
   }
-  .kt-uml {
-    --uml-stroke: #{$dark-muted};
-    --uml-fill: #{$dark-surface-2};
-    --uml-uc-stroke: #{$brand-color-primary-blue};
-    --uml-text: #{$dark-text};
-    --uml-boundary: #{$dark-surface};
-    --uml-label-bg: #{$dark-surface};
-  }
-  .kt-flow header,
-  .kt-flow.is-alternative header,
-  .kt-flow.is-exception header {
-    color: $dark-text;
-    .btn-link {
+  .kt-sheet {
+    border-color: #38572b;
+    > thead > tr > th {
+      background: #1f3319;
       color: $dark-text;
     }
+    > thead > tr.kt-sheet-title > th {
+      background: #2f4a25;
+    }
   }
-  .kt-flow header {
-    background: #2f4a25;
+  .kt-sipoc th {
+    background: #1f3319;
   }
-  .kt-flow.is-alternative header {
-    background: #263b20;
+  .kt-file-drop.is-over {
+    background: rgba($brand-color-primary-blue, 0.12);
   }
-  .kt-flow.is-exception header {
-    background: #4a2626;
+  .kt-file-preview {
+    background: $dark-surface-2;
   }
 
   // Kanban
@@ -1541,6 +2074,11 @@ $dark-link: #5cc6ec;
   }
   .kt-main {
     padding: 0;
+    background: none !important;
+  }
+  .kt-card {
+    box-shadow: none !important;
+    border: 0 !important;
   }
   .kt-report {
     font-size: 11pt;

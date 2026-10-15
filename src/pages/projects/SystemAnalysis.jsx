@@ -3,6 +3,7 @@ import { resourceApi, systemAnalysisApi } from '../../api/endpoints.js';
 import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { useToast } from '../../components/Toasts.jsx';
+import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { EmptyState, Loading } from '../../components/ui.jsx';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { formatDate, useAsync, useSubmit } from '../../lib/hooks.js';
@@ -16,21 +17,23 @@ function CountTable({ title, counts, enumName }) {
   const entries = Object.entries(counts ?? {});
   return (
     <div className="col-md-6 col-xl-4">
-      <h3 className="h4">{title}</h3>
-      {entries.length === 0 ? (
-        <p className="text-body-secondary small">{t('common.empty')}</p>
-      ) : (
-        <table className="table table-sm">
-          <tbody>
-            {entries.map(([key, n]) => (
-              <tr key={key}>
-                <td>{t(`enums.${enumName}.${key}`)}</td>
-                <td className="text-end fw-semibold">{n}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+      <section className="kt-count-panel">
+        <h3>{title}</h3>
+        {entries.length === 0 ? (
+          <p className="text-body-secondary small">{t('common.empty')}</p>
+        ) : (
+          <table className="table table-sm">
+            <tbody>
+              {entries.map(([key, n]) => (
+                <tr key={key}>
+                  <td>{t(`enums.${enumName}.${key}`)}</td>
+                  <td className="text-end fw-semibold">{n}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
     </div>
   );
 }
@@ -46,13 +49,14 @@ function Overview() {
     <>
       <div className="row g-3 mb-4">
         {[
-          ['requirements', counts.requirements.total],
-          ['userStories', counts.userStories.total],
-          ['diagrams', counts.diagrams.total],
-        ].map(([key, n]) => (
+          ['requirements', counts.requirements.total, 'list-check'],
+          ['userStories', counts.userStories.total, 'person-lines-fill'],
+          ['diagrams', counts.diagrams.total, 'diagram-3'],
+        ].map(([key, n, icon]) => (
           <div className="col-sm-4" key={key}>
             <div className="card kt-stat h-100">
               <div className="card-body">
+                <i className={`bi bi-${icon}`} aria-hidden="true" />
                 <div className="kt-stat-value">{n}</div>
                 <div className="text-body-secondary">{t(`project.tabs.${key}`)}</div>
               </div>
@@ -87,10 +91,15 @@ function AnalysisForm({ initial, projectId }) {
   const { submit, busy, errors } = useSubmit((body) => systemAnalysisApi.updateAnalysis(projectId, body), {
     onSuccess: () => toast.success(t('common.saved')),
   });
+  // depois de salvar, o que está no formulário passa a ser a referência
+  const [saved, setSaved] = useState(() => toFormValues(ANALYSIS_FIELDS, initial));
+  const dirty = !sameValues(values, saved);
+  useUnsavedChanges(dirty);
   return (
-    <form noValidate onSubmit={(e) => { e.preventDefault(); submit(toPayload(ANALYSIS_FIELDS, values, t)); }}>
+    <form noValidate onKeyDown={saveShortcut}
+      onSubmit={(e) => { e.preventDefault(); submit(toPayload(ANALYSIS_FIELDS, values, t)).then((r) => r && setSaved(values)); }}>
       <FieldGrid fields={ANALYSIS_FIELDS} values={values} errors={errors} onChange={(n, v) => setValues((s) => ({ ...s, [n]: v }))} />
-      <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? t('common.saving') : t('common.save')}</button>
+      <SaveButton busy={busy} dirty={dirty} />
     </form>
   );
 }
