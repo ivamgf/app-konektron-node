@@ -16,6 +16,7 @@ const SHARED_TABS = [
   ['ontologies', 'ontologies', 'diagram-2', 'ontologies'],
   ['bpm', 'bpm', 'bezier2', 'bpm'],
   ['commonkads', 'commonkads', 'journal-richtext', 'commonkads'],
+  ['scrum', 'scrum', 'arrow-repeat', 'scrum'],
 ];
 
 const TABS = {
@@ -25,6 +26,7 @@ const TABS = {
     ['requirements', 'requirements', 'list-check'],
     ['user-stories', 'userStories', 'person-lines-fill'],
     ['diagrams', 'diagrams', 'diagram-3'],
+    ['function-points', 'functionPoints', 'calculator', 'function-point'],
     ...SHARED_TABS,
     ['kanban', 'kanban', 'kanban'],
     ['report', 'report', 'file-earmark-pdf'],

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.1.0 — 2026-10-15
+
+Requer a API 4.1.0.
+
+### Adicionado
+- **Formulário de contato** na página Contatos (nome, e-mail, assunto e mensagem, com aviso antes de sair com a
+  mensagem não enviada) e a aba **Mensagens** na administração: filtro por situação, leitura (abrir marca como
+  lida), responder por e-mail, mudar a situação e excluir.
+- Aba **Pontos de Função** (projetos de software, plano Master): contagens com o total de PF e a página da contagem
+  no formato das planilhas — tipo de contagem, determinação do escopo (ALI/AIE), tabela de complexidade (TD/TR) e
+  tabela de contribuição IFPUG — com o cadastro das funções (complexidade e PF calculados), estimativa de esforço e
+  custo e as tabelas de referência do IFPUG.
+- Aba **Scrum** (qualquer tipo de projeto, planos Standard e Master): visão geral com a sprint atual, burndown e
+  velocidade; projeto e papéis (Product Owner, Scrum Master, Developers); Product Backlog ordenável; sprints com
+  Sprint Backlog, quadro de tasks e eventos; eventos (planning, daily, review, retrospectiva, refinamento); e
+  artefatos com os seus compromissos (Meta do Produto, Meta da Sprint, Definição de Pronto) e os incrementos.
+- Gráficos de burndown e velocidade em SVG, com legenda, tooltip, foco pelo teclado e os dados em tabela.
+
 ## 2.0.0 — 2026-10-14
 
 Requer a API 4.0.0.

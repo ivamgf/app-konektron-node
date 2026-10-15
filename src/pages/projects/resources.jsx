@@ -29,6 +29,16 @@ export const ENUMS = {
   agentKind: ['human', 'information_system', 'other'],
   itemRole: ['core', 'support'],
   communicationType: ['request', 'require', 'order', 'propose', 'offer', 'agree', 'reject', 'ask', 'reply', 'report', 'inform'],
+  fpCountType: ['development', 'enhancement', 'application'],
+  fpType: ['ilf', 'eif', 'ei', 'eo', 'eq'],
+  fpAction: ['add', 'change', 'delete'],
+  complexity: ['low', 'average', 'high'],
+  scrumRole: ['product_owner', 'scrum_master', 'developer', 'stakeholder'],
+  itemType: ['story', 'bug', 'technical', 'spike'],
+  itemStatus: ['new', 'ready', 'in_progress', 'done'],
+  sprintStatus: ['planned', 'active', 'completed', 'cancelled'],
+  taskStatus: ['todo', 'in_progress', 'done'],
+  eventType: ['planning', 'daily', 'review', 'retrospective', 'refinement'],
 };
 
 // Extensões aceitas no upload (iguais às da API)

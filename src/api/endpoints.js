@@ -62,6 +62,25 @@ export const commonkadsApi = {
   updateWorksheet: (pid, key, body) => api.patch(`/projects/${pid}/commonkads/worksheets/${key}`, body),
 };
 
+// Pontos de Função (projetos software) e Scrum (qualquer projeto)
+export const fpApi = {
+  overview: (pid) => api.get(`/projects/${pid}/function-points`),
+  summary: (pid, id) => api.get(`/projects/${pid}/function-points/counts/${id}/summary`),
+};
+
+export const scrumApi = {
+  overview: (pid) => api.get(`/projects/${pid}/scrum`),
+  settings: (pid) => api.get(`/projects/${pid}/scrum/settings`),
+  updateSettings: (pid, body) => api.patch(`/projects/${pid}/scrum/settings`, body),
+  sprint: (pid, id) => api.get(`/projects/${pid}/scrum/sprints/${id}/detail`),
+  moveItem: (pid, id, position) => api.post(`/projects/${pid}/scrum/items/${id}/move`, { position }),
+};
+
+// Formulário de contato (público; com sessão, a mensagem fica ligada ao usuário)
+export const contactApi = {
+  send: (body) => api.post('/contact', body),
+};
+
 // Arquivo anexado a um registro (ontologia, diagrama BPMN): <caminho do registro>/file
 export const fileApi = (itemPath) => ({
   upload: (file) => api.upload(`${itemPath}/file`, file),
@@ -97,4 +116,7 @@ export const adminApi = {
   updateUser: (id, body) => api.patch(`/admin/users/${id}`, body),
   removeUser: (id) => api.del(`/admin/users/${id}`),
   logs: (query) => api.get('/admin/logs', query),
+  messages: (query) => api.get('/admin/contact-messages', query),
+  updateMessage: (id, body) => api.patch(`/admin/contact-messages/${id}`, body),
+  removeMessage: (id) => api.del(`/admin/contact-messages/${id}`),
 };

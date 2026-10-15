@@ -13,7 +13,7 @@ const PAGE_SIZE = 20;
 
 export function AdminLayout() {
   const { t } = useI18n();
-  const tabs = [['', 'summary', 'speedometer2'], ['users', 'users', 'people'], ['logs', 'logs', 'journal-text']];
+  const tabs = [['', 'summary', 'speedometer2'], ['users', 'users', 'people'], ['messages', 'messages', 'envelope'], ['logs', 'logs', 'journal-text']];
   return (
     <div className="container-xl px-3 mt-3">
       <ContentCard icon="shield-lock" as="h1" title={t('admin.title')}>
@@ -303,6 +303,99 @@ export function AdminLogs() {
             </table>
           </div>
           <Pagination page={page} pageSize={PAGE_SIZE} total={logs.data.total} onChange={setPage} />
+        </>
+      )}
+    </>
+  );
+}
+
+// Mensagens do formulário de contato
+const MESSAGE_STATUS = ['new', 'read', 'answered', 'archived'];
+const MESSAGE_BADGE = { new: 'text-bg-accent', read: 'text-bg-primary', answered: 'text-bg-success', archived: 'text-bg-secondary' };
+
+export function AdminMessages() {
+  const { t, locale } = useI18n();
+  const toast = useToast();
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState('');
+  const [openId, setOpenId] = useState(null);
+  const data = useAsync(() => adminApi.messages({ page, pageSize: PAGE_SIZE, status: status || undefined }), [page, status]);
+
+  const update = async (m, next) => {
+    try {
+      await adminApi.updateMessage(m.id, { status: next });
+      data.reload();
+    } catch (err) {
+      toast.fromError(err);
+    }
+  };
+  // abrir uma mensagem nova a marca como lida
+  const toggle = (m) => {
+    setOpenId(openId === m.id ? null : m.id);
+    if (openId !== m.id && m.status === 'new') update(m, 'read');
+  };
+  const remove = async (m) => {
+    if (!window.confirm(t('common.confirmDelete', { name: m.subject }))) return;
+    try {
+      await adminApi.removeMessage(m.id);
+      toast.success(t('common.deleted'));
+      data.reload();
+    } catch (err) {
+      toast.fromError(err);
+    }
+  };
+
+  const by = data.data?.byStatus ?? {};
+  return (
+    <>
+      <div className="d-flex flex-wrap gap-2 mb-3" role="group" aria-label={t('common.filter')}>
+        {['', ...MESSAGE_STATUS].map((st) => (
+          <button key={st || 'all'} type="button" aria-pressed={status === st}
+            className={`btn btn-sm ${status === st ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => { setStatus(st); setPage(1); }}>
+            {st ? t(`enums.contactStatus.${st}`) : t('common.all')}
+            {st && by[st] ? <span className="badge text-bg-light ms-1">{by[st]}</span> : null}
+          </button>
+        ))}
+      </div>
+      {data.loading && !data.data ? <Loading small /> : !data.data?.data.length ? (
+        <EmptyState>{t('admin.noMessages')}</EmptyState>
+      ) : (
+        <>
+          <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
+            {data.data.data.map((m) => (
+              <li key={m.id} className={`kt-message is-${m.status}`}>
+                <button type="button" className="kt-message-head" aria-expanded={openId === m.id} onClick={() => toggle(m)}>
+                  <span className={`badge ${MESSAGE_BADGE[m.status]}`}>{t(`enums.contactStatus.${m.status}`)}</span>
+                  <strong className="text-truncate">{m.subject}</strong>
+                  <span className="small text-body-secondary text-truncate">{m.name} &lt;{m.email}&gt;</span>
+                  <span className="small text-body-secondary ms-auto text-nowrap">{formatDate(m.createdAt, locale)}</span>
+                  <i className={`bi bi-chevron-${openId === m.id ? 'up' : 'down'}`} aria-hidden="true" />
+                </button>
+                {openId === m.id && (
+                  <div className="kt-message-body">
+                    <p className="kt-prewrap">{m.message}</p>
+                    <div className="d-flex flex-wrap align-items-center gap-2">
+                      <a className="btn btn-sm btn-primary"
+                        href={`mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.subject}`)}`}
+                        onClick={() => m.status !== 'answered' && update(m, 'answered')}>
+                        <i className="bi bi-reply me-1" aria-hidden="true" />{t('admin.reply')}
+                      </a>
+                      <label className="small text-body-secondary ms-2" htmlFor={`st-${m.id}`}>{t('admin.markAs')}</label>
+                      <select id={`st-${m.id}`} className="form-select form-select-sm w-auto" value={m.status}
+                        onChange={(e) => update(m, e.target.value)}>
+                        {MESSAGE_STATUS.map((st) => <option key={st} value={st}>{t(`enums.contactStatus.${st}`)}</option>)}
+                      </select>
+                      <button type="button" className="btn btn-sm btn-outline-danger ms-auto" onClick={() => remove(m)}>
+                        <i className="bi bi-trash me-1" aria-hidden="true" />{t('common.delete')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          <Pagination page={page} pageSize={PAGE_SIZE} total={data.data.total} onChange={setPage} />
         </>
       )}
     </>

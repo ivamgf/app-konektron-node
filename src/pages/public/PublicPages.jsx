@@ -1,21 +1,24 @@
 import { useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { contactApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { CONTACT_EMAIL, SITE_URL } from '../../components/Layout.jsx';
+import { SaveButton, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.jsx';
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
+import { useSubmit } from '../../lib/hooks.js';
 
 // Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
-export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'kanban'];
+export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban'];
 export const PLAN_SECTIONS = {
   free: ['system-analysis', 'kanban'],
-  standard: ['system-analysis', 'bpm', 'crisp-dm', 'kanban'],
+  standard: ['system-analysis', 'bpm', 'crisp-dm', 'scrum', 'kanban'],
   master: SECTION_KEYS,
 };
-export const IMPLEMENTED = ['system-analysis', 'ontologies', 'bpm', 'commonkads', 'crisp-dm', 'kanban'];
-// Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Kanban)
-export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'crisp-dm': 'data_analysis' };
+export const IMPLEMENTED = SECTION_KEYS;
+// Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
+export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
 // Administradores acessam todas as seções
 export const canAccessSection = (user, section) =>
   user?.role === 'admin' || (PLAN_SECTIONS[user?.plan] ?? []).includes(section);
@@ -26,6 +29,7 @@ export const SECTION_ICONS = {
   'function-point': 'calculator',
   commonkads: 'journal-richtext',
   'crisp-dm': 'bar-chart-steps',
+  scrum: 'arrow-repeat',
   kanban: 'kanban',
 };
 const FEATURED_PLAN = 'standard';
@@ -221,28 +225,101 @@ export function About() {
   );
 }
 
+// Formulário de contato: a API guarda a mensagem e a envia para a equipe
+function ContactForm() {
+  const { t } = useI18n();
+  const { user } = useAuth();
+  const blank = { name: '', email: user?.email ?? '', subject: '', message: '', website: '' };
+  const [values, setValues] = useState(blank);
+  const [sentTo, setSentTo] = useState(null);
+  const id = useId();
+  const { submit, busy, errors } = useSubmit((body) => contactApi.send(body), {
+    onSuccess: () => {
+      setSentTo(values.email.trim());
+      setValues(blank);
+    },
+  });
+  // mensagem escrita e não enviada: avisa antes de sair da página
+  useUnsavedChanges(!sentTo && Boolean(values.message.trim() || values.subject.trim()));
+  const set = (name) => (e) => setValues((v) => ({ ...v, [name]: e.target.value }));
+
+  if (sentTo) {
+    return (
+      <div className="kt-contact-sent text-center py-4" role="status">
+        <i className="bi bi-envelope-check fs-1" aria-hidden="true" />
+        <h3 className="h3 mt-2">{t('contacts.sentTitle')}</h3>
+        <p>{t('contacts.sentText', { email: sentTo })}</p>
+        <button type="button" className="btn btn-outline-primary" onClick={() => setSentTo(null)}>{t('contacts.another')}</button>
+      </div>
+    );
+  }
+
+  const field = (name, label, props = {}) => (
+    <div className={`mb-3 ${props.col ?? 'col-12'}`}>
+      <label className="form-label fw-semibold" htmlFor={`${id}-${name}`}>
+        {label}<span className="text-danger" aria-hidden="true"> *</span>
+      </label>
+      {props.textarea ? (
+        <textarea id={`${id}-${name}`} className={`form-control ${errors[name] ? 'is-invalid' : ''}`} rows={6} maxLength={5000}
+          required value={values[name]} onChange={set(name)} aria-describedby={`${id}-${name}-help`} />
+      ) : (
+        <input id={`${id}-${name}`} type={props.type ?? 'text'} className={`form-control ${errors[name] ? 'is-invalid' : ''}`}
+          maxLength={props.maxLength} required autoComplete={props.autoComplete} value={values[name]} onChange={set(name)} />
+      )}
+      {props.help && <div className="form-text" id={`${id}-${name}-help`}>{props.help}</div>}
+      {errors[name] && <div className="invalid-feedback d-block">{errors[name]}</div>}
+    </div>
+  );
+
+  return (
+    <form noValidate onSubmit={(e) => { e.preventDefault(); submit(values); }} aria-labelledby={`${id}-title`}>
+      <h3 className="h3 mb-1" id={`${id}-title`}>{t('contacts.formTitle')}</h3>
+      <p className="small text-body-secondary">{t('contacts.formLead')}</p>
+      <div className="row">
+        {field('name', t('contacts.name'), { col: 'col-md-6', maxLength: 120, autoComplete: 'name' })}
+        {field('email', t('contacts.yourEmail'), { col: 'col-md-6', type: 'email', maxLength: 254, autoComplete: 'email' })}
+        {field('subject', t('contacts.subject'), { maxLength: 150 })}
+        {field('message', t('contacts.message'), { textarea: true, help: t('contacts.messageHelp', { count: values.message.length }) })}
+      </div>
+      {/* armadilha para robôs: invisível para pessoas e leitores de tela */}
+      <div className="kt-hp" aria-hidden="true">
+        <label htmlFor={`${id}-website`}>Website</label>
+        <input id={`${id}-website`} tabIndex={-1} autoComplete="off" value={values.website} onChange={set('website')} />
+      </div>
+      <SaveButton busy={busy} label={busy ? t('contacts.sending') : t('contacts.send')} />
+    </form>
+  );
+}
+
 export function Contacts() {
   const { t } = useI18n();
   return (
     <div className="container-xl px-3 mt-3" style={{ maxWidth: 1232 }}>
-      <ContentCard icon="geo-alt" title={t('contacts.title')} as="h1" footer={`© OrkneyTech · ${SITE_URL}`}>
-        <div className="position-relative pe-5">
-          <h2 className="h1 mb-3">{t('contacts.heading')}</h2>
-          <p className="mb-4">{t('contacts.text')}</p>
-          <dl className="row mb-4">
-            <dt className="col-sm-2">{t('contacts.site')}</dt>
-            <dd className="col-sm-10">
-              <a href={`https://${SITE_URL}`} target="_blank" rel="noopener noreferrer">{SITE_URL}</a>
-            </dd>
-            <dt className="col-sm-2">{t('contacts.email')}</dt>
-            <dd className="col-sm-10">
-              <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-            </dd>
-          </dl>
-          <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-primary">{t('contacts.write')}</a>
-          <svg className="kt-wave d-none d-md-block" viewBox="0 0 70 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d="M70 0H8C40 20 40 40 20 60 4 76 0 90 0 100H70Z" fill="currentColor" />
-          </svg>
+      <ContentCard icon="geo-alt" title={t('contacts.title')} as="h1" footer={`© OrkneyTech · ${SITE_URL}`} bodyClassName="kt-tinted">
+        <div className="row g-4">
+          <div className="col-lg-5 position-relative">
+            <h2 className="h1 mb-3">{t('contacts.heading')}</h2>
+            <p className="mb-4">{t('contacts.text')}</p>
+            <dl className="row mb-4">
+              <dt className="col-sm-2">{t('contacts.site')}</dt>
+              <dd className="col-sm-10">
+                <a href={`https://${SITE_URL}`} target="_blank" rel="noopener noreferrer">{SITE_URL}</a>
+              </dd>
+              <dt className="col-sm-2">{t('contacts.email')}</dt>
+              <dd className="col-sm-10">
+                <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              </dd>
+            </dl>
+            <p className="small text-body-secondary mb-2">{t('contacts.or')}</p>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-outline-primary">
+              <i className="bi bi-envelope me-1" aria-hidden="true" />{t('contacts.write')}
+            </a>
+          </div>
+          <div className="col-lg-7">
+            <div className="kt-contact-card">
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </ContentCard>
     </div>

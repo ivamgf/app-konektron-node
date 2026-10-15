@@ -17,9 +17,10 @@ const SECTION_COLORS = {
   'system-analysis': '#0189b6',
   ontologies: '#0b74e3',
   bpm: '#d96a04',
-  'function-point': '#6c757d',
+  'function-point': '#6f42c1',
   commonkads: '#0b39d9',
   'crisp-dm': '#11866a',
+  scrum: '#b4410c',
   kanban: '#0c8d8b',
 };
 
