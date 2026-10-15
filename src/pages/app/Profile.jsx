@@ -5,8 +5,9 @@ import { useAuth } from '../../auth/AuthProvider.jsx';
 import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { useToast } from '../../components/Toasts.jsx';
+import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { ContentCard, Loading, Modal } from '../../components/ui.jsx';
-import { useI18n } from '../../i18n/I18nProvider.jsx';
+import { LANGUAGES, useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync, useSubmit } from '../../lib/hooks.js';
 import { addressConfig } from '../projects/resources.jsx';
 import { VerifyBanner } from './Dashboard.jsx';
@@ -29,7 +30,7 @@ function PersonalTab({ profile, onSaved }) {
     { name: 'avatarUrl', label: 'profile.avatarUrl', type: 'url', maxLength: 500, col: 'col-md-8' },
     {
       name: 'locale', label: 'profile.locale', type: 'select', required: true, col: 'col-md-4',
-      options: [{ value: 'en', label: t('enums.locale.en') }, { value: 'pt-BR', label: t('enums.locale.pt-BR') }],
+      options: LANGUAGES.map(({ code }) => ({ value: code, label: t(`enums.locale.${code}`) })),
     },
   ];
   const [values, setValues] = useState(() => toFormValues(fields, profile));
@@ -40,10 +41,12 @@ function PersonalTab({ profile, onSaved }) {
       onSaved(updated);
     },
   });
+  const dirty = !sameValues(values, toFormValues(fields, profile));
+  useUnsavedChanges(dirty);
   return (
-    <form noValidate onSubmit={(e) => { e.preventDefault(); submit(toPayload(fields, values, t)); }}>
+    <form noValidate onKeyDown={saveShortcut} onSubmit={(e) => { e.preventDefault(); submit(toPayload(fields, values, t)); }}>
       <FieldGrid fields={fields} values={values} errors={errors} onChange={(n, v) => setValues((s) => ({ ...s, [n]: v }))} />
-      <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? t('common.saving') : t('common.save')}</button>
+      <SaveButton busy={busy} dirty={dirty} />
     </form>
   );
 }

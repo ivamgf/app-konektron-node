@@ -77,7 +77,7 @@ export const formatDate = (value, locale) => {
     const [y, m, d] = value.split('-');
     return locale === 'en' ? `${m}/${d}/${y}` : `${d}/${m}/${y}`;
   }
-  return new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'pt-BR', {
+  return new Date(value).toLocaleString({ en: 'en-US', es: 'es-ES' }[locale] ?? 'pt-BR', {
     dateStyle: 'short',
     timeStyle: 'short',
   });

@@ -45,6 +45,43 @@ export const crispdmApi = {
   updatePhase: (pid, phase, body) => api.patch(`/projects/${pid}/crisp-dm/phases/${phase}`, body),
 };
 
+// Seções para qualquer tipo de projeto. Os cadastros usam resourceApi (abaixo).
+export const ontologiesApi = {
+  summary: (pid) => api.get(`/projects/${pid}/ontologies/summary`),
+};
+
+export const bpmApi = {
+  overview: (pid) => api.get(`/projects/${pid}/bpm`),
+};
+
+export const commonkadsApi = {
+  overview: (pid) => api.get(`/projects/${pid}/commonkads`),
+  report: (pid) => api.get(`/projects/${pid}/commonkads/report`),
+  worksheets: (pid) => api.get(`/projects/${pid}/commonkads/worksheets`),
+  worksheet: (pid, key) => api.get(`/projects/${pid}/commonkads/worksheets/${key}`),
+  updateWorksheet: (pid, key, body) => api.patch(`/projects/${pid}/commonkads/worksheets/${key}`, body),
+};
+
+// Arquivo anexado a um registro (ontologia, diagrama BPMN): <caminho do registro>/file
+export const fileApi = (itemPath) => ({
+  upload: (file) => api.upload(`${itemPath}/file`, file),
+  download: () => api.blob(`${itemPath}/file`),
+  remove: () => api.del(`${itemPath}/file`),
+});
+
+// Kanban (qualquer tipo de projeto). Os movimentos devolvem o quadro atualizado.
+export const kanbanApi = {
+  board: (pid) => api.get(`/projects/${pid}/kanban`),
+  createColumn: (pid, body) => api.post(`/projects/${pid}/kanban/columns`, body),
+  updateColumn: (pid, id, body) => api.patch(`/projects/${pid}/kanban/columns/${id}`, body),
+  removeColumn: (pid, id) => api.del(`/projects/${pid}/kanban/columns/${id}`),
+  moveColumn: (pid, id, position) => api.post(`/projects/${pid}/kanban/columns/${id}/move`, { position }),
+  createCard: (pid, body) => api.post(`/projects/${pid}/kanban/cards`, body),
+  updateCard: (pid, id, body) => api.patch(`/projects/${pid}/kanban/cards/${id}`, body),
+  removeCard: (pid, id) => api.del(`/projects/${pid}/kanban/cards/${id}`),
+  moveCard: (pid, id, columnId, position) => api.post(`/projects/${pid}/kanban/cards/${id}/move`, { columnId, position }),
+};
+
 // CRUD genérico para os recursos que seguem o crudRouter da API
 export const resourceApi = (basePath) => ({
   list: (query) => api.get(basePath, query),

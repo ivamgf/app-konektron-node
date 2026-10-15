@@ -2,89 +2,197 @@ import { useId, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { CONTACT_EMAIL, SITE_URL } from '../../components/Layout.jsx';
-import { BrandMark, ContentCard, Panel } from '../../components/ui.jsx';
+import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.jsx';
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 
-// Planos e seções (espelha a API: config/plans.js)
-export const SECTION_KEYS = ['system-analysis', 'system-view', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm'];
-const PLAN_SECTIONS = {
-  free: ['system-analysis'],
-  standard: ['system-analysis', 'system-view', 'bpm', 'crisp-dm'],
+// Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
+export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'kanban'];
+export const PLAN_SECTIONS = {
+  free: ['system-analysis', 'kanban'],
+  standard: ['system-analysis', 'bpm', 'crisp-dm', 'kanban'],
   master: SECTION_KEYS,
 };
-const IMPLEMENTED = ['system-analysis', 'crisp-dm'];
+export const IMPLEMENTED = ['system-analysis', 'ontologies', 'bpm', 'commonkads', 'crisp-dm', 'kanban'];
+// Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Kanban)
+export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'crisp-dm': 'data_analysis' };
+// Administradores acessam todas as seções
+export const canAccessSection = (user, section) =>
+  user?.role === 'admin' || (PLAN_SECTIONS[user?.plan] ?? []).includes(section);
+export const SECTION_ICONS = {
+  'system-analysis': 'diagram-3',
+  ontologies: 'diagram-2',
+  bpm: 'bezier2',
+  'function-point': 'calculator',
+  commonkads: 'journal-richtext',
+  'crisp-dm': 'bar-chart-steps',
+  kanban: 'kanban',
+};
+const FEATURED_PLAN = 'standard';
 
 export function Home() {
   const { t } = useI18n();
   const { status } = useAuth();
   const authed = status === 'authenticated';
+  // disponíveis primeiro, na ordem do catálogo
+  const sections = [...SECTION_KEYS].sort((a, b) => IMPLEMENTED.includes(b) - IMPLEMENTED.includes(a));
+  const stats = [
+    [SECTION_KEYS.length, 'sections'],
+    [IMPLEMENTED.length, 'available'],
+    [Object.keys(PLAN_SECTIONS).length, 'plans'],
+  ];
+
   return (
-    <>
-      <section className="kt-hero mb-5">
-        <div className="container-xl py-5 d-flex flex-wrap align-items-center gap-5">
-          <div className="flex-grow-1" style={{ maxWidth: 640 }}>
-            <p className="ds-label text-uppercase mb-2">KoneKtron</p>
-            <h1 className="display-large text-white mb-3">{t('home.title')}</h1>
-            <p className="text-large mb-4">{t('home.lead')}</p>
-            {authed ? (
-              <Link to="/projects" className="btn btn-accent btn-lg fw-bold">{t('home.goDashboard')}</Link>
-            ) : (
-              <div className="d-flex flex-wrap gap-3">
-                <Link to="/signup" className="btn btn-accent btn-lg fw-bold">{t('home.start')}</Link>
-                <Link to="/signin" className="btn btn-outline-light btn-lg">{t('nav.signin')}</Link>
-              </div>
-            )}
+    <div className="kt-home">
+      <section className="kt-home-hero">
+        <span className="kt-home-hero-shape d-none d-md-block" aria-hidden="true" />
+        <div className="container-xl px-3 py-5 d-flex flex-wrap align-items-center gap-5 position-relative">
+          <div className="flex-grow-1 py-md-4" style={{ maxWidth: 640 }}>
+            <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
+              <span className="kt-home-eyebrow">
+                <i className="bi bi-diagram-3 me-1" aria-hidden="true" /> KoneKtron
+              </span>
+              <ThemeToggle />
+            </div>
+            <h1 className="kt-home-title mb-3">{t('home.title')}</h1>
+            <p className="kt-home-lead mb-4">{t('home.lead')}</p>
+            <div className="d-flex flex-wrap gap-3 mb-5">
+              {authed ? (
+                <Link to="/projects" className="btn btn-accent btn-lg fw-bold px-4">
+                  {t('home.goDashboard')} <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+                </Link>
+              ) : (
+                <>
+                  <Link to="/signup" className="btn btn-accent btn-lg fw-bold px-4">
+                    {t('home.start')} <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+                  </Link>
+                  <Link to="/signin" className="btn btn-outline-light btn-lg px-4">{t('nav.signin')}</Link>
+                </>
+              )}
+            </div>
+            <dl className="kt-home-stats mb-0">
+              {stats.map(([n, key]) => (
+                <div key={key}>
+                  <dt>{n}</dt>
+                  <dd>{t(`home.stats.${key}`)}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
-          <BrandMark size={240} className="mx-auto" />
+          <div className="kt-home-tile mx-auto">
+            <BrandMark size={220} title="KoneKtron" />
+          </div>
         </div>
       </section>
 
-      <div className="container-xl px-3">
-        <h2 className="display-tiny mb-4">{t('home.sectionsTitle')}</h2>
-        <div className="row g-4 mb-5">
-          {SECTION_KEYS.map((key) => {
-            const ready = IMPLEMENTED.includes(key);
-            return (
-              <div className="col-sm-6 col-lg-4" key={key}>
-                <div className={`card kt-section-card ${ready ? 'is-available' : ''}`}>
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
-                      <h3 className="h3 mb-0">{t(`sections.${key}.name`)}</h3>
-                      <span className={`badge ${ready ? 'text-bg-primary' : 'text-bg-light border'}`}>
-                        {ready ? t('sections.available') : t('sections.soon')}
-                      </span>
-                    </div>
-                    <p className="text-small mb-0">{t(`sections.${key}.text`)}</p>
-                  </div>
+      <section className="kt-home-band kt-home-steps kt-on-color" aria-labelledby="kt-home-how">
+        <div className="container-xl px-3">
+          <h2 className="kt-home-heading" id="kt-home-how">{t('home.howTitle')}</h2>
+          <p className="kt-home-sub">{t('home.howLead')}</p>
+          <ol className="row g-3 list-unstyled mb-0">
+            {['create', 'document', 'report'].map((key) => (
+              <li className="col-md-4" key={key}>
+                <div className="kt-home-step">
+                  <h3>{t(`home.steps.${key}.title`)}</h3>
+                  <p>{t(`home.steps.${key}.text`)}</p>
                 </div>
-              </div>
-            );
-          })}
+              </li>
+            ))}
+          </ol>
         </div>
+      </section>
 
-        <h2 className="display-tiny mb-3">{t('home.plansTitle')}</h2>
-        <div className="table-responsive mb-2">
-          <table className="table align-middle">
-            <thead>
-              <tr>
-                <th scope="col">{t('home.plan')}</th>
-                <th scope="col">{t('home.sections')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(PLAN_SECTIONS).map(([plan, sections]) => (
-                <tr key={plan}>
-                  <th scope="row">{t(`plans.${plan}`)}</th>
-                  <td>{sections.map((s) => t(`sections.${s}.name`)).join(', ')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <section className="kt-home-band kt-home-sections" aria-labelledby="kt-home-sections">
+        <div className="container-xl px-3">
+          <h2 className="kt-home-heading" id="kt-home-sections">{t('home.sectionsTitle')}</h2>
+          <p className="kt-home-sub">{t('home.sectionsLead')}</p>
+          <ul className="row g-4 list-unstyled mb-0">
+            {sections.map((key) => {
+              const ready = IMPLEMENTED.includes(key);
+              const body = (
+                <>
+                  <span className="kt-home-tag">{ready ? t('sections.available') : t('sections.soon')}</span>
+                  <span className="kt-home-icon"><i className={`bi bi-${SECTION_ICONS[key]}`} aria-hidden="true" /></span>
+                  <h3>{t(`sections.${key}.name`)}</h3>
+                  <p>{t(`sections.${key}.text`)}</p>
+                  {ready && (
+                    <span className="kt-home-more">
+                      {t('home.learnMore')} <i className="bi bi-arrow-right" aria-hidden="true" />
+                    </span>
+                  )}
+                </>
+              );
+              return (
+                <li className="col-sm-6 col-lg-4" key={key}>
+                  {ready ? (
+                    <Link to="/engineering" className="kt-home-card is-available">{body}</Link>
+                  ) : (
+                    <div className="kt-home-card">{body}</div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
-        <p className="text-small text-body-secondary">{t('home.adminNote')}</p>
+      </section>
+
+      <section className="kt-home-band kt-home-plans kt-on-color" aria-labelledby="kt-home-plans">
+        <div className="container-xl px-3">
+          <h2 className="kt-home-heading" id="kt-home-plans">{t('home.plansTitle')}</h2>
+          <p className="kt-home-sub">{t('home.plansLead')}</p>
+          <div className="row g-4 pt-2">
+            {Object.entries(PLAN_SECTIONS).map(([plan, included]) => {
+              const featured = plan === FEATURED_PLAN;
+              return (
+                <div className="col-md-4" key={plan}>
+                  <article className={`kt-home-plan ${featured ? 'is-featured' : ''}`} aria-labelledby={`kt-plan-${plan}`}>
+                    {featured && <span className="kt-home-ribbon">{t('home.recommended')}</span>}
+                    <header>
+                      <h3 id={`kt-plan-${plan}`}>{t(`plans.${plan}`)}</h3>
+                      <small>{t(`home.tagline.${plan}`)}</small>
+                    </header>
+                    <ul>
+                      {SECTION_KEYS.map((key) => {
+                        const has = included.includes(key);
+                        return (
+                          <li key={key} className={has ? '' : 'is-off'}>
+                            <i className={`bi ${has ? 'bi-check-circle-fill' : 'bi-dash-circle'} me-2`} aria-hidden="true" />
+                            <span className="visually-hidden">{has ? t('common.yes') : t('common.no')}: </span>
+                            {t(`sections.${key}.name`)}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {!authed && (
+                      <footer>
+                        <Link to="/signup" className={`btn w-100 ${featured ? 'btn-accent fw-bold' : 'btn-outline-primary'}`}>
+                          {plan === 'free' ? t('home.start') : t('home.choose')}
+                        </Link>
+                      </footer>
+                    )}
+                  </article>
+                </div>
+              );
+            })}
+          </div>
+          <p className="kt-home-note mt-4 mb-0">
+            <i className="bi bi-shield-check me-1" aria-hidden="true" /> {t('home.adminNote')}
+          </p>
+        </div>
+      </section>
+
+      <div className="container-xl px-3 pt-5">
+        <section className="kt-home-cta p-4 p-md-5 d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div>
+            <h2 className="h3 text-white mb-1">{t('home.ctaTitle')}</h2>
+            {!authed && <p className="mb-0">{t('home.ctaText')}</p>}
+          </div>
+          <Link to={authed ? '/projects' : '/signup'} className="btn btn-light btn-lg fw-bold position-relative">
+            {authed ? t('home.goDashboard') : t('home.start')}
+          </Link>
+        </section>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -144,7 +252,7 @@ export function Contacts() {
 export function Terms() {
   const { t, locale } = useI18n();
   const navigate = useNavigate();
-  const items = TERMS[locale] ?? TERMS.en;
+  const items = TERMS[locale] ?? TERMS['pt-BR'];
   const [open, setOpen] = useState(0);
   const baseId = useId();
   return (

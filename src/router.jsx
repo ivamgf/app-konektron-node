@@ -9,6 +9,13 @@ import { Recover, ResetPassword, Signin, Signup, VerifyEmail } from './pages/aut
 import {
   DmDatasetDetail, DmDatasets, DmModelDetail, DmModels, DmObjectives, DmOverview, DmPhases, DmPreparation, DmReport,
 } from './pages/projects/CrispDm.jsx';
+import Kanban from './pages/projects/Kanban.jsx';
+import { BpmDiagramDetail, BpmDiagrams, BpmLayout, BpmOverview, BpmProcessDetail, BpmProcesses } from './pages/projects/Bpm.jsx';
+import {
+  CkAgentDetail, CkAgents, CkCommunication, CkDesign, CkDocument, CkImpact, CkKnowledge, CkKnowledgeDetail, CkKnowledgeModel,
+  CkLayout, CkOrganization, CkOverview, CkTaskDetail, CkTasks, CkTransactionDetail,
+} from './pages/projects/CommonKads.jsx';
+import { OnCatalog, OnDetail, OnLayout } from './pages/projects/Ontologies.jsx';
 import ProjectLayout, { useProject } from './pages/projects/ProjectLayout.jsx';
 import { SaAnalysis, SaDiagrams, SaOverview, SaReport, SaRequirements, SaUserStories } from './pages/projects/SystemAnalysis.jsx';
 import { About, Contacts, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
@@ -20,6 +27,18 @@ function ProjectOverview() {
 }
 
 const crumb = (key) => ({ crumb: key });
+
+// Lista com página de detalhe: /<path> e /<path>/:<param> (o id da rota recebe o rótulo do registro)
+const detailRoutes = (path, label, list, id, param, detail, detailLabel) => [
+  {
+    path,
+    handle: crumb(label),
+    children: [
+      { index: true, element: list },
+      { id, path: param, element: detail, handle: crumb(detailLabel) },
+    ],
+  },
+];
 
 export const routes = [
   {
@@ -83,6 +102,45 @@ export const routes = [
                       { id: 'model', path: ':modelId', element: <DmModelDetail />, handle: crumb('dm.modelName') },
                     ],
                   },
+                  // Ontologias, BPM e CommonKADS (qualquer tipo de projeto)
+                  {
+                    path: 'ontologies',
+                    element: <OnLayout />,
+                    handle: crumb('project.tabs.ontologies'),
+                    children: [
+                      { index: true, element: <OnCatalog /> },
+                      { id: 'ontology', path: ':ontologyId', element: <OnDetail />, handle: crumb('on.ontology') },
+                    ],
+                  },
+                  {
+                    path: 'bpm',
+                    element: <BpmLayout />,
+                    handle: crumb('project.tabs.bpm'),
+                    children: [
+                      { index: true, element: <BpmOverview /> },
+                      ...detailRoutes('processes', 'bpm.nav.processes', <BpmProcesses />, 'bpmProcess', ':processId', <BpmProcessDetail />, 'bpm.process'),
+                      ...detailRoutes('diagrams', 'bpm.nav.diagrams', <BpmDiagrams />, 'bpmDiagram', ':diagramId', <BpmDiagramDetail />, 'bpm.diagram'),
+                    ],
+                  },
+                  {
+                    path: 'commonkads',
+                    element: <CkLayout />,
+                    handle: crumb('project.tabs.commonkads'),
+                    children: [
+                      { index: true, element: <CkOverview /> },
+                      { path: 'organization', element: <CkOrganization />, handle: crumb('ck.nav.organization') },
+                      ...detailRoutes('tasks', 'ck.nav.tasks', <CkTasks />, 'ckTask', ':taskId', <CkTaskDetail />, 'ck.task'),
+                      ...detailRoutes('knowledge', 'ck.nav.knowledge', <CkKnowledge />, 'ckKnowledge', ':knowledgeId', <CkKnowledgeDetail />, 'ck.knowledgeItem'),
+                      ...detailRoutes('agents', 'ck.nav.agents', <CkAgents />, 'ckAgent', ':agentId', <CkAgentDetail />, 'ck.agent'),
+                      { path: 'impact', element: <CkImpact />, handle: crumb('ck.nav.impact') },
+                      { path: 'knowledge-model', element: <CkKnowledgeModel />, handle: crumb('ck.nav.knowledgeModel') },
+                      ...detailRoutes('communication', 'ck.nav.communication', <CkCommunication />, 'ckTransaction', ':transactionId', <CkTransactionDetail />, 'ck.transaction'),
+                      { path: 'design', element: <CkDesign />, handle: crumb('ck.nav.design') },
+                      { path: 'document', element: <CkDocument />, handle: crumb('ck.nav.document') },
+                    ],
+                  },
+                  // Kanban (qualquer tipo de projeto)
+                  { path: 'kanban', element: <Kanban />, handle: crumb('project.tabs.kanban') },
                   {
                     path: 'report',
                     handle: crumb('project.tabs.report'),

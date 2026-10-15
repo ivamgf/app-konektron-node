@@ -44,52 +44,61 @@ export function AdminSummary() {
       <div className="row g-3 mb-4">
         <div className="col-sm-4">
           <div className="card kt-stat h-100"><div className="card-body">
+            <i className="bi bi-people" aria-hidden="true" />
             <div className="kt-stat-value">{s.totalUsers}</div><div className="text-body-secondary">{t('admin.totalUsers')}</div>
           </div></div>
         </div>
         <div className="col-sm-4">
           <div className="card kt-stat h-100"><div className="card-body">
+            <i className="bi bi-folder2-open" aria-hidden="true" />
             <div className="kt-stat-value">{s.projectsByType.reduce((n, p) => n + p.total, 0)}</div>
             <div className="text-body-secondary">{t('nav.projects')}</div>
           </div></div>
         </div>
         <div className="col-sm-4">
           <div className="card kt-stat h-100"><div className="card-body">
+            <i className="bi bi-box-arrow-in-right" aria-hidden="true" />
             <div className="kt-stat-value">{logins}</div><div className="text-body-secondary">{t('admin.loginsLast30Days')}</div>
           </div></div>
         </div>
       </div>
       <div className="row g-4">
-        <div className="col-md-6">
-          <h2 className="h3">{t('admin.usersByPlan')}</h2>
-          <table className="table table-sm">
-            <tbody>
-              {s.usersByPlan.map((r) => (
-                <tr key={r.plan}><td>{t(`plans.${r.plan}`)}</td><td className="text-end fw-semibold">{r.total}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          <h2 className="h3 mt-4">{t('admin.projectsByType')}</h2>
-          <table className="table table-sm">
-            <tbody>
-              {s.projectsByType.map((r) => (
-                <tr key={r.type}><td>{t(`project.types.${r.type}`)}</td><td className="text-end fw-semibold">{r.total}</td></tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="col-md-6">
-          <h2 className="h3">{t('admin.loginsLast30Days')}</h2>
-          {s.loginsLast30Days.length === 0 ? <EmptyState>{t('common.empty')}</EmptyState> : (
+        <div className="col-md-6 d-flex flex-column gap-4">
+          <section className="kt-count-panel" style={{ '--acc': '#019bcd' }}>
+            <h2 className="h3">{t('admin.usersByPlan')}</h2>
             <table className="table table-sm">
-              <thead><tr><th>{t('admin.day')}</th><th className="text-end">{t('admin.total')}</th></tr></thead>
               <tbody>
-                {[...s.loginsLast30Days].reverse().map((d) => (
-                  <tr key={d.day}><td>{formatDate(String(d.day).slice(0, 10), locale)}</td><td className="text-end">{d.total}</td></tr>
+                {s.usersByPlan.map((r) => (
+                  <tr key={r.plan}><td>{t(`plans.${r.plan}`)}</td><td className="text-end fw-semibold">{r.total}</td></tr>
                 ))}
               </tbody>
             </table>
-          )}
+          </section>
+          <section className="kt-count-panel" style={{ '--acc': '#fe7d05' }}>
+            <h2 className="h3">{t('admin.projectsByType')}</h2>
+            <table className="table table-sm">
+              <tbody>
+                {s.projectsByType.map((r) => (
+                  <tr key={r.type}><td>{t(`project.types.${r.type}`)}</td><td className="text-end fw-semibold">{r.total}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+        </div>
+        <div className="col-md-6">
+          <section className="kt-count-panel" style={{ '--acc': '#11866a' }}>
+            <h2 className="h3">{t('admin.loginsLast30Days')}</h2>
+            {s.loginsLast30Days.length === 0 ? <EmptyState>{t('common.empty')}</EmptyState> : (
+              <table className="table table-sm">
+                <thead><tr><th>{t('admin.day')}</th><th className="text-end">{t('admin.total')}</th></tr></thead>
+                <tbody>
+                  {[...s.loginsLast30Days].reverse().map((d) => (
+                    <tr key={d.day}><td>{formatDate(String(d.day).slice(0, 10), locale)}</td><td className="text-end">{d.total}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </section>
         </div>
       </div>
     </>

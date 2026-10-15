@@ -1,6 +1,7 @@
 // Componentes visuais do protótipo / Design System KonekTron
 import { useEffect, useId, useRef } from 'react';
 import { useI18n } from '../i18n/I18nProvider.jsx';
+import { useTheme } from '../lib/theme.js';
 
 // Símbolo KoneKtron (Brand Icons). variant: 'color' | 'mono'
 export function BrandMark({ size = 200, variant = 'color', className = '', title = 'KoneKtron' }) {
@@ -19,6 +20,20 @@ export function BrandMark({ size = 200, variant = 'color', className = '', title
       <path d="M35 0H100V66H70V31H35Z" fill={blue} />
       <path d="M35 70H100V100H35Z" fill={blue} />
     </svg>
+  );
+}
+
+// Alterna tema claro/escuro (a escolha vale para o app inteiro e fica salva)
+export function ThemeToggle({ className = 'btn-outline-light' }) {
+  const { t } = useI18n();
+  const { theme, toggle } = useTheme();
+  const dark = theme === 'dark';
+  return (
+    <button type="button" className={`btn btn-sm kt-theme-toggle ${className}`} onClick={toggle} aria-pressed={dark}
+      title={t(dark ? 'theme.toLight' : 'theme.toDark')}>
+      <i className={`bi ${dark ? 'bi-sun' : 'bi-moon-stars'} me-1`} aria-hidden="true" />
+      {t(dark ? 'theme.light' : 'theme.dark')}
+    </button>
   );
 }
 
@@ -45,7 +60,7 @@ export function Panel({ title, wide = false, children }) {
 }
 
 // Cartão azul com ícone (About, Contacts e áreas logadas)
-export function ContentCard({ icon, title, footer, actions, children, as: Heading = 'h2' }) {
+export function ContentCard({ icon, title, footer, actions, children, bodyClassName = '', as: Heading = 'h2' }) {
   return (
     <section className="card kt-card">
       <div className="card-header">
@@ -53,7 +68,7 @@ export function ContentCard({ icon, title, footer, actions, children, as: Headin
         <Heading className="flex-grow-1">{title}</Heading>
         {actions}
       </div>
-      <div className="card-body">{children}</div>
+      <div className={`card-body ${bodyClassName}`}>{children}</div>
       {footer && <div className="card-footer">{footer}</div>}
     </section>
   );

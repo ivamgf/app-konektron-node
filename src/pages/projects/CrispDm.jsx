@@ -5,6 +5,7 @@ import { enumOptions } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { useToast } from '../../components/Toasts.jsx';
+import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { EmptyState, Loading } from '../../components/ui.jsx';
 import { taskLabel } from '../../content/crispdm.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
@@ -44,7 +45,7 @@ function Overview() {
       </div>
       <ol className="list-group list-group-numbered mb-4">
         {o.phases.map((p) => (
-          <li key={p.phase} className="list-group-item d-flex justify-content-between align-items-center gap-3">
+          <li key={p.phase} className={`list-group-item kt-phase is-${p.status} d-flex justify-content-between align-items-center gap-3`}>
             <div className="ms-2 me-auto">
               <Link to={`/projects/${project.id}/phases#${p.phase}`} className="fw-semibold">
                 {phaseName(p, locale)}
@@ -90,6 +91,9 @@ function PhaseCard({ projectId, phase, onSaved }) {
     },
   });
 
+  const dirty = status !== phase.status || notes !== (phase.notes ?? '') || !sameValues(content, initialContent);
+  useUnsavedChanges(dirty);
+
   const save = (e) => {
     e.preventDefault();
     // RN10.1: a API faz merge — envia só as tarefas alteradas ('' apaga com null)
@@ -112,7 +116,7 @@ function PhaseCard({ projectId, phase, onSaved }) {
         <h3 className="h3 mb-0" id={`${phase.phase}-title`}>{phase.order}. {phaseName(phase, locale)}</h3>
         <span className={`badge ${STATUS_BADGE[phase.status]}`}>{t(`enums.phaseStatus.${phase.status}`)}</span>
       </div>
-      <form className="card-body" onSubmit={save} noValidate>
+      <form className="card-body" onSubmit={save} onKeyDown={saveShortcut} noValidate>
         <div className="row">
           <div className="col-md-4 mb-3">
             <label className="form-label fw-semibold" htmlFor={`${phase.phase}-status`}>{t('common.status')}</label>
@@ -146,7 +150,7 @@ function PhaseCard({ projectId, phase, onSaved }) {
         <label className="form-label fw-semibold" htmlFor={`${phase.phase}-notes`}>{t('sa.notes')}</label>
         <textarea id={`${phase.phase}-notes`} className="form-control mb-3" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
         {errors.content && <div className="text-danger small mb-2">{String(errors.content)}</div>}
-        <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? t('common.saving') : t('common.save')}</button>
+        <SaveButton busy={busy} dirty={dirty} />
       </form>
     </section>
   );

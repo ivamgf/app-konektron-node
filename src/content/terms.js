@@ -23,4 +23,15 @@ export const TERMS = {
     ['Intellectual Property', 'The projects and documents you create belong to you. The KoneKtron and OrkneyTech brands and logos belong to their respective owners.'],
     ['Contact', 'Questions about these terms: konektron@konektron.orkneytech.com.br.'],
   ],
+  es: [
+    ['Aceptación', 'Al crear una cuenta o usar KoneKtron, aceptas estos Términos de Uso. Si no estás de acuerdo, no utilices el sistema.'],
+    ['Licencia Limitada', 'Te otorgamos una licencia personal, no exclusiva y revocable para usar el sistema según tu plan. El código fuente de KoneKtron se distribuye bajo la licencia MIT; esta licencia de uso se refiere al servicio alojado.'],
+    ['Cambios y Modificaciones', 'Podemos modificar el sistema, los planes y estos términos. Los cambios relevantes se comunicarán en el sistema o por correo antes de entrar en vigor.'],
+    ['Recopilación y Uso de Datos', 'Recopilamos datos de registro, de perfil y de uso (registros de acceso y operaciones) para operar el servicio, garantizar la seguridad y cumplir obligaciones legales, conforme a la LGPD de Brasil (Ley 13.709/2018). Puedes eliminar tu cuenta en cualquier momento; los datos de acceso se anonimizan.'],
+    ['Exención de Garantías', 'El servicio se ofrece "tal cual". Buscamos una disponibilidad de al menos 99,5%, pero no garantizamos un funcionamiento ininterrumpido ni libre de errores.'],
+    ['Cuenta y Seguridad', 'Eres responsable de mantener tu contraseña en secreto y de la actividad realizada en tu cuenta. Avísanos de inmediato ante cualquier uso no autorizado.'],
+    ['Planes y Facturación', 'El acceso a las secciones de ingeniería depende del plan (Free, Standard o Master). Los planes pagos se cobran en dólares estadounidenses, con un valor equivalente en reales en Brasil.'],
+    ['Propiedad Intelectual', 'Los proyectos y documentos que creas te pertenecen. Las marcas KoneKtron y OrkneyTech y sus logotipos pertenecen a sus respectivos titulares.'],
+    ['Contacto', 'Dudas sobre estos términos: konektron@konektron.orkneytech.com.br.'],
+  ],
 };

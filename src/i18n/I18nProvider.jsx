@@ -1,10 +1,17 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import en from './en.js';
+import es from './es.js';
 import ptBR from './pt-BR.js';
 
-// RNF5: inglês e português, com prioridade para o inglês
-export const LOCALES = { en, 'pt-BR': ptBR };
-export const DEFAULT_LOCALE = 'en';
+// RNF5: português (padrão), inglês e espanhol
+export const LOCALES = { 'pt-BR': ptBR, en, es };
+export const DEFAULT_LOCALE = 'pt-BR';
+// Ordem e rótulos curtos do seletor de idioma
+export const LANGUAGES = [
+  { code: 'pt-BR', short: 'PT' },
+  { code: 'en', short: 'EN' },
+  { code: 'es', short: 'ES' },
+];
 const STORAGE_KEY = 'kt.locale';
 
 const lookup = (messages, key) =>
@@ -29,7 +36,11 @@ function initialLocale() {
 const I18nContext = createContext(null);
 
 export function I18nProvider({ children }) {
-  const [locale, setLocaleState] = useState(initialLocale);
+  const [locale, setLocaleState] = useState(() => {
+    const first = initialLocale();
+    document.documentElement.lang = first;
+    return first;
+  });
 
   const setLocale = useCallback((next) => {
     if (!LOCALES[next]) return;

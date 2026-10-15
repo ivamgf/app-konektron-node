@@ -2,9 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useMatches, useNavigate } from 'react-router';
 import { session } from '../api/client.js';
 import { useAuth } from '../auth/AuthProvider.jsx';
-import { useI18n } from '../i18n/I18nProvider.jsx';
+import { LANGUAGES, useI18n } from '../i18n/I18nProvider.jsx';
 import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
+import { UnsavedProvider } from './unsaved.jsx';
 
 const API_DOCS_URL = `${(import.meta.env.VITE_API_URL ?? '/api/v1').replace(/\/$/, '')}/docs/`;
 export const SITE_URL = 'www.konektron.orkneytech.com.br';
@@ -22,13 +23,22 @@ export function useCrumbLabel(routeId, label) {
 function Breadcrumbs({ labels }) {
   const { t } = useI18n();
   const matches = useMatches().filter((m) => m.handle?.crumb);
+  const labelOf = (m) => labels[m.id] ?? t(m.handle.crumb);
+  // título da aba: página atual e a de cima (ex.: "Tarefas · CommonKADS · KoneKtron")
+  const title = [...matches.slice(1).slice(-2).reverse().map(labelOf), 'KoneKtron'].join(' · ');
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
   if (!matches.length) return null;
+  // "Voltar" (à direita da barra) leva sempre ao nível acima na hierarquia (funciona mesmo vindo de um link direto)
+  const parent = matches.length > 1 ? matches[matches.length - 2] : null;
+  const backLabel = parent && t('nav.backTo', { page: labelOf(parent) });
   return (
-    <nav className="kt-breadcrumbs kt-no-print" aria-label={t('nav.breadcrumb')}>
+    <nav className="kt-breadcrumbs kt-no-print d-flex flex-wrap align-items-center gap-2 gap-sm-3" aria-label={t('nav.breadcrumb')}>
       <ol className="breadcrumb">
         {matches.map((m, i) => {
           const last = i === matches.length - 1;
-          const label = labels[m.id] ?? t(m.handle.crumb);
+          const label = labelOf(m);
           return (
             <li key={m.id} className={`breadcrumb-item ${last ? 'active' : ''}`} aria-current={last ? 'page' : undefined}>
               {last ? label : <Link to={m.pathname}>{label}</Link>}
@@ -37,6 +47,11 @@ function Breadcrumbs({ labels }) {
         })}
         <li className="breadcrumb-item" aria-hidden="true" />
       </ol>
+      {parent && (
+        <Link to={parent.pathname} className="btn btn-sm btn-outline-primary kt-back ms-auto" title={backLabel} aria-label={backLabel}>
+          <i className="bi bi-arrow-left me-1" aria-hidden="true" />{t('nav.back')}
+        </Link>
+      )}
     </nav>
   );
 }
@@ -129,7 +144,7 @@ function SideMenu({ open, onClose }) {
           </nav>
           <div className="kt-sidemenu-sep" />
           <div className="kt-lang d-flex justify-content-end align-items-center gap-2" role="group" aria-label={t('nav.language')}>
-            {['en', 'pt-BR'].map((code) => (
+            {LANGUAGES.map(({ code, short }) => (
               <button
                 key={code}
                 type="button"
@@ -137,8 +152,9 @@ function SideMenu({ open, onClose }) {
                 aria-pressed={locale === code}
                 onClick={() => setLocale(code)}
                 lang={code}
+                title={t(`enums.locale.${code}`)}
               >
-                {code === 'en' ? 'EN' : 'PT'}
+                {short}
               </button>
             ))}
           </div>
@@ -153,6 +169,93 @@ function SideMenu({ open, onClose }) {
       </aside>
       {open && <div className="offcanvas-backdrop fade show" onClick={onClose} />}
     </>
+  );
+}
+
+// Seletor de idioma do cabeçalho: botão com o idioma atual e lista com os três
+function LanguageMenu() {
+  const { t, locale, setLocale } = useI18n();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef(null);
+  const current = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0];
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onDown = (e) => !rootRef.current?.contains(e.target) && setOpen(false);
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      rootRef.current?.querySelector('.kt-lang-toggle')?.focus();
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    rootRef.current?.querySelector('[aria-checked="true"]')?.focus();
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="kt-lang-menu" ref={rootRef}>
+      <button
+        type="button"
+        className="kt-lang-toggle"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-label={`${t('nav.language')}: ${t(`enums.locale.${current.code}`)}`}
+        title={t('nav.language')}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <i className="bi bi-globe2" aria-hidden="true" />
+        <span>{current.short}</span>
+        <i className="bi bi-chevron-down small" aria-hidden="true" />
+      </button>
+      {open && (
+        <ul className="kt-lang-list" role="menu" aria-label={t('nav.language')}>
+          {LANGUAGES.map(({ code, short }) => (
+            <li key={code} role="none">
+              <button
+                type="button"
+                role="menuitemradio"
+                aria-checked={locale === code}
+                lang={code}
+                onClick={() => {
+                  setLocale(code);
+                  setOpen(false);
+                }}
+              >
+                <span className="kt-lang-short">{short}</span>
+                {t(`enums.locale.${code}`)}
+                {locale === code && <i className="bi bi-check2 ms-auto" aria-hidden="true" />}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// Botão flutuante para voltar ao topo nas páginas longas
+function BackToTop() {
+  const { t } = useI18n();
+  const [show, setShow] = useState(() => window.scrollY > 600);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  if (!show) return null;
+  const toTop = () => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    document.getElementById('kt-main')?.focus({ preventScroll: true });
+  };
+  return (
+    <button type="button" className="btn kt-to-top kt-no-print" onClick={toTop} aria-label={t('nav.toTop')} title={t('nav.toTop')}>
+      <i className="bi bi-arrow-up" aria-hidden="true" />
+    </button>
   );
 }
 
@@ -219,6 +322,16 @@ export default function Layout() {
 
   const crumbValue = useMemo(() => setLabel, [setLabel]);
 
+  // a cada navegação o foco vai para o conteúdo (teclado e leitor de tela começam pela página nova)
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    document.getElementById('kt-main')?.focus({ preventScroll: true });
+  }, [location.pathname]);
+
   return (
     <CrumbContext.Provider value={crumbValue}>
       <div className="kt-app">
@@ -231,7 +344,8 @@ export default function Layout() {
               KoneKtron
             </Link>
             <div className="d-flex align-items-center gap-3">
-              {user && <span className="kt-header-user d-none d-sm-inline">{user.email}</span>}
+              {user && <span className="kt-header-user d-none d-md-inline">{user.email}</span>}
+              <LanguageMenu />
               <button
                 type="button"
                 className="kt-menu-toggle"
@@ -247,10 +361,11 @@ export default function Layout() {
         </header>
         <Breadcrumbs labels={labels} />
         <main id="kt-main" className="kt-main" tabIndex={-1}>
-          {status === 'loading' ? <Loading /> : <Outlet />}
+          <UnsavedProvider>{status === 'loading' ? <Loading /> : <Outlet />}</UnsavedProvider>
         </main>
         <Footer />
         <SideMenu open={menuOpen} onClose={closeMenu} />
+        <BackToTop />
         <ScrollRestoration />
       </div>
     </CrumbContext.Provider>

@@ -29,14 +29,16 @@ src/
 ├── api/                       client.js (fetch, tokens, renovação da sessão), endpoints.js
 ├── auth/                      AuthProvider (sessão), guards (RequireAuth, RequireAdmin, GuestOnly)
 ├── i18n/                      en.js (padrão), pt-BR.js — RNF5
-├── components/                Layout (cabeçalho, menu, rodapé), ui, forms, ResourceManager, Toasts
-├── content/                   termos de uso, rótulos das tarefas do CRISP-DM
+├── components/                Layout (cabeçalho, menu, rodapé), ui, forms, ResourceManager, Toasts,
+│                              sections (sub-navegação por plano, arquivo, editor de linhas)
+├── content/                   termos de uso, tarefas do CRISP-DM, planilhas do CommonKADS (PT/EN/ES)
 ├── lib/hooks.js               useAsync, useSubmit, formatação de datas
 ├── pages/
 │   ├── public/                Início, Sobre, Contatos, Termos, 404
 │   ├── auth/                  Entrar, Cadastrar, Recuperar, Nova senha, Confirmar e-mail
 │   ├── app/                   Projetos, Engenharia, Perfil
-│   ├── projects/              ProjectLayout, SystemAnalysis, CrispDm, resources (configuração CRUD)
+│   ├── projects/              ProjectLayout, SystemAnalysis, CrispDm, Ontologies, Bpm, CommonKads,
+│   │                          Kanban, resources (configuração CRUD)
 │   └── admin/                 Resumo, Usuários, Logs
 └── styles/                    _tokens.scss (Design System), main.scss (Bootstrap + componentes)
 ```
@@ -64,7 +66,8 @@ configuração (`pages/projects/resources.jsx`), com os mesmos enums e limites d
 
 ## Testes
 
-- `npm test`: Vitest — i18n (paridade de chaves en/pt-BR), conversão de formulários e o cliente
-  HTTP (renovação única em chamadas simultâneas, sessão expirada, erros 422).
+- `npm test`: Vitest — i18n (paridade de chaves pt-BR/en/es), conversão de formulários, o cliente
+  HTTP (renovação única em chamadas simultâneas, sessão expirada, erros 422, upload e download) e
+  as páginas de Ontologias, BPM e CommonKADS renderizadas pelo roteador com a API simulada.
 - O fluxo completo (cadastro, projetos, CRISP-DM, perfil, admin, mobile) foi validado com
   Chrome headless contra a API e um banco de teste.
