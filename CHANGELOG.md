@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.2.0 — 2026-10-16
+
+Requer a API 4.2.0.
+
+### Adicionado
+- Sprint: botão **Publicar no Kanban** no quadro de tasks (publica as tasks ainda fora do Kanban; itens do
+  Sprint Backlog sem tasks ganham uma), atalho **Abrir o Kanban** e o ícone do Kanban nas tasks publicadas.
+- Seção **Incremento entregue** na sprint: itens e tasks concluídos (no Scrum ou movendo o cartão no Kanban),
+  com data de conclusão e pontos entregues; os Artefatos listam os itens entregues de cada sprint.
+- Kanban: cartões de tasks do Scrum mostram a sprint e o item (link para a sprint) e um aviso no formulário;
+  colunas ganham o campo "Situação das tasks do Scrum", exibido abaixo do nome. As colunas padrão já vêm
+  marcadas (A fazer, Em andamento, Concluído).
+
 ## 2.1.0 — 2026-10-15
 
 Requer a API 4.1.0.

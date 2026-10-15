@@ -73,6 +73,8 @@ export const scrumApi = {
   settings: (pid) => api.get(`/projects/${pid}/scrum/settings`),
   updateSettings: (pid, body) => api.patch(`/projects/${pid}/scrum/settings`, body),
   sprint: (pid, id) => api.get(`/projects/${pid}/scrum/sprints/${id}/detail`),
+  // publica no Kanban as tasks da sprint que ainda não estão lá (devolve a sprint atualizada)
+  publishKanban: (pid, id, body) => api.post(`/projects/${pid}/scrum/sprints/${id}/publish-kanban`, body),
   moveItem: (pid, id, position) => api.post(`/projects/${pid}/scrum/items/${id}/move`, { position }),
 };
 

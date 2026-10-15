@@ -401,6 +401,66 @@ function taskFields(t, items, members) {
   ];
 }
 
+// Incremento entregue: o que foi concluído na sprint (no Scrum ou movendo o cartão no Kanban)
+function Delivered({ sprint: s, items }) {
+  const { t, locale } = useI18n();
+  const { delivered } = s;
+  const doneOn = (d) => t('scrum.doneOn', { date: formatDate(d, locale) });
+  const empty = !delivered.items.length && !delivered.tasks.length;
+  return (
+    <section className="kt-increment mb-4" aria-labelledby="kt-increment-title">
+      <header className="d-flex flex-wrap align-items-center gap-2">
+        <i className="bi bi-box-seam" aria-hidden="true" />
+        <h4 className="h3 mb-0" id="kt-increment-title">{t('scrum.increment')}</h4>
+        {s.incrementVersion && <span className="kt-tile-chip">v{s.incrementVersion}</span>}
+        {!empty && <span className="kt-tile-chip ms-auto">{t('scrum.deliveredPoints', { points: delivered.points })}</span>}
+      </header>
+      <div className="kt-increment-body">
+        {(s.increment || s.incrementUrl) && (
+          <p className="small kt-prewrap">
+            {s.increment}
+            {s.incrementUrl && (
+              <a href={s.incrementUrl} target="_blank" rel="noopener noreferrer" className="ms-2">
+                {t('scrum.incrementUrl')} <i className="bi bi-box-arrow-up-right" aria-hidden="true" />
+              </a>
+            )}
+          </p>
+        )}
+        {empty ? <p className="small text-body-secondary mb-0">{t('scrum.noDelivered')}</p> : (
+          <div className="row g-3">
+            <div className="col-md-6">
+              <h5 className="h5">{t('scrum.deliveredItems')} <span className="badge text-bg-light">{delivered.items.length}</span></h5>
+              <ul className="list-unstyled mb-0">
+                {delivered.items.map((i) => (
+                  <li key={i.id}>
+                    <i className="bi bi-check-circle-fill text-success me-1" aria-hidden="true" />
+                    <strong>{i.code}</strong> {i.title}
+                    {i.storyPoints != null && <span className="text-body-secondary"> · {i.storyPoints} pts</span>}
+                    {i.doneAt && <span className="small text-body-secondary"> · {doneOn(i.doneAt)}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="col-md-6">
+              <h5 className="h5">{t('scrum.deliveredTasks')} <span className="badge text-bg-light">{delivered.tasks.length}</span></h5>
+              <ul className="list-unstyled mb-0">
+                {delivered.tasks.map((tk) => (
+                  <li key={tk.id}>
+                    <i className="bi bi-check2 text-success me-1" aria-hidden="true" />
+                    {items[tk.itemId]?.code && <span className="text-body-secondary">{items[tk.itemId].code} · </span>}
+                    {tk.title}
+                    {tk.doneAt && <span className="small text-body-secondary"> · {doneOn(tk.doneAt)}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function SprintDetail() {
   const { t, locale } = useI18n();
   const toast = useToast();
@@ -409,6 +469,7 @@ function SprintDetail() {
   const data = useScrumData(project);
   const detail = useAsync(() => scrumApi.sprint(project.id, sprintId), [project.id, sprintId]);
   const [taskEdit, setTaskEdit] = useState(null);
+  const [publishing, setPublishing] = useState(false);
   useCrumbLabel('scrumSprint', detail.data ? sprintLabel(detail.data) : null);
   const sprintApi = useMemo(() => res(project, 'sprints'), [project]);
   if ((detail.loading && !detail.data) || !data.ready) return <Loading small />;
@@ -418,6 +479,24 @@ function SprintDetail() {
   const items = byId(s.items);
   const available = data.items.filter((i) => !i.sprintId && i.status !== 'done');
   const refresh = () => { detail.reload(); data.reload(); };
+  // fora do Kanban: tasks sem cartão e itens do Sprint Backlog sem tasks (ganham uma ao publicar)
+  const itemsWithTasks = new Set(s.tasks.map((tk) => tk.itemId));
+  const unpublished = s.tasks.filter((tk) => !tk.kanbanCardId).length + s.items.filter((i) => !itemsWithTasks.has(i.id)).length;
+  const publish = async () => {
+    setPublishing(true);
+    try {
+      const result = await scrumApi.publishKanban(project.id, s.id, {
+        columnNames: { todo: t('kb.defaults.todo'), in_progress: t('kb.defaults.doing'), done: t('kb.defaults.done') },
+      });
+      toast.success(t('scrum.publishedKanban', { count: result.published }));
+      detail.setData(result.sprint);
+      data.reload();
+    } catch (err) {
+      toast.fromError(err);
+    } finally {
+      setPublishing(false);
+    }
+  };
   const run = async (fn) => {
     try {
       await fn();
@@ -498,10 +577,24 @@ function SprintDetail() {
 
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
         <h4 className="h3 mb-0">{t('scrum.board')}</h4>
-        <button type="button" className="btn btn-sm btn-primary" onClick={() => setTaskEdit('new')}>
-          <i className="bi bi-plus-lg me-1" aria-hidden="true" />{t('scrum.newTask')}
-        </button>
+        <div className="d-flex flex-wrap gap-2">
+          {unpublished > 0 && (
+            <button type="button" className="btn btn-sm kt-tile-cta" style={{ '--sec': '#0c8d8b' }} onClick={publish} disabled={publishing}>
+              <i className="bi bi-kanban me-1" aria-hidden="true" />{publishing ? t('common.saving') : t('scrum.publishKanban')}
+            </button>
+          )}
+          <Link to={`/projects/${project.id}/kanban`} className="btn btn-sm btn-outline-primary">
+            <i className="bi bi-box-arrow-up-right me-1" aria-hidden="true" />{t('scrum.openKanban')}
+          </Link>
+          <button type="button" className="btn btn-sm btn-primary" onClick={() => setTaskEdit('new')}>
+            <i className="bi bi-plus-lg me-1" aria-hidden="true" />{t('scrum.newTask')}
+          </button>
+        </div>
       </div>
+      <p className="small text-body-secondary mb-2">
+        <i className="bi bi-kanban me-1" aria-hidden="true" />
+        {unpublished > 0 ? t('scrum.publishKanbanHint', { count: unpublished }) : t('scrum.allOnKanban')}
+      </p>
       <div className="row g-3 mb-4">
         {STEPS.map((step, si) => {
           const tasks = s.tasks.filter((tk) => tk.status === step);
@@ -516,7 +609,12 @@ function SprintDetail() {
                     <div className="small text-body-secondary">
                       {items[tk.itemId]?.code && <span className="me-2">{items[tk.itemId].code}</span>}
                       {members[tk.assigneeId]?.name && <span className="me-2"><i className="bi bi-person me-1" aria-hidden="true" />{members[tk.assigneeId].name}</span>}
-                      {tk.remainingHours != null && <span>{tk.remainingHours} h</span>}
+                      {tk.remainingHours != null && <span className="me-2">{tk.remainingHours} h</span>}
+                      {tk.kanbanCardId && (
+                        <span className="kt-on-kanban" title={t('scrum.onKanban')}>
+                          <i className="bi bi-kanban" aria-hidden="true" /><span className="visually-hidden">{t('scrum.onKanban')}</span>
+                        </span>
+                      )}
                     </div>
                     <div className="d-flex justify-content-between mt-1">
                       <button type="button" className="btn btn-sm btn-link px-1" disabled={si === 0}
@@ -536,6 +634,8 @@ function SprintDetail() {
           );
         })}
       </div>
+
+      <Delivered sprint={s} items={items} />
 
       {s.events.length > 0 && (
         <>
@@ -718,7 +818,9 @@ function Artifacts() {
   const current = data.sprints.find((s) => s.status === 'active') ?? data.sprints.find((s) => s.status === 'planned');
   const backlog = data.items.filter((i) => !i.sprintId && i.status !== 'done');
   const sprintItems = current ? data.items.filter((i) => i.sprintId === current.id) : [];
-  const increments = data.sprints.filter((s) => s.increment || s.incrementVersion || s.incrementUrl);
+  // incremento de cada sprint: o que foi concluído nela (tasks finalizadas no Scrum ou no Kanban) e o texto/versão
+  const doneBySprint = Object.groupBy(data.items.filter((i) => i.sprintId && i.status === 'done'), (i) => i.sprintId);
+  const increments = data.sprints.filter((s) => doneBySprint[s.id] || s.increment || s.incrementVersion || s.incrementUrl);
   const tiles = [
     { key: 'productBacklog', title: 'Product Backlog', icon: 'list-ol', color: '#0189b6', text: t('scrum.productBacklogText'),
       commitment: t('scrum.productGoal'), value: settings.data.productGoal, meta: t('scrum.items', { count: backlog.length }), to: 'backlog' },
@@ -764,6 +866,13 @@ function Artifacts() {
                 {s.incrementUrl && <a href={s.incrementUrl} target="_blank" rel="noopener noreferrer" className="small ms-auto">{t('scrum.incrementUrl')} <i className="bi bi-box-arrow-up-right" aria-hidden="true" /></a>}
               </div>
               {s.increment && <p className="small mb-0 mt-1 kt-prewrap">{s.increment}</p>}
+              {doneBySprint[s.id] && (
+                <p className="small mb-0 mt-1">
+                  <i className="bi bi-check-circle-fill text-success me-1" aria-hidden="true" />
+                  {doneBySprint[s.id].map((i) => i.code).join(', ')}
+                  <span className="text-body-secondary"> · {t('scrum.deliveredPoints', { points: doneBySprint[s.id].reduce((n, i) => n + (i.storyPoints ?? 0), 0) })}</span>
+                </p>
+              )}
             </li>
           ))}
         </ul>

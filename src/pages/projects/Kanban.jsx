@@ -1,5 +1,6 @@
 // Kanban: quadro de tarefas de qualquer projeto (colunas e cartões ordenados)
 import { useState } from 'react';
+import { Link } from 'react-router';
 import { kanbanApi } from '../../api/endpoints.js';
 import { enumOptions, FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import { useToast } from '../../components/Toasts.jsx';
@@ -9,6 +10,9 @@ import { formatDate, useAsync, useSubmit } from '../../lib/hooks.js';
 import { useProject } from './ProjectLayout.jsx';
 
 export const CARD_PRIORITIES = ['low', 'medium', 'high', 'urgent'];
+// situação das tasks do Scrum que cada coluna representa (cartões publicados pela sprint)
+const TASK_STATUSES = ['todo', 'in_progress', 'done'];
+const sprintPath = (projectId, card) => `/projects/${projectId}/scrum/sprints/${card.sprintId}`;
 const PRIORITY_CLASS = { low: 'text-bg-light border', medium: 'text-bg-info', high: 'text-bg-warning', urgent: 'text-bg-danger' };
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -40,6 +44,8 @@ function ColumnModal({ projectId, column, onClose, onSaved }) {
   const fields = [
     { name: 'name', label: 'kb.columnName', required: true, maxLength: 60, col: 'col-md-8' },
     { name: 'wipLimit', label: 'kb.wipLimit', type: 'integer', min: 1, max: 999, help: 'kb.wipHelp', col: 'col-md-4' },
+    { name: 'taskStatus', label: 'kb.taskStatus', type: 'select', help: 'kb.taskStatusHelp',
+      options: enumOptions(t, 'taskStatus', TASK_STATUSES) },
   ];
   const [values, setValues] = useState(() => toFormValues(fields, column ?? {}));
   const { submit, busy, errors } = useSubmit(
@@ -105,6 +111,13 @@ function CardModal({ projectId, columns, card, columnId, onClose, onSaved, onDel
         </>
       }
     >
+      {card?.scrumTaskId && (
+        <p className="kt-kb-linked">
+          <i className="bi bi-arrow-repeat me-1" aria-hidden="true" />
+          {t('kb.linkedTask', { number: card.sprintNumber })}{' '}
+          <Link to={sprintPath(projectId, card)}>{t('kb.openSprint')}</Link>
+        </p>
+      )}
       <form id="kt-kb-card" noValidate onSubmit={(e) => { e.preventDefault(); submit(toPayload(fields, values, t)); }}>
         <FieldGrid fields={fields} values={values} errors={errors} onChange={(n, v) => setValues((s) => ({ ...s, [n]: v }))} />
       </form>
@@ -112,7 +125,7 @@ function CardModal({ projectId, columns, card, columnId, onClose, onSaved, onDel
   );
 }
 
-function Card({ card, prev, next, onOpen, onMove, onDragStart, onDragEnd, onDragOver, dragging }) {
+function Card({ projectId, card, prev, next, onOpen, onMove, onDragStart, onDragEnd, onDragOver, dragging }) {
   const { t, locale } = useI18n();
   const overdue = card.dueDate && card.dueDate < today();
   return (
@@ -130,8 +143,14 @@ function Card({ card, prev, next, onOpen, onMove, onDragStart, onDragEnd, onDrag
       <button type="button" className="kt-kb-card-title" onClick={() => onOpen(card)}>
         {card.title}
       </button>
-      {(card.priority || card.dueDate || card.assignee) && (
+      {(card.priority || card.dueDate || card.assignee || card.scrumTaskId) && (
         <div className="kt-kb-meta">
+          {card.scrumTaskId && (
+            <Link to={sprintPath(projectId, card)} className="kt-kb-sprint" title={t('kb.openSprint')}>
+              <i className="bi bi-arrow-repeat me-1" aria-hidden="true" />
+              S{card.sprintNumber}{card.itemCode && ` · ${card.itemCode}`}
+            </Link>
+          )}
           {card.priority && (
             <span className={`badge ${PRIORITY_CLASS[card.priority]}`}>{t(`enums.cardPriority.${card.priority}`)}</span>
           )}
@@ -220,8 +239,9 @@ export default function Kanban() {
   const createDefaults = async () => {
     setCreatingDefaults(true);
     try {
-      for (const key of ['todo', 'doing', 'done']) {
-        await kanbanApi.createColumn(project.id, { name: t(`kb.defaults.${key}`) });
+      // já marcadas com a situação das tasks do Scrum que representam
+      for (const [key, taskStatus] of [['todo', 'todo'], ['doing', 'in_progress'], ['done', 'done']]) {
+        await kanbanApi.createColumn(project.id, { name: t(`kb.defaults.${key}`), taskStatus });
       }
     } catch (err) {
       toast.fromError(err);
@@ -349,6 +369,14 @@ export default function Kanban() {
                   </button>
                 </div>
               </header>
+              {column.taskStatus && (
+                <p className="kt-kb-col-status">
+                  <span className={`kt-kb-status is-${column.taskStatus}`}>
+                    <i className="bi bi-arrow-repeat me-1" aria-hidden="true" />
+                    {t('kb.taskStatus')}: {t(`enums.taskStatus.${column.taskStatus}`)}
+                  </span>
+                </p>
+              )}
 
               <ol
                 className="kt-kb-list"
@@ -361,6 +389,7 @@ export default function Kanban() {
                 {column.cards.map((card, i) => (
                   <FragmentWithDrop key={card.id} show={showDrop(i)}>
                     <Card
+                      projectId={project.id}
                       card={card}
                       prev={columns[ci - 1]}
                       next={columns[ci + 1]}
