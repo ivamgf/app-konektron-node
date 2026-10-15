@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.3.0 — 2026-10-16
+
+### Alterado
+- **Menu sanduíche redesenhado**: painel claro e legível (o laranja com texto branco não tinha contraste
+  suficiente), com cabeçalho no estilo da marca mostrando quem está logado (avatar, e-mail, plano e papel, com
+  link para o perfil) ou, para visitantes, os botões Entrar e Cadastrar.
+- Itens alinhados à esquerda, com ícone e indicação clara da página atual, em grupos: Navegar (Início, Meus
+  projetos, Engenharia), Sua conta (Perfil, Administração, Sair) e Ajuda e informações (Sobre, Contatos,
+  Termos, Documentação da API, que abre em nova aba).
+- Preferências no rodapé do menu: tema claro/escuro (antes só na Home) e idioma.
+- Acessibilidade: o menu é um diálogo, o Tab fica dentro dele, Esc fecha e devolve o foco ao botão, e a página
+  atrás não rola enquanto ele está aberto.
+- Cabeçalho: botão "Menu" com rótulo (só o ícone no celular) e o usuário com avatar, levando ao perfil.
+
+### Removido
+- Aviso "Rascunho — sujeito a revisão jurídica" da página de Termos de Uso.
+
 ## 2.2.0 — 2026-10-16
 
 Requer a API 4.2.0.

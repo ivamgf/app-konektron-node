@@ -161,16 +161,41 @@ body,
     text-decoration: none;
   }
   .kt-header-user {
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 18rem;
+    padding: 0.2rem 0.75rem 0.2rem 0.2rem;
+    border-radius: 999px;
     font-size: 0.875rem;
-    color: rgba($white, 0.9);
+    color: rgba($white, 0.95);
+    text-decoration: none;
+    &:hover,
+    &:focus-visible {
+      color: $white;
+      background: rgba($white, 0.15);
+    }
   }
   .kt-menu-toggle {
-    background: none;
-    border: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     color: $white;
-    font-size: 2rem;
-    line-height: 1;
-    padding: 0.125rem 0.25rem;
+    background: rgba($white, 0.12);
+    border: 1px solid rgba($white, 0.55);
+    border-radius: 999px;
+    padding: 0.2rem 0.85rem 0.2rem 0.6rem;
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    .bi {
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+    &:hover,
+    &[aria-expanded='true'] {
+      background: rgba($white, 0.25);
+    }
   }
 }
 
@@ -251,65 +276,6 @@ body,
   .breadcrumb-item.active {
     color: $color-dimgray;
     text-decoration: underline;
-  }
-}
-
-// Menu lateral laranja (offcanvas do protótipo)
-.kt-sidemenu {
-  --bs-offcanvas-width: 253px;
-  --bs-offcanvas-bg: #{$brand-color-secondary-orange};
-  --bs-offcanvas-color: #{$white};
-  .offcanvas-header {
-    border-bottom: 1px solid rgba($white, 0.8);
-    margin: 0 1.25rem;
-    padding: 1rem 0 0.75rem;
-  }
-  .offcanvas-title {
-    font-family: $font-sans;
-    font-weight: 700;
-    font-size: 1.5rem;
-  }
-  .btn-close {
-    filter: invert(1) grayscale(1) brightness(2);
-    opacity: 1;
-  }
-  .kt-sidemenu-nav a,
-  .kt-sidemenu-nav button {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.75rem;
-    width: 100%;
-    padding: 0.4rem 0;
-    color: $white;
-    background: none;
-    border: 0;
-    font-family: $font-sans;
-    font-weight: 700;
-    font-size: 1.375rem;
-    text-decoration: none;
-    &:hover,
-    &:focus-visible,
-    &.active {
-      text-decoration: underline;
-    }
-    .bi {
-      font-size: 1.375rem;
-      width: 1.75rem;
-      text-align: center;
-    }
-  }
-  .kt-sidemenu-sep {
-    border-top: 1px solid rgba($white, 0.8);
-    margin: 0.75rem 0;
-  }
-  .kt-lang button {
-    color: $white;
-    border-color: rgba($white, 0.8);
-    &.active {
-      background: $white;
-      color: $brand-color-secondary-orange;
-    }
   }
 }
 
@@ -1625,6 +1591,250 @@ a.kt-tile {
   }
 }
 
+// Menu lateral (botão sanduíche): painel claro, cabeçalho no estilo do hero com quem está logado,
+// navegação em grupos e preferências (tema, idioma) no rodapé
+.kt-sidemenu {
+  --bs-offcanvas-width: min(360px, 92vw);
+  --bs-offcanvas-bg: var(--bs-body-bg);
+  --bs-offcanvas-color: var(--bs-body-color);
+  display: flex;
+  flex-direction: column;
+  border-left: 0 !important;
+  box-shadow: -12px 0 32px rgba($black, 0.18);
+}
+@media (prefers-reduced-motion: reduce) {
+  .kt-sidemenu {
+    transition: none;
+  }
+}
+.kt-sidemenu-top {
+  padding: 1rem 1.25rem 1.25rem;
+  color: $white;
+  background-color: $home-blue-dark;
+  background-image:
+    linear-gradient(rgba($white, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba($white, 0.07) 1px, transparent 1px),
+    radial-gradient(circle at 92% 20%, rgba($brand-color-secondary-orange, 0.35), transparent 45%),
+    linear-gradient(135deg, $brand-color-primary-blue, $home-blue-dark);
+  background-size:
+    32px 32px,
+    32px 32px,
+    auto,
+    auto;
+  border-bottom: 4px solid $brand-color-secondary-orange;
+  .kt-mark {
+    flex-shrink: 0;
+    margin: 0;
+  }
+}
+.kt-sidemenu-title {
+  margin: 0;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.kt-sidemenu-close {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  color: $white;
+  background: rgba($white, 0.15);
+  &:hover,
+  &:focus-visible {
+    background: rgba($white, 0.3);
+  }
+}
+.kt-sidemenu-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.6rem 0.75rem;
+  color: $white;
+  text-decoration: none;
+  background: rgba($white, 0.12);
+  border: 1px solid rgba($white, 0.25);
+  border-radius: 0.75rem;
+  &:hover,
+  &:focus-visible {
+    color: $white;
+    background: rgba($white, 0.22);
+  }
+}
+.kt-sidemenu-user-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.kt-sidemenu-email {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kt-sidemenu-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.kt-sidemenu-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: rgba($white, 0.2);
+  &.is-admin {
+    background: $brand-color-secondary-orange;
+  }
+}
+.kt-sidemenu-guest {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+}
+// Avatar com as iniciais (menu e cabeçalho)
+.kt-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  font-family: $font-sans;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: $white;
+  background: $home-orange-text-bg;
+  box-shadow: 0 0 0 2px rgba($white, 0.6);
+  &.is-sm {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.6875rem;
+  }
+}
+.kt-sidemenu-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1rem;
+}
+.kt-sidemenu-heading {
+  margin: 1rem 0.6rem 0.35rem;
+  font-family: $font-sans;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bs-secondary-color);
+}
+.kt-sidemenu-nav a,
+.kt-sidemenu-nav button {
+  display: flex;
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.6rem;
+  color: var(--bs-body-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s;
+  &:hover,
+  &:focus-visible {
+    background: rgba($brand-color-primary-blue, 0.08);
+    .kt-sidemenu-trail {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+  }
+  &.active {
+    font-weight: 700;
+    color: $home-blue-deep;
+    background: rgba($brand-color-primary-blue, 0.12);
+    box-shadow: inset 3px 0 0 $brand-color-secondary-orange;
+    .kt-sidemenu-icon {
+      color: $white;
+      background: $brand-color-primary-blue;
+    }
+  }
+}
+.kt-sidemenu-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 0.5rem;
+  font-size: 1.05rem;
+  color: $home-blue-deep;
+  background: rgba($brand-color-primary-blue, 0.1);
+}
+.kt-sidemenu-label {
+  flex: 1;
+  min-width: 0;
+}
+.kt-sidemenu-trail {
+  font-size: 0.75rem;
+  color: var(--bs-secondary-color);
+  opacity: 0.6;
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+// Preferências numa linha: tema (ícones) e idioma
+.kt-sidemenu-bottom {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid $card-line;
+  background: $card-tint;
+}
+// Botões segmentados (tema, idioma)
+.kt-segmented {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid $card-line;
+  border-radius: 999px;
+  background: $white;
+  button {
+    flex: 1;
+    min-width: 2.25rem;
+    padding: 0.35rem 0.6rem;
+    border: 0;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--bs-body-color);
+    background: none;
+    &:hover {
+      background: rgba($brand-color-primary-blue, 0.08);
+    }
+    &[aria-pressed='true'] {
+      color: $white;
+      background: $brand-color-primary-blue;
+    }
+  }
+}
+// Sair: último item de "Sua conta", em vermelho
+.kt-sidemenu-nav .kt-sidemenu-signout {
+  color: $danger;
+  .kt-sidemenu-icon {
+    color: $danger;
+    background: rgba($danger, 0.1);
+  }
+  &:hover,
+  &:focus-visible {
+    background: rgba($danger, 0.08);
+  }
+}
+
 // ---------- Navegação e usabilidade ----------
 // Voltar: sempre no mesmo lugar, antes das migalhas de pão
 .kt-back {
@@ -2279,6 +2489,56 @@ $dark-link: #5cc6ec;
 
   .kt-back {
     background: $dark-surface;
+  }
+
+  // Menu lateral
+  .kt-sidemenu {
+    --bs-offcanvas-bg: #{$dark-surface};
+    box-shadow: -12px 0 32px rgba($black, 0.55);
+  }
+  .kt-sidemenu-top {
+    background-image:
+      linear-gradient(rgba($white, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba($white, 0.06) 1px, transparent 1px),
+      radial-gradient(circle at 92% 20%, rgba($brand-color-secondary-orange, 0.25), transparent 45%),
+      linear-gradient(135deg, #015a78, $dark-chrome);
+  }
+  .kt-sidemenu-nav .kt-sidemenu-signout {
+    color: #ff8a8a;
+    .kt-sidemenu-icon {
+      color: #ff8a8a;
+      background: rgba($danger, 0.18);
+    }
+  }
+  .kt-sidemenu-nav a,
+  .kt-sidemenu-nav button {
+    &:hover,
+    &:focus-visible {
+      background: rgba($brand-color-primary-blue, 0.15);
+    }
+    &.active {
+      color: $dark-link;
+      background: #16303b;
+    }
+  }
+  .kt-sidemenu-icon {
+    color: $dark-link;
+    background: #16303b;
+  }
+  .kt-sidemenu-bottom {
+    border-top-color: $dark-border;
+    background: $dark-surface-2;
+  }
+  .kt-segmented {
+    border-color: $dark-border;
+    background: $dark-bg;
+    button:hover {
+      background: rgba($brand-color-primary-blue, 0.15);
+    }
+    button[aria-pressed='true'] {
+      color: $white;
+      background: #0b78a0;
+    }
   }
   .kt-to-top {
     box-shadow: 0 8px 18px rgba($black, 0.5);
