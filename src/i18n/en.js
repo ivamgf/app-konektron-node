@@ -75,6 +75,13 @@ export default {
     back: 'Back',
     backTo: 'Back to {page}',
     toTop: 'Back to top',
+    myProjects: 'My projects',
+    apiDocs: 'API documentation',
+    newTab: 'opens in a new tab',
+    theme: 'Theme',
+    plan: '{plan} plan',
+    guestText: 'Sign in to access your projects and engineering sections.',
+    groups: { navigate: 'Navigate', account: 'Your account', help: 'Help and information', preferences: 'Preferences' },
   },
   footer: {
     developer: 'Developer: Ivam Galvão Filho',
@@ -806,5 +813,5 @@ export default {
     or: 'Prefer your e-mail app?',
   },
   theme: { dark: 'Dark theme', light: 'Light theme', toDark: 'Switch to the dark theme', toLight: 'Switch to the light theme' },
-  terms: { title: 'Terms of Use', draft: 'Draft — subject to legal review.' },
+  terms: { title: 'Terms of Use' },
 };

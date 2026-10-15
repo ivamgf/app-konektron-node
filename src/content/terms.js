@@ -1,4 +1,4 @@
-// Termos de Uso (rascunho, sujeito a revisão jurídica). Itens 1–5 vêm do protótipo;
+// Termos de Uso. Itens 1–5 vêm do protótipo;
 // 6–9 substituem os "Item I–IV" do protótipo com base na especificação 3.3.
 export const TERMS = {
   'pt-BR': [

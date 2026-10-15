@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, session } from '../api/client.js';
@@ -298,6 +298,28 @@ describe('páginas das seções novas', () => {
     expect(chip.getAttribute('href')).toBe(`/projects/${P}/scrum/sprints/${ids.sprint}`);
     expect(screen.getByText(/Situação das tasks do Scrum: Feito/, { selector: '.kt-kb-status' })).toBeTruthy();
     expect(unknown).toEqual([]);
+  });
+
+  it('menu lateral: usuário, grupos, tema e idioma; Esc fecha e devolve o foco', async () => {
+    renderAt(`/projects/${P}/bpm`);
+    const toggle = await screen.findByRole('button', { name: 'Abrir menu' });
+    toggle.focus();
+    fireEvent.click(toggle);
+    const menu = await screen.findByRole('dialog', { name: 'KoneKtron' });
+    expect(menu.getAttribute('aria-hidden')).toBe('false');
+    expect(within(menu).getByText('ana@ex.com')).toBeTruthy();
+    expect(within(menu).getByText('Plano Master')).toBeTruthy();
+    for (const group of ['Navegar', 'Sua conta', 'Ajuda e informações']) expect(within(menu).getByRole('heading', { name: group })).toBeTruthy();
+    expect(within(menu).getByRole('link', { name: /Documentação da API/ }).getAttribute('target')).toBe('_blank');
+    fireEvent.click(within(menu).getByRole('button', { name: 'Tema escuro' }));
+    expect(document.documentElement.getAttribute('data-bs-theme')).toBe('dark');
+    expect(within(menu).getByRole('button', { name: 'Tema escuro' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(within(menu).getByRole('button', { name: 'EN' }));
+    await waitFor(() => expect(within(menu).getByRole('heading', { name: 'Your account' })).toBeTruthy());
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await waitFor(() => expect(menu.getAttribute('aria-hidden')).toBe('true'));
+    expect(document.activeElement).toBe(toggle);
+    document.documentElement.setAttribute('data-bs-theme', 'light');
   });
 
   it('planilha de texto: salva só o item alterado (merge na API)', async () => {

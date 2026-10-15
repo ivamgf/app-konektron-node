@@ -75,6 +75,13 @@ export default {
     back: 'Volver',
     backTo: 'Volver a {page}',
     toTop: 'Volver arriba',
+    myProjects: 'Mis proyectos',
+    apiDocs: 'Documentación de la API',
+    newTab: 'se abre en una pestaña nueva',
+    theme: 'Tema',
+    plan: 'Plan {plan}',
+    guestText: 'Inicia sesión para acceder a tus proyectos y secciones de ingeniería.',
+    groups: { navigate: 'Navegar', account: 'Tu cuenta', help: 'Ayuda e información', preferences: 'Preferencias' },
   },
   footer: {
     developer: 'Desarrollador: Ivam Galvão Filho',
@@ -806,5 +813,5 @@ export default {
     or: '¿Prefieres tu programa de correo?',
   },
   theme: { dark: 'Tema oscuro', light: 'Tema claro', toDark: 'Cambiar al tema oscuro', toLight: 'Cambiar al tema claro' },
-  terms: { title: 'Términos de Uso', draft: 'Borrador, sujeto a revisión jurídica.' },
+  terms: { title: 'Términos de Uso' },
 };

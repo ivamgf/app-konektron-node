@@ -360,8 +360,7 @@ export function Terms() {
             );
           })}
         </div>
-        <div className="d-flex justify-content-between align-items-center mt-4 mx-md-4">
-          <small className="text-body-secondary">{t('terms.draft')}</small>
+        <div className="d-flex justify-content-end align-items-center mt-4 mx-md-4">
           <button type="button" className="btn btn-link kt-auth-links p-0" onClick={() => navigate(-1)}>
             {t('common.back')}
           </button>

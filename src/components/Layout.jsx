@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useMatches, useN
 import { session } from '../api/client.js';
 import { useAuth } from '../auth/AuthProvider.jsx';
 import { LANGUAGES, useI18n } from '../i18n/I18nProvider.jsx';
+import { useTheme } from '../lib/theme.js';
 import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
 import { UnsavedProvider } from './unsaved.jsx';
@@ -56,32 +57,78 @@ function Breadcrumbs({ labels }) {
   );
 }
 
+// Iniciais para o avatar (ex.: "ana.souza@ex.com" → "AS")
+export const initialsOf = (email = '') => {
+  const parts = email.split('@')[0].split(/[._-]+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '?';
+};
+
+// Menu lateral: quem está logado, navegação em grupos, preferências (tema e idioma) e sair
 function SideMenu({ open, onClose }) {
   const { t, locale, setLocale } = useI18n();
-  const { status, isAdmin, logout } = useAuth();
+  const { status, user, isAdmin, logout } = useAuth();
+  const { theme: themeState, setTheme } = useTheme();
+  // o tema também muda fora do menu (Home): vale o que está aplicado na página
+  const theme = document.documentElement.getAttribute('data-bs-theme') ?? themeState;
   const toast = useToast();
   const navigate = useNavigate();
   const panelRef = useRef(null);
   const authed = status === 'authenticated';
 
+  // aberto: foco no painel, Esc fecha, Tab fica dentro do painel e a página atrás não rola
   useEffect(() => {
     if (!open) return undefined;
     const previous = document.activeElement;
-    panelRef.current?.querySelector('.btn-close')?.focus();
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    const panel = panelRef.current;
+    panel?.querySelector('.kt-sidemenu-close')?.focus();
+    const onKey = (e) => {
+      if (e.key === 'Escape') return onClose();
+      if (e.key !== 'Tab' || !panel) return undefined;
+      const focusable = [...panel.querySelectorAll('a[href], button:not([disabled])')];
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+      return undefined;
+    };
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
       previous?.focus?.();
     };
   }, [open, onClose]);
 
-  const item = (to, icon, key) => (
-    <li>
-      <NavLink to={to} onClick={onClose} end={to === '/'}>
-        {t(key)} <i className={`bi bi-${icon}`} aria-hidden="true" />
-      </NavLink>
+  const item = (to, icon, key, { end = false, external = false } = {}) => (
+    <li key={key}>
+      {external ? (
+        <a href={to} target="_blank" rel="noopener noreferrer" onClick={onClose}>
+          <span className="kt-sidemenu-icon"><i className={`bi bi-${icon}`} aria-hidden="true" /></span>
+          <span className="kt-sidemenu-label">{t(key)}</span>
+          <i className="bi bi-box-arrow-up-right kt-sidemenu-trail" aria-hidden="true" />
+          <span className="visually-hidden"> ({t('nav.newTab')})</span>
+        </a>
+      ) : (
+        <NavLink to={to} onClick={onClose} end={end}>
+          <span className="kt-sidemenu-icon"><i className={`bi bi-${icon}`} aria-hidden="true" /></span>
+          <span className="kt-sidemenu-label">{t(key)}</span>
+          <i className="bi bi-chevron-right kt-sidemenu-trail" aria-hidden="true" />
+        </NavLink>
+      )}
     </li>
+  );
+  const group = (titleKey, items) => (
+    <section className="kt-sidemenu-group" aria-labelledby={`kt-menu-${titleKey}`}>
+      <h3 className="kt-sidemenu-heading" id={`kt-menu-${titleKey}`}>{t(`nav.groups.${titleKey}`)}</h3>
+      <ul className="list-unstyled kt-sidemenu-nav mb-0">{items}</ul>
+    </section>
   );
 
   const signOut = async () => {
@@ -97,77 +144,91 @@ function SideMenu({ open, onClose }) {
         ref={panelRef}
         className={`offcanvas offcanvas-end kt-sidemenu ${open ? 'show' : ''}`}
         style={{ visibility: open ? 'visible' : 'hidden' }}
+        role="dialog"
+        aria-modal="true"
         aria-labelledby="kt-menu-title"
         aria-hidden={!open}
         id="kt-sidemenu"
       >
-        <div className="offcanvas-header">
-          <h2 className="offcanvas-title" id="kt-menu-title">
-            {t('nav.menu')}
-          </h2>
-          <button type="button" className="btn-close" aria-label={t('common.close')} onClick={onClose} />
+        <div className="kt-sidemenu-top">
+          <div className="d-flex align-items-center gap-2">
+            <BrandMark size={28} variant="mono" title="" />
+            <h2 className="kt-sidemenu-title" id="kt-menu-title">KoneKtron</h2>
+            <button type="button" className="kt-sidemenu-close ms-auto" aria-label={t('common.close')} title={t('common.close')} onClick={onClose}>
+              <i className="bi bi-x-lg" aria-hidden="true" />
+            </button>
+          </div>
+          {authed ? (
+            <Link to="/profile" className="kt-sidemenu-user" onClick={onClose}>
+              <span className="kt-avatar" aria-hidden="true">{initialsOf(user?.email)}</span>
+              <span className="kt-sidemenu-user-text">
+                <span className="kt-sidemenu-email">{user?.email}</span>
+                <span className="kt-sidemenu-badges">
+                  <span className="kt-sidemenu-badge">{t('nav.plan', { plan: t(`plans.${user?.plan}`) })}</span>
+                  {isAdmin && <span className="kt-sidemenu-badge is-admin">{t('roles.admin')}</span>}
+                </span>
+              </span>
+              <i className="bi bi-chevron-right ms-auto" aria-hidden="true" />
+            </Link>
+          ) : (
+            <div className="kt-sidemenu-guest">
+              <p className="mb-2">{t('nav.guestText')}</p>
+              <div className="d-flex gap-2">
+                <Link to="/signin" className="btn btn-light btn-sm fw-semibold flex-fill" onClick={onClose}>
+                  <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true" />{t('nav.signin')}
+                </Link>
+                <Link to="/signup" className="btn btn-outline-light btn-sm fw-semibold flex-fill" onClick={onClose}>
+                  <i className="bi bi-person-plus me-1" aria-hidden="true" />{t('nav.signup')}
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="offcanvas-body d-flex flex-column px-4">
-          <nav aria-label={t('nav.menu')}>
-            <ul className="list-unstyled kt-sidemenu-nav mb-0">
-              {item('/', 'house', 'nav.home')}
-              {item('/about', 'file-text', 'nav.about')}
-              {item(authed ? '/projects' : '/signin', 'tools', 'nav.projects')}
-              {item('/engineering', 'box', 'nav.engineering')}
-              {item('/terms', 'file-earmark-text', 'nav.terms')}
-              <li>
-                <a href={API_DOCS_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
-                  {t('nav.docs')} <i className="bi bi-folder" aria-hidden="true" />
-                </a>
-              </li>
-              {item('/contacts', 'envelope', 'nav.contacts')}
-            </ul>
-            <div className="kt-sidemenu-sep" />
-            <ul className="list-unstyled kt-sidemenu-nav mb-0">
-              {authed ? (
-                <>
-                  {item('/profile', 'person-circle', 'nav.profile')}
-                  {isAdmin && item('/admin', 'speedometer2', 'nav.admin')}
-                  <li>
-                    <button type="button" onClick={signOut}>
-                      {t('nav.signout')} <i className="bi bi-box-arrow-right" aria-hidden="true" />
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <>
-                  {item('/signin', 'box-arrow-in-right', 'nav.signin')}
-                  {item('/signup', 'person-plus', 'nav.signup')}
-                </>
-              )}
-            </ul>
-          </nav>
-          <div className="kt-sidemenu-sep" />
-          <div className="kt-lang d-flex justify-content-end align-items-center gap-2" role="group" aria-label={t('nav.language')}>
+
+        <nav className="kt-sidemenu-body" aria-label={t('nav.menu')}>
+          {group('navigate', [
+            item('/', 'house', 'nav.home', { end: true }),
+            item(authed ? '/projects' : '/signin', 'folder2-open', 'nav.myProjects'),
+            item('/engineering', 'grid-3x3-gap', 'nav.engineering'),
+          ])}
+          {authed && group('account', [
+            item('/profile', 'person-circle', 'nav.profile'),
+            isAdmin && item('/admin', 'shield-lock', 'nav.admin'),
+            <li key="signout">
+              <button type="button" className="kt-sidemenu-signout" onClick={signOut}>
+                <span className="kt-sidemenu-icon"><i className="bi bi-box-arrow-right" aria-hidden="true" /></span>
+                <span className="kt-sidemenu-label">{t('nav.signout')}</span>
+              </button>
+            </li>,
+          ])}
+          {group('help', [
+            item('/about', 'info-circle', 'nav.about'),
+            item('/contacts', 'chat-dots', 'nav.contacts'),
+            item('/terms', 'file-earmark-text', 'nav.terms'),
+            item(API_DOCS_URL, 'code-slash', 'nav.apiDocs', { external: true }),
+          ])}
+        </nav>
+
+        <div className="kt-sidemenu-bottom" role="group" aria-label={t('nav.groups.preferences')}>
+          <div className="kt-segmented" role="group" aria-label={t('nav.theme')}>
+            {[['light', 'sun'], ['dark', 'moon-stars']].map(([value, icon]) => (
+              <button key={value} type="button" aria-pressed={theme === value} onClick={() => setTheme(value)}
+                aria-label={t(`theme.${value}`)} title={t(`theme.${value}`)}>
+                <i className={`bi bi-${icon}`} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+          <div className="kt-segmented flex-fill" role="group" aria-label={t('nav.language')}>
             {LANGUAGES.map(({ code, short }) => (
-              <button
-                key={code}
-                type="button"
-                className={`btn btn-sm btn-outline-light ${locale === code ? 'active' : ''}`}
-                aria-pressed={locale === code}
-                onClick={() => setLocale(code)}
-                lang={code}
-                title={t(`enums.locale.${code}`)}
-              >
+              <button key={code} type="button" aria-pressed={locale === code} onClick={() => setLocale(code)} lang={code}
+                title={t(`enums.locale.${code}`)}>
                 {short}
               </button>
             ))}
           </div>
-          <img
-            src="/brand/konektron-engineering-design.png"
-            alt="KoneKtron Engineering & Design"
-            width="124"
-            height="90"
-            className="mt-auto mx-auto d-block pt-4"
-          />
         </div>
       </aside>
-      {open && <div className="offcanvas-backdrop fade show" onClick={onClose} />}
+      {open && <div className="offcanvas-backdrop fade show kt-sidemenu-backdrop" onClick={onClose} />}
     </>
   );
 }
@@ -344,7 +405,12 @@ export default function Layout() {
               KoneKtron
             </Link>
             <div className="d-flex align-items-center gap-3">
-              {user && <span className="kt-header-user d-none d-md-inline">{user.email}</span>}
+              {user && (
+                <Link to="/profile" className="kt-header-user d-none d-md-inline-flex" title={t('nav.profile')}>
+                  <span className="kt-avatar is-sm" aria-hidden="true">{initialsOf(user.email)}</span>
+                  <span className="text-truncate">{user.email}</span>
+                </Link>
+              )}
               <LanguageMenu />
               <button
                 type="button"
@@ -355,6 +421,7 @@ export default function Layout() {
                 onClick={() => setMenuPath(location.pathname)}
               >
                 <i className="bi bi-list" aria-hidden="true" />
+                <span className="d-none d-sm-inline" aria-hidden="true">{t('nav.menu')}</span>
               </button>
             </div>
           </div>
