@@ -81,7 +81,7 @@ describe('cliente: upload e download de arquivos', () => {
 
 // ---------- Páginas renderizadas pelo roteador real, com a API simulada ----------
 const P = 'p1';
-const ids = { task: 't1', knowledge: 'k1', agent: 'a1', agent2: 'a2', tr: 'tr1', onto: 'o1', proc: 'pr1', diag: 'd1' };
+const ids = { task: 't1', knowledge: 'k1', agent: 'a1', agent2: 'a2', tr: 'tr1', onto: 'o1', proc: 'pr1', diag: 'd1', sprint: 'sp1' };
 const stamp = { createdAt: '2026-10-14T10:00:00Z', updatedAt: '2026-10-14T10:00:00Z' };
 const worksheets = SHEET_KEYS.map((key, i) => ({
   key, model: MODEL(key), order: i + 1, fields: Object.keys(CK_TEXT.en.worksheets[key].fields ?? {}), resource: REGISTRY[key],
@@ -124,6 +124,22 @@ const diagram = {
   ...stamp,
 };
 
+const sprint = { id: 'sp1', projectId: P, number: 1, name: null, goal: 'MVP', status: 'active', startDate: null, endDate: null, increment: null, ...stamp };
+const sprintDetail = {
+  ...sprint,
+  items: [{ id: 'it1', projectId: P, sprintId: 'sp1', code: 'PB-1', title: 'Login', type: 'story', storyPoints: 3, status: 'done', position: 0, doneAt: '2026-10-15T13:00:00Z', ...stamp }],
+  tasks: [
+    { id: 'tk1', projectId: P, sprintId: 'sp1', itemId: 'it1', title: 'Tela de login', status: 'done', position: 0, doneAt: '2026-10-15T12:00:00Z', kanbanCardId: null, ...stamp },
+  ],
+  events: [],
+  burndown: null,
+  delivered: {
+    items: [{ id: 'it1', code: 'PB-1', title: 'Login', storyPoints: 3, doneAt: '2026-10-15T13:00:00Z' }],
+    tasks: [{ id: 'tk1', title: 'Tela de login', itemId: 'it1', doneAt: '2026-10-15T12:00:00Z' }],
+    points: 3,
+  },
+};
+
 const ROUTES = {
   '/auth/refresh': { accessToken: 'acc', refreshToken: 'ref2' },
   '/auth/me': { id: 'u1', email: 'ana@ex.com', role: 'client', plan: 'master', emailVerified: true },
@@ -163,6 +179,23 @@ const ROUTES = {
   [`/projects/${P}/bpm/processes/${ids.proc}`]: processes[1],
   [`/projects/${P}/bpm/diagrams`]: [diagram],
   [`/projects/${P}/bpm/diagrams/${ids.diag}`]: diagram,
+  // Scrum ↔ Kanban
+  [`/projects/${P}/scrum/members`]: [],
+  [`/projects/${P}/scrum/sprints`]: [sprint],
+  [`/projects/${P}/scrum/items`]: sprintDetail.items,
+  [`/projects/${P}/scrum/sprints/${ids.sprint}/detail`]: sprintDetail,
+  [`/projects/${P}/scrum/sprints/${ids.sprint}/publish-kanban`]: {
+    published: 1, createdTasks: 0, sprint: { ...sprintDetail, tasks: sprintDetail.tasks.map((tk) => ({ ...tk, kanbanCardId: 'card-1' })) },
+  },
+  [`/projects/${P}/kanban`]: {
+    columns: [
+      { id: 'col-1', projectId: P, name: 'A fazer', position: 0, wipLimit: null, taskStatus: 'todo', cards: [] },
+      {
+        id: 'col-3', projectId: P, name: 'Concluído', position: 1, wipLimit: null, taskStatus: 'done',
+        cards: [{ id: 'card-1', projectId: P, columnId: 'col-3', title: 'Tela de login', position: 0, scrumTaskId: 'tk1', taskStatus: 'done', sprintId: ids.sprint, sprintNumber: 1, itemCode: 'PB-1', ...stamp }],
+      },
+    ],
+  },
 };
 
 function renderAt(path) {
@@ -237,6 +270,33 @@ describe('páginas das seções novas', () => {
     renderAt(path);
     await waitFor(() => expect(screen.getAllByText((_, el) => el?.textContent === text || el?.textContent?.startsWith(text)).length).toBeGreaterThan(0), { timeout: 4000 });
     expect(screen.queryByText(/Unexpected Application Error/i)).toBeNull();
+    expect(unknown).toEqual([]);
+  });
+
+  it('sprint: publica as tasks no Kanban e mostra o incremento entregue', async () => {
+    renderAt(`/projects/${P}/scrum/sprints/${ids.sprint}`);
+    const publish = await screen.findByRole('button', { name: /Publicar no Kanban/ });
+    expect(screen.getByText('3 ponto(s) entregue(s)')).toBeTruthy();
+    expect(screen.getAllByText('Tela de login').length).toBeGreaterThan(1); // no quadro e no incremento
+    fireEvent.click(publish);
+    await waitFor(() => expect(writes).toHaveLength(1));
+    expect(writes[0]).toEqual({
+      method: 'POST',
+      path: `/projects/${P}/scrum/sprints/${ids.sprint}/publish-kanban`,
+      body: { columnNames: { todo: 'A fazer', in_progress: 'Em andamento', done: 'Concluído' } },
+    });
+    // tudo publicado: o botão sai e a task fica marcada como "No Kanban"
+    await waitFor(() => expect(screen.queryByRole('button', { name: /Publicar no Kanban/ })).toBeNull());
+    expect(screen.getByText(/Todas as tasks estão no Kanban/)).toBeTruthy();
+    expect(screen.getAllByText('No Kanban').length).toBe(1);
+    expect(unknown).toEqual([]);
+  });
+
+  it('Kanban: cartão de task do Scrum mostra a sprint e o item, e a coluna a situação', async () => {
+    renderAt(`/projects/${P}/kanban`);
+    const chip = await screen.findByRole('link', { name: /S1 · PB-1/ });
+    expect(chip.getAttribute('href')).toBe(`/projects/${P}/scrum/sprints/${ids.sprint}`);
+    expect(screen.getByText(/Situação das tasks do Scrum: Feito/, { selector: '.kt-kb-status' })).toBeTruthy();
     expect(unknown).toEqual([]);
   });
 

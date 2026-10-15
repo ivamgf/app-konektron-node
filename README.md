@@ -38,7 +38,7 @@ src/
 │   ├── auth/                  Entrar, Cadastrar, Recuperar, Nova senha, Confirmar e-mail
 │   ├── app/                   Projetos, Engenharia, Perfil
 │   ├── projects/              ProjectLayout, SystemAnalysis, CrispDm, Ontologies, Bpm, CommonKads,
-│   │                          Kanban, resources (configuração CRUD)
+│   │                          FunctionPoints, Scrum, Kanban, resources (configuração CRUD)
 │   └── admin/                 Resumo, Usuários, Logs
 └── styles/                    _tokens.scss (Design System), main.scss (Bootstrap + componentes)
 ```

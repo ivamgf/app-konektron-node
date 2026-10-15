@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import { GuestOnly, RequireAdmin, RequireAuth } from './auth/guards.jsx';
 import Layout from './components/Layout.jsx';
-import { AdminLayout, AdminLogs, AdminSummary, AdminUsers } from './pages/admin/Admin.jsx';
+import { AdminLayout, AdminLogs, AdminMessages, AdminSummary, AdminUsers } from './pages/admin/Admin.jsx';
 import Dashboard from './pages/app/Dashboard.jsx';
 import Engineering from './pages/app/Engineering.jsx';
 import Profile from './pages/app/Profile.jsx';
@@ -15,8 +15,12 @@ import {
   CkAgentDetail, CkAgents, CkCommunication, CkDesign, CkDocument, CkImpact, CkKnowledge, CkKnowledgeDetail, CkKnowledgeModel,
   CkLayout, CkOrganization, CkOverview, CkTaskDetail, CkTasks, CkTransactionDetail,
 } from './pages/projects/CommonKads.jsx';
+import { FpCountDetail, FpCounts, FpLayout } from './pages/projects/FunctionPoints.jsx';
 import { OnCatalog, OnDetail, OnLayout } from './pages/projects/Ontologies.jsx';
 import ProjectLayout, { useProject } from './pages/projects/ProjectLayout.jsx';
+import {
+  ScrumArtifacts, ScrumBacklog, ScrumEvents, ScrumLayout, ScrumOverview, ScrumProject, ScrumSprintDetail, ScrumSprints,
+} from './pages/projects/Scrum.jsx';
 import { SaAnalysis, SaDiagrams, SaOverview, SaReport, SaRequirements, SaUserStories } from './pages/projects/SystemAnalysis.jsx';
 import { About, Contacts, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
 
@@ -82,6 +86,15 @@ export const routes = [
                   { path: 'requirements', element: <SaRequirements />, handle: crumb('project.tabs.requirements') },
                   { path: 'user-stories', element: <SaUserStories />, handle: crumb('project.tabs.userStories') },
                   { path: 'diagrams', element: <SaDiagrams />, handle: crumb('project.tabs.diagrams') },
+                  {
+                    path: 'function-points',
+                    element: <FpLayout />,
+                    handle: crumb('project.tabs.functionPoints'),
+                    children: [
+                      { index: true, element: <FpCounts /> },
+                      { id: 'fpCount', path: ':countId', element: <FpCountDetail />, handle: crumb('fp.count') },
+                    ],
+                  },
                   // CRISP-DM (data_analysis)
                   { path: 'phases', element: <DmPhases />, handle: crumb('project.tabs.phases') },
                   { path: 'objectives', element: <DmObjectives />, handle: crumb('project.tabs.objectives') },
@@ -139,6 +152,20 @@ export const routes = [
                       { path: 'document', element: <CkDocument />, handle: crumb('ck.nav.document') },
                     ],
                   },
+                  // Scrum (qualquer tipo de projeto)
+                  {
+                    path: 'scrum',
+                    element: <ScrumLayout />,
+                    handle: crumb('project.tabs.scrum'),
+                    children: [
+                      { index: true, element: <ScrumOverview /> },
+                      { path: 'project', element: <ScrumProject />, handle: crumb('scrum.nav.project') },
+                      { path: 'backlog', element: <ScrumBacklog />, handle: crumb('scrum.nav.backlog') },
+                      ...detailRoutes('sprints', 'scrum.nav.sprints', <ScrumSprints />, 'scrumSprint', ':sprintId', <ScrumSprintDetail />, 'scrum.sprint'),
+                      { path: 'events', element: <ScrumEvents />, handle: crumb('scrum.nav.events') },
+                      { path: 'artifacts', element: <ScrumArtifacts />, handle: crumb('scrum.nav.artifacts') },
+                    ],
+                  },
                   // Kanban (qualquer tipo de projeto)
                   { path: 'kanban', element: <Kanban />, handle: crumb('project.tabs.kanban') },
                   {
@@ -160,6 +187,7 @@ export const routes = [
                 children: [
                   { index: true, element: <AdminSummary /> },
                   { path: 'users', element: <AdminUsers />, handle: crumb('admin.users') },
+                  { path: 'messages', element: <AdminMessages />, handle: crumb('admin.messages') },
                   { path: 'logs', element: <AdminLogs />, handle: crumb('admin.logs') },
                 ],
               },
