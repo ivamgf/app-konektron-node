@@ -7,22 +7,14 @@ import { SaveButton, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.jsx';
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
-import { PlanCards } from '../billing/Billing.jsx';
 import { useSubmit } from '../../lib/hooks.js';
 
-// Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
+// Seções (espelha a API: config/plans.js). Todos os planos, inclusive o Free, acessam todas.
 export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban'];
-export const PLAN_SECTIONS = {
-  free: ['system-analysis', 'kanban'],
-  standard: ['system-analysis', 'bpm', 'crisp-dm', 'scrum', 'kanban'],
-  master: SECTION_KEYS,
-};
 export const IMPLEMENTED = SECTION_KEYS;
 // Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
 export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
-// Administradores acessam todas as seções
-export const canAccessSection = (user, section) =>
-  user?.role === 'admin' || (PLAN_SECTIONS[user?.plan] ?? []).includes(section);
+export const canAccessSection = (user, section) => Boolean(user) && SECTION_KEYS.includes(section);
 export const SECTION_ICONS = {
   'system-analysis': 'diagram-3',
   ontologies: 'diagram-2',
@@ -43,7 +35,6 @@ export function Home() {
   const stats = [
     [SECTION_KEYS.length, 'sections'],
     [IMPLEMENTED.length, 'available'],
-    [Object.keys(PLAN_SECTIONS).length, 'plans'],
   ];
 
   return (
@@ -137,17 +128,6 @@ export function Home() {
               );
             })}
           </ul>
-        </div>
-      </section>
-
-      <section className="kt-home-band kt-home-plans kt-on-color" aria-labelledby="kt-home-plans">
-        <div className="container-xl px-3">
-          <h2 className="kt-home-heading" id="kt-home-plans">{t('home.plansTitle')}</h2>
-          <p className="kt-home-sub">{t('home.plansLead')}</p>
-          <PlanCards />
-          <p className="kt-home-note mt-4 mb-0">
-            <i className="bi bi-shield-check me-1" aria-hidden="true" /> {t('home.adminNote')}
-          </p>
         </div>
       </section>
 

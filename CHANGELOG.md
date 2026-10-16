@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.5.0 — 2026-10-16
+
+### Adicionado
+- **Responder mensagens de contato pela plataforma**: em Administração › Mensagens, o campo de resposta envia o
+  e-mail ao remetente pelo servidor do KonekTron (antes era um link `mailto:` que dependia do programa de e-mail
+  do computador). A resposta fica registrada na mensagem, e uma falha de envio aparece na tela com o motivo.
+
+### Removido
+- **Assinaturas e anúncios de planos** (requer a API 5.0.0): páginas `/plans`, `/checkout/:plan` e
+  `/billing/return`, item Planos do menu, cartões de planos na página inicial e aba Assinatura do perfil.
+- Bloqueios por plano: cadeados nas abas do projeto, avisos "fora do seu plano" e a restrição a projetos de
+  análise de dados no Free.
+
+### Alterado
+- Site exibido no rodapé e em Contatos: **www.orkneytech-lab.com**.
+- **Todas as seções liberadas para todos**, inclusive no plano Free.
+- **Administração só para administrador com plano Master**: o menu, a rota `/admin` e o selo de administrador
+  seguem a mesma regra da API.
+- Painel **Administração › Usuários**: o modal de edição mostra se o perfil escolhido (papel + plano) dá acesso à
+  administração e explica que todo cadastro novo começa Free; o administrador não edita o próprio perfil. A
+  lista marca quem tem acesso à administração.
+- **Termos de Uso** sem cobrança: "Planos e Perfis" (serviço gratuito, perfis atribuídos pela administração) e
+  "Encerramento da Conta" no lugar de cobrança, cancelamento e arrependimento; PagBank removido da LGPD.
+
 ## 2.4.0 — 2026-10-16
 
 ### Adicionado

@@ -709,101 +709,6 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   }
 }
 
-// Planos: faixa azul-escura com cartões; o recomendado em laranja
-.kt-home-plans {
-  background: linear-gradient(160deg, $home-blue-deep, $home-blue-night);
-}
-.kt-home-plan {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  color: $body-color;
-  background: $white;
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 24px rgba($black, 0.25);
-  header {
-    padding: 1.25rem 1.5rem;
-    background: #f4fafd;
-    border-bottom: 1px solid #cfe6ef;
-    border-radius: 0.5rem 0.5rem 0 0;
-  }
-  h3 {
-    font-size: 1.375rem;
-    margin: 0;
-  }
-  small {
-    color: $brand-color-neutral;
-  }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 1.25rem 1.5rem;
-    flex: 1;
-  }
-  li {
-    padding: 0.3rem 0;
-    font-size: 0.925rem;
-    .bi-check-circle-fill {
-      color: $brand-color-primary-blue;
-    }
-    &.is-off {
-      color: $color-dimgray;
-      .bi {
-        color: $color-darkgray;
-      }
-    }
-  }
-  footer {
-    padding: 0 1.5rem 1.5rem;
-  }
-  &.is-featured {
-    outline: 2px solid $brand-color-secondary-orange;
-    @include media-breakpoint-up(md) {
-      transform: translateY(-10px);
-    }
-    header {
-      background: $home-orange-text-bg;
-      border-color: $home-orange-text-bg;
-      color: $white;
-      small {
-        color: $white;
-      }
-    }
-  }
-}
-// Preço do plano (cartões e checkout)
-.kt-plan-price,
-.kt-checkout-price {
-  strong {
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-  span {
-    font-size: 0.875rem;
-    opacity: 0.85;
-  }
-}
-.kt-checkout-price strong {
-  font-size: 2rem;
-  color: $brand-color-primary-blue;
-}
-.kt-home-ribbon {
-  position: absolute;
-  top: -12px;
-  right: 1rem;
-  background: $color-bootstrap-dark;
-  color: $white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-}
-.kt-home-note {
-  color: rgba($white, 0.85);
-  font-size: 0.875rem;
-}
-
 // Chamada final
 .kt-home-cta {
   position: relative;
@@ -2624,31 +2529,6 @@ $dark-link: #5cc6ec;
     .kt-home-more {
       color: $dark-link;
     }
-  }
-  .kt-home-plans {
-    background: linear-gradient(160deg, #08141a, #050d11);
-  }
-  .kt-home-plan {
-    color: $dark-text;
-    background: $dark-surface;
-    border: 1px solid $dark-border;
-    header {
-      background: $dark-surface-2;
-      border-color: $dark-border;
-    }
-    small {
-      color: $dark-muted;
-    }
-    li.is-off {
-      color: #7f95a1;
-      .bi {
-        color: #5d717c;
-      }
-    }
-  }
-  .kt-home-ribbon {
-    background: $dark-text;
-    color: $dark-bg;
   }
   .kt-home-cta {
     box-shadow: 0 12px 30px rgba($black, 0.45);

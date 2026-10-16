@@ -11,10 +11,9 @@ import { LANGUAGES, useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync, useSubmit } from '../../lib/hooks.js';
 import { addressConfig } from '../projects/resources.jsx';
 import { VerifyBanner } from './Dashboard.jsx';
-import { SubscriptionTab } from '../billing/Billing.jsx';
 
-const TABS = ['personal', 'social', 'addresses', 'subscription', 'security'];
-const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', subscription: 'credit-card', security: 'shield-lock' };
+const TABS = ['personal', 'social', 'addresses', 'security'];
+const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', security: 'shield-lock' };
 
 function PersonalTab({ profile, onSaved }) {
   const { t, setLocale } = useI18n();
@@ -205,7 +204,7 @@ function SecurityTab() {
 export default function Profile() {
   const { t } = useI18n();
   const [params] = useSearchParams();
-  // ?tab=subscription: links da volta do checkout
+  // ?tab=: abre direto numa aba (ex.: ?tab=security)
   const [tab, setTab] = useState(() => (TABS.includes(params.get('tab')) ? params.get('tab') : 'personal'));
   const profile = useAsync(() => profileApi.get(), []);
   const addresses = addressConfig(t);
@@ -228,8 +227,6 @@ export default function Profile() {
           <ResourceManager path="/addresses" {...addresses} />
         ) : tab === 'security' ? (
           <SecurityTab />
-        ) : tab === 'subscription' ? (
-          <SubscriptionTab />
         ) : profile.loading && !profile.data ? (
           <Loading small />
         ) : profile.data ? (

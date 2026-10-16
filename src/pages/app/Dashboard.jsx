@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { authApi, engineeringApi, projectsApi } from '../../api/endpoints.js';
+import { authApi, projectsApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { FieldGrid, toPayload } from '../../components/forms.jsx';
 import { useToast } from '../../components/Toasts.jsx';
@@ -69,7 +69,7 @@ export function VerifyBanner() {
   );
 }
 
-function NewProjectModal({ onClose, canDataAnalysis }) {
+function NewProjectModal({ onClose }) {
   const { t } = useI18n();
   const toast = useToast();
   const navigate = useNavigate();
@@ -79,7 +79,7 @@ function NewProjectModal({ onClose, canDataAnalysis }) {
       name: 'type', label: 'project.type', type: 'select', required: true, help: 'project.typeHelp',
       options: [
         { value: 'software', label: t('project.types.software') },
-        ...(canDataAnalysis ? [{ value: 'data_analysis', label: t('project.types.data_analysis') }] : []),
+        { value: 'data_analysis', label: t('project.types.data_analysis') },
       ],
     },
     { name: 'description', label: 'project.description', type: 'textarea', maxLength: 10000 },
@@ -107,7 +107,6 @@ function NewProjectModal({ onClose, canDataAnalysis }) {
     >
       <form id="kt-new-project" noValidate onSubmit={(e) => { e.preventDefault(); submit(toPayload(fields, values, t)); }}>
         <FieldGrid fields={fields} values={values} errors={errors} onChange={(n, v) => setValues((s) => ({ ...s, [n]: v }))} />
-        {!canDataAnalysis && <p className="small text-body-secondary mb-0">{t('project.dataAnalysisLocked')}</p>}
       </form>
     </Modal>
   );
@@ -120,8 +119,6 @@ export default function Dashboard() {
   const [type, setType] = useState('');
   const [creating, setCreating] = useState(false);
   const projects = useAsync(() => projectsApi.list({ page, pageSize: PAGE_SIZE, type: type || undefined }), [page, type]);
-  const sections = useAsync(() => engineeringApi.sections(), []);
-  const canDataAnalysis = Boolean(sections.data?.find((s) => s.key === 'crisp-dm')?.enabled);
 
   return (
     <div className="container-xl px-3 mt-3">
@@ -179,7 +176,7 @@ export default function Dashboard() {
           </>
         )}
       </ContentCard>
-      {creating && <NewProjectModal onClose={() => setCreating(false)} canDataAnalysis={canDataAnalysis} />}
+      {creating && <NewProjectModal onClose={() => setCreating(false)} />}
     </div>
   );
 }

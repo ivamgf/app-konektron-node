@@ -5,7 +5,6 @@ import { AdminLayout, AdminLogs, AdminMessages, AdminSummary, AdminUsers } from 
 import Dashboard from './pages/app/Dashboard.jsx';
 import Engineering from './pages/app/Engineering.jsx';
 import Profile from './pages/app/Profile.jsx';
-import { BillingReturn, Checkout, Plans } from './pages/billing/Billing.jsx';
 import { Recover, ResetPassword, Signin, Signup, VerifyEmail } from './pages/auth/AuthPages.jsx';
 import {
   DmDatasetDetail, DmDatasets, DmModelDetail, DmModels, DmObjectives, DmOverview, DmPhases, DmPreparation, DmReport,
@@ -56,7 +55,6 @@ export const routes = [
       { path: 'contacts', element: <Contacts />, handle: crumb('nav.contacts') },
       { path: 'terms', element: <Terms />, handle: crumb('nav.terms') },
       { path: 'engineering', element: <Engineering />, handle: crumb('nav.engineering') },
-      { path: 'plans', element: <Plans />, handle: crumb('nav.plans') },
       { path: 'verify-email', element: <VerifyEmail />, handle: crumb('auth.verifyTitle') },
       { path: 'reset-password', element: <ResetPassword />, handle: crumb('auth.resetTitle') },
       {
@@ -71,9 +69,6 @@ export const routes = [
         element: <RequireAuth />,
         children: [
           { path: 'profile', element: <Profile />, handle: crumb('nav.profile') },
-          // Assinatura: resumo do plano → página de pagamento do PagBank → volta para /billing/return
-          { path: 'checkout/:plan', element: <Checkout />, handle: crumb('billing.checkout') },
-          { path: 'billing/return', element: <BillingReturn />, handle: crumb('billing.returnTitle') },
           {
             path: 'projects',
             handle: crumb('nav.projects'),

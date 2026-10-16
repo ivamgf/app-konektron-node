@@ -53,7 +53,8 @@ export function AuthProvider({ children }) {
       user,
       status,
       signedOutByUser,
-      isAdmin: user?.role === 'admin',
+      // administração: só administrador com plano Master (a API confere de novo)
+      isAdmin: user?.role === 'admin' && user?.plan === 'master',
       login: async (credentials) => applySession(await authApi.login(credentials)),
       register: async (data) => applySession(await authApi.register(data)),
       // Após trocar a senha a API devolve tokens novos (as outras sessões caem)

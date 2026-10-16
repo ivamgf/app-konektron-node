@@ -2,10 +2,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { NavLink, Outlet, useOutletContext } from 'react-router';
 import { fileApi } from '../api/endpoints.js';
-import { useAuth } from '../auth/AuthProvider.jsx';
 import { useI18n } from '../i18n/I18nProvider.jsx';
 import { formatDate, useSubmit } from '../lib/hooks.js';
-import { canAccessSection, PLAN_SECTIONS } from '../pages/public/PublicPages.jsx';
 import { FieldGrid, toFormValues, toPayload } from './forms.jsx';
 import { useToast } from './Toasts.jsx';
 import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from './unsaved.jsx';
@@ -38,31 +36,15 @@ export function saveBlob(blob, name) {
   URL.revokeObjectURL(url);
 }
 
-// Seção fora do plano: explica e mostra em quais planos ela está
-export function SectionLocked({ section }) {
-  const { t } = useI18n();
-  const plans = Object.entries(PLAN_SECTIONS).filter(([, keys]) => keys.includes(section)).map(([plan]) => t(`plans.${plan}`));
-  return (
-    <div className="text-center py-4">
-      <i className="bi bi-lock fs-1 text-body-secondary" aria-hidden="true" />
-      <h2 className="h3 mt-2">{t(`sections.${section}.name`)}</h2>
-      <p className="mb-1">{t('sections.locked', { plans: plans.join(', ') })}</p>
-      <p className="small text-body-secondary mb-0">{t(`sections.${section}.text`)}</p>
-    </div>
-  );
-}
-
 /**
- * Layout de seção: confere o plano e desenha a sub-navegação em pílulas.
+ * Layout de seção: desenha a sub-navegação em pílulas.
  * @param {string} section   chave da seção (ex.: 'bpm')
  * @param {string} base      caminho da seção no app (ex.: /projects/:id/bpm)
  * @param {Array}  items     [[subcaminho, rótulo já traduzido, ícone]]
  */
 export function SectionLayout({ section, base, items = [], actions }) {
   const { t } = useI18n();
-  const { user } = useAuth();
   const context = useOutletContext();
-  if (!canAccessSection(user, section)) return <SectionLocked section={section} />;
   return (
     <>
       {(items.length > 0 || actions) && (
