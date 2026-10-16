@@ -7,11 +7,9 @@ import { useToast } from '../../components/Toasts.jsx';
 import { ContentCard, Loading, Modal } from '../../components/ui.jsx';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync, useSubmit } from '../../lib/hooks.js';
-import { useAuth } from '../../auth/AuthProvider.jsx';
-import { canAccessSection } from '../public/PublicPages.jsx';
 import { NotFound } from '../public/PublicPages.jsx';
 
-// Seções para qualquer tipo de projeto: [caminho, rótulo, ícone, seção do plano]
+// Seções para qualquer tipo de projeto: [caminho, rótulo, ícone, seção]
 const SHARED_TABS = [
   ['ontologies', 'ontologies', 'diagram-2', 'ontologies'],
   ['bpm', 'bpm', 'bezier2', 'bpm'],
@@ -95,7 +93,6 @@ export default function ProjectLayout() {
   const { t } = useI18n();
   const toast = useToast();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { projectId } = useParams();
   const [editing, setEditing] = useState(false);
   const project = useAsync(() => projectsApi.get(projectId), [projectId]);
@@ -139,14 +136,11 @@ export default function ProjectLayout() {
       >
         {p.description && <p className="text-body-secondary kt-prewrap kt-no-print">{p.description}</p>}
         <ul className="nav nav-underline kt-tabs mb-4 kt-no-print">
-          {TABS[p.type].map(([path, key, icon, section]) => (
+          {TABS[p.type].map(([path, key, icon]) => (
             <li className="nav-item" key={key}>
               <NavLink to={path ? `/projects/${p.id}/${path}` : `/projects/${p.id}`} end={!path}
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                 <i className={`bi bi-${icon} me-1`} aria-hidden="true" />{t(`project.tabs.${key}`)}
-                {section && !canAccessSection(user, section) && (
-                  <i className="bi bi-lock ms-1 small" title={t('sections.notInPlan')} aria-label={t('sections.notInPlan')} />
-                )}
               </NavLink>
             </li>
           ))}

@@ -30,7 +30,7 @@ src/
 ├── auth/                      AuthProvider (sessão), guards (RequireAuth, RequireAdmin, GuestOnly)
 ├── i18n/                      en.js (padrão), pt-BR.js — RNF5
 ├── components/                Layout (cabeçalho, menu, rodapé), ui, forms, ResourceManager, Toasts,
-│                              sections (sub-navegação por plano, arquivo, editor de linhas)
+│                              sections (sub-navegação, arquivo, editor de linhas)
 ├── content/                   termos de uso, tarefas do CRISP-DM, planilhas do CommonKADS (PT/EN/ES)
 ├── lib/hooks.js               useAsync, useSubmit, formatação de datas
 ├── pages/

@@ -23,7 +23,7 @@ em [`docs/prototipo/`](prototipo/) e substituem o protótipo como referência vi
 | Novas | — | **Nova senha** (`/reset-password`) e **Confirmar e-mail** (`/verify-email`) | Destinos dos links que a API envia por e-mail |
 | Menu | Itens fixos; "Projeto"/"Services"/"Products" | Início, Sobre, Projetos, Engenharia, Termos, Docs, Contatos + Perfil, Administração (admin) e Sair, ou Entrar/Cadastrar | Itens conforme o login e o papel; "Docs" abre a documentação da API; troca de idioma EN/PT (RNF5) |
 | Sobre / Contatos | Fotos de banco de imagens, "Title 1 / Paragraph" | Texto real da especificação e identidade da marca | Sem licença das fotos; conteúdo provisório substituído |
-| Termos | Itens 6–9 "Item I–IV" | Conta e segurança, Planos e cobrança, Propriedade intelectual, Contato | Conteúdo real; **rascunho sujeito a revisão jurídica** |
+| Termos | Itens 6–9 "Item I–IV" | Conta e segurança, Planos e perfis, Encerramento da conta, Propriedade intelectual, Contato | Conteúdo real; **rascunho sujeito a revisão jurídica** |
 | Novas (área logada) | — | Projetos, Engenharia, Perfil (dados, redes, endereços, segurança), Análise de Sistemas, CRISP-DM, Relatórios e Administração | RF3, RF5, RF6, RF8–RF12 não tinham telas no protótipo |
 
 ## Decisões de design system

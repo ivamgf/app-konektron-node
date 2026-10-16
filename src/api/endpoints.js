@@ -120,5 +120,7 @@ export const adminApi = {
   logs: (query) => api.get('/admin/logs', query),
   messages: (query) => api.get('/admin/contact-messages', query),
   updateMessage: (id, body) => api.patch(`/admin/contact-messages/${id}`, body),
+  // a API envia por e-mail ao remetente (SMTP do sistema) e registra a resposta
+  replyMessage: (id, message) => api.post(`/admin/contact-messages/${id}/reply`, { message }),
   removeMessage: (id) => api.del(`/admin/contact-messages/${id}`),
 };

@@ -105,6 +105,10 @@ export function AdminSummary() {
   );
 }
 
+// Acesso à administração: papel Administrador com plano Master (igual à API: isMasterAdmin)
+const hasAdminAccess = (u) => u.role === 'admin' && u.plan === 'master';
+
+// RF5.1: o administrador muda o perfil (papel e plano) dos usuários; todo cadastro novo começa Free
 function EditUserModal({ user, isSelf, onClose, onSaved }) {
   const { t } = useI18n();
   const toast = useToast();
@@ -118,9 +122,10 @@ function EditUserModal({ user, isSelf, onClose, onSaved }) {
   });
   const onSubmit = (e) => {
     e.preventDefault();
-    // RN5.1: o admin não muda o próprio papel nem se desativa
-    submit(isSelf ? { plan: values.plan } : values);
+    // RN5.1: o administrador não muda o próprio perfil nem se desativa (perderia o acesso)
+    if (!isSelf) submit(values);
   };
+  const admin = hasAdminAccess(values);
   return (
     <Modal
       title={`${t('admin.editUser')}: ${user.email}`}
@@ -128,21 +133,27 @@ function EditUserModal({ user, isSelf, onClose, onSaved }) {
       footer={
         <>
           <button type="button" className="btn btn-outline-secondary" onClick={onClose}>{t('common.cancel')}</button>
-          <button type="submit" form="kt-edit-user" className="btn btn-primary" disabled={busy}>{t('common.save')}</button>
+          <button type="submit" form="kt-edit-user" className="btn btn-primary" disabled={busy || isSelf}>{t('common.save')}</button>
         </>
       }
     >
       <form id="kt-edit-user" onSubmit={onSubmit}>
+        {isSelf && <p className="alert alert-info small py-2">{t('admin.selfNote')}</p>}
         <label className="form-label fw-semibold" htmlFor="u-role">{t('admin.role')}</label>
         <select id="u-role" className="form-select mb-3" value={values.role} disabled={isSelf}
           onChange={(e) => setValues((v) => ({ ...v, role: e.target.value }))}>
           {ROLES.map((r) => <option key={r} value={r}>{t(`roles.${r}`)}</option>)}
         </select>
         <label className="form-label fw-semibold" htmlFor="u-plan">{t('profile.plan')}</label>
-        <select id="u-plan" className="form-select mb-3" value={values.plan}
-          onChange={(e) => setValues((v) => ({ ...v, plan: e.target.value }))}>
+        <select id="u-plan" className="form-select mb-1" value={values.plan} disabled={isSelf}
+          aria-describedby="u-plan-help" onChange={(e) => setValues((v) => ({ ...v, plan: e.target.value }))}>
           {PLANS.map((p) => <option key={p} value={p}>{t(`plans.${p}`)}</option>)}
         </select>
+        <div className="form-text mb-3" id="u-plan-help">{t('admin.planHelp')}</div>
+        <p className={`small mb-3 ${admin ? 'text-success' : 'text-body-secondary'}`} role="status">
+          <i className={`bi ${admin ? 'bi-shield-check' : 'bi-shield-x'} me-1`} aria-hidden="true" />
+          {admin ? t('admin.accessYes') : t('admin.accessNo')}
+        </p>
         <div className="form-check form-switch">
           <input id="u-active" type="checkbox" className="form-check-input" role="switch" checked={values.isActive} disabled={isSelf}
             onChange={(e) => setValues((v) => ({ ...v, isActive: e.target.checked }))} />
@@ -223,7 +234,10 @@ export function AdminUsers() {
                   return (
                     <tr key={u.id}>
                       <td>{u.email} {!u.emailVerifiedAt && <span className="badge text-bg-warning ms-1">{t('auth.notVerified')}</span>}</td>
-                      <td>{t(`roles.${u.role}`)}</td>
+                      <td>
+                        {t(`roles.${u.role}`)}
+                        {hasAdminAccess(u) && <span className="badge text-bg-primary ms-1" title={t('admin.accessYes')}>{t('admin.title')}</span>}
+                      </td>
                       <td>{t(`plans.${u.plan}`)}</td>
                       <td>{u.isActive ? <i className="bi bi-check-lg text-success" aria-label={t('common.yes')} /> : <i className="bi bi-x-lg text-danger" aria-label={t('common.no')} />}</td>
                       <td>{formatDate(u.lastLoginAt, locale)}</td>
@@ -313,6 +327,30 @@ export function AdminLogs() {
 const MESSAGE_STATUS = ['new', 'read', 'answered', 'archived'];
 const MESSAGE_BADGE = { new: 'text-bg-accent', read: 'text-bg-primary', answered: 'text-bg-success', archived: 'text-bg-secondary' };
 
+// Resposta enviada pela plataforma: a API manda o e-mail ao remetente e só marca como respondida se der certo
+function ReplyForm({ message, onSent }) {
+  const { t } = useI18n();
+  const toast = useToast();
+  const [text, setText] = useState('');
+  const { submit, busy } = useSubmit((body) => adminApi.replyMessage(message.id, body), {
+    onSuccess: () => {
+      toast.success(t('admin.replySent', { email: message.email }));
+      setText('');
+      onSent();
+    },
+  });
+  const id = `reply-${message.id}`;
+  return (
+    <form className="mb-3" onSubmit={(e) => { e.preventDefault(); if (text.trim()) submit(text); }}>
+      <label className="form-label small fw-semibold" htmlFor={id}>{t('admin.replyTo', { email: message.email })}</label>
+      <textarea id={id} className="form-control mb-2" rows={4} maxLength={10000} value={text} onChange={(e) => setText(e.target.value)} />
+      <button type="submit" className="btn btn-sm btn-primary" disabled={busy || !text.trim()}>
+        <i className="bi bi-send me-1" aria-hidden="true" />{busy ? t('contacts.sending') : t('admin.reply')}
+      </button>
+    </form>
+  );
+}
+
 export function AdminMessages() {
   const { t, locale } = useI18n();
   const toast = useToast();
@@ -375,13 +413,17 @@ export function AdminMessages() {
                 {openId === m.id && (
                   <div className="kt-message-body">
                     <p className="kt-prewrap">{m.message}</p>
+                    {m.reply && (
+                      <div className="border-start border-3 border-success ps-3 mb-3">
+                        <p className="small text-body-secondary mb-1">
+                          <i className="bi bi-reply me-1" aria-hidden="true" />{t('admin.repliedAt', { date: formatDate(m.repliedAt, locale) })}
+                        </p>
+                        <p className="kt-prewrap mb-0">{m.reply}</p>
+                      </div>
+                    )}
+                    <ReplyForm message={m} onSent={data.reload} />
                     <div className="d-flex flex-wrap align-items-center gap-2">
-                      <a className="btn btn-sm btn-primary"
-                        href={`mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.subject}`)}`}
-                        onClick={() => m.status !== 'answered' && update(m, 'answered')}>
-                        <i className="bi bi-reply me-1" aria-hidden="true" />{t('admin.reply')}
-                      </a>
-                      <label className="small text-body-secondary ms-2" htmlFor={`st-${m.id}`}>{t('admin.markAs')}</label>
+                      <label className="small text-body-secondary" htmlFor={`st-${m.id}`}>{t('admin.markAs')}</label>
                       <select id={`st-${m.id}`} className="form-select form-select-sm w-auto" value={m.status}
                         onChange={(e) => update(m, e.target.value)}>
                         {MESSAGE_STATUS.map((st) => <option key={st} value={st}>{t(`enums.contactStatus.${st}`)}</option>)}

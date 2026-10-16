@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { authApi, profileApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
@@ -203,7 +203,9 @@ function SecurityTab() {
 
 export default function Profile() {
   const { t } = useI18n();
-  const [tab, setTab] = useState('personal');
+  const [params] = useSearchParams();
+  // ?tab=: abre direto numa aba (ex.: ?tab=security)
+  const [tab, setTab] = useState(() => (TABS.includes(params.get('tab')) ? params.get('tab') : 'personal'));
   const profile = useAsync(() => profileApi.get(), []);
   const addresses = addressConfig(t);
 

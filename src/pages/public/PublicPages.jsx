@@ -9,19 +9,12 @@ import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useSubmit } from '../../lib/hooks.js';
 
-// Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
+// Seções (espelha a API: config/plans.js). Todos os planos, inclusive o Free, acessam todas.
 export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban'];
-export const PLAN_SECTIONS = {
-  free: ['system-analysis', 'kanban'],
-  standard: ['system-analysis', 'bpm', 'crisp-dm', 'scrum', 'kanban'],
-  master: SECTION_KEYS,
-};
 export const IMPLEMENTED = SECTION_KEYS;
 // Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
 export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
-// Administradores acessam todas as seções
-export const canAccessSection = (user, section) =>
-  user?.role === 'admin' || (PLAN_SECTIONS[user?.plan] ?? []).includes(section);
+export const canAccessSection = (user, section) => Boolean(user) && SECTION_KEYS.includes(section);
 export const SECTION_ICONS = {
   'system-analysis': 'diagram-3',
   ontologies: 'diagram-2',
@@ -32,7 +25,6 @@ export const SECTION_ICONS = {
   scrum: 'arrow-repeat',
   kanban: 'kanban',
 };
-const FEATURED_PLAN = 'standard';
 
 export function Home() {
   const { t } = useI18n();
@@ -43,7 +35,6 @@ export function Home() {
   const stats = [
     [SECTION_KEYS.length, 'sections'],
     [IMPLEMENTED.length, 'available'],
-    [Object.keys(PLAN_SECTIONS).length, 'plans'],
   ];
 
   return (
@@ -137,51 +128,6 @@ export function Home() {
               );
             })}
           </ul>
-        </div>
-      </section>
-
-      <section className="kt-home-band kt-home-plans kt-on-color" aria-labelledby="kt-home-plans">
-        <div className="container-xl px-3">
-          <h2 className="kt-home-heading" id="kt-home-plans">{t('home.plansTitle')}</h2>
-          <p className="kt-home-sub">{t('home.plansLead')}</p>
-          <div className="row g-4 pt-2">
-            {Object.entries(PLAN_SECTIONS).map(([plan, included]) => {
-              const featured = plan === FEATURED_PLAN;
-              return (
-                <div className="col-md-4" key={plan}>
-                  <article className={`kt-home-plan ${featured ? 'is-featured' : ''}`} aria-labelledby={`kt-plan-${plan}`}>
-                    {featured && <span className="kt-home-ribbon">{t('home.recommended')}</span>}
-                    <header>
-                      <h3 id={`kt-plan-${plan}`}>{t(`plans.${plan}`)}</h3>
-                      <small>{t(`home.tagline.${plan}`)}</small>
-                    </header>
-                    <ul>
-                      {SECTION_KEYS.map((key) => {
-                        const has = included.includes(key);
-                        return (
-                          <li key={key} className={has ? '' : 'is-off'}>
-                            <i className={`bi ${has ? 'bi-check-circle-fill' : 'bi-dash-circle'} me-2`} aria-hidden="true" />
-                            <span className="visually-hidden">{has ? t('common.yes') : t('common.no')}: </span>
-                            {t(`sections.${key}.name`)}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {!authed && (
-                      <footer>
-                        <Link to="/signup" className={`btn w-100 ${featured ? 'btn-accent fw-bold' : 'btn-outline-primary'}`}>
-                          {plan === 'free' ? t('home.start') : t('home.choose')}
-                        </Link>
-                      </footer>
-                    )}
-                  </article>
-                </div>
-              );
-            })}
-          </div>
-          <p className="kt-home-note mt-4 mb-0">
-            <i className="bi bi-shield-check me-1" aria-hidden="true" /> {t('home.adminNote')}
-          </p>
         </div>
       </section>
 

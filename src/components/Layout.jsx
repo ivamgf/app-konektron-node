@@ -9,8 +9,8 @@ import { BrandMark, Loading } from './ui.jsx';
 import { UnsavedProvider } from './unsaved.jsx';
 
 const API_DOCS_URL = `${(import.meta.env.VITE_API_URL ?? '/api/v1').replace(/\/$/, '')}/docs/`;
-export const SITE_URL = 'www.konektron.orkneytech.com.br';
-export const CONTACT_EMAIL = 'konektron@konektron.orkneytech.com.br';
+export const SITE_URL = 'www.orkneytech-lab.com';
+export const CONTACT_EMAIL = 'konektron@orkneytech-lab.com';
 
 // Rótulos dinâmicos de migalhas (ex.: nome do projeto), definidos pela própria página
 const CrumbContext = createContext(null);

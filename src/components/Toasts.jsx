@@ -31,7 +31,9 @@ export function ToastProvider({ children }) {
         if (err instanceof ApiError) {
           if (err.status === 0) return push('error', t('errors.network'));
           const extra = err.requestId ? t('errors.requestId', { id: err.requestId }) : null;
-          return push('error', err.status >= 500 ? t('errors.generic') : err.message, extra);
+          // 502/503 trazem um motivo útil (ex.: o servidor de e-mail recusou o envio); os demais 5xx ficam genéricos
+          const explained = (err.status === 502 || err.status === 503) && err.message;
+          return push('error', err.status >= 500 && !explained ? t('errors.generic') : err.message, extra);
         }
         push('error', t('errors.generic'));
       },

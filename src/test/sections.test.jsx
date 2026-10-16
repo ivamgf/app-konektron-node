@@ -43,11 +43,11 @@ describe('planos e seções', () => {
     for (const s of ['ontologies', 'bpm', 'commonkads']) expect(IMPLEMENTED).toContain(s);
   });
 
-  it('acesso por plano, como na API', () => {
-    expect(canAccessSection({ plan: 'standard' }, 'bpm')).toBe(true);
-    expect(canAccessSection({ plan: 'standard' }, 'commonkads')).toBe(false);
-    expect(canAccessSection({ plan: 'master' }, 'ontologies')).toBe(true);
-    expect(canAccessSection({ plan: 'free', role: 'admin' }, 'commonkads')).toBe(true);
+  it('todos os planos, inclusive o Free, acessam todas as seções, como na API', () => {
+    for (const plan of ['free', 'standard', 'master']) {
+      for (const s of SECTION_KEYS) expect(canAccessSection({ role: 'client', plan }, s)).toBe(true);
+    }
+    expect(canAccessSection(null, 'kanban')).toBe(false);
   });
 });
 
@@ -417,11 +417,11 @@ describe('páginas das seções novas', () => {
     expect(writes[0].body).toEqual({ content: { organizationalContext: 'Missão' } });
   });
 
-  it('seção fora do plano mostra o bloqueio', async () => {
-    ROUTES['/auth/me'] = { ...ROUTES['/auth/me'], plan: 'standard' };
+  it('o plano Free também abre a seção, sem bloqueio', async () => {
+    ROUTES['/auth/me'] = { ...ROUTES['/auth/me'], plan: 'free' };
     try {
-      renderAt(`/projects/${P}/commonkads`);
-      expect(await screen.findByText('Esta seção faz parte do(s) plano(s) Master.')).toBeInTheDocument();
+      renderAt(`/projects/${P}/commonkads/organization`);
+      expect(await screen.findByLabelText('Contexto organizacional')).toBeInTheDocument();
     } finally {
       ROUTES['/auth/me'] = { ...ROUTES['/auth/me'], plan: 'master' };
     }
