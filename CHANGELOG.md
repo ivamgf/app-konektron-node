@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.4.0 — 2026-10-16
+
+### Adicionado
+- **Assinatura dos planos pelo PagBank** (requer a API 4.3.0): os cartões de plano mostram a mensalidade e o
+  botão **Assinar**. O visitante cria a conta e segue direto para o checkout (`/signup?next=/checkout/:plan`).
+- Página `/checkout/:plan`: resumo do plano, preço e como funciona a cobrança; **Ir para o pagamento**
+  redireciona para a página segura do PagBank (cartão de crédito, cobrança mensal automática).
+- Página `/billing/return`: na volta do PagBank, confere o pagamento, renova a sessão e libera o plano na hora;
+  sem confirmação, oferece continuar o pagamento.
+- Página pública `/plans` (também no menu) e aba **Assinatura** no perfil: situação, próxima cobrança,
+  histórico, mudar de plano e cancelar.
+- Textos em português, inglês e espanhol e testes das telas.
+- Checkout com aceite obrigatório dos Termos e da cobrança mensal; avisos de arrependimento (estorno integral
+  em até 7 dias) e de cancelamento com acesso até o fim do período pago.
+
+### Alterado
+- **Termos de Uso**: cobrança em reais pelo PagBank (antes dizia "em dólar"), renovação mensal automática,
+  falha de cobrança, cancelamento e arrependimento (CDC art. 49), processamento do cartão pelo PagBank (LGPD),
+  aviso prévio de 30 dias para reajustes e métodos citados como marcas de terceiros.
+- E-mail de contato: konektron@orkneytech-lab.com (rodapé, Contatos e Termos).
+
 ## 2.3.0 — 2026-10-16
 
 ### Alterado

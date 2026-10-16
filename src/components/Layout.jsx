@@ -10,7 +10,7 @@ import { UnsavedProvider } from './unsaved.jsx';
 
 const API_DOCS_URL = `${(import.meta.env.VITE_API_URL ?? '/api/v1').replace(/\/$/, '')}/docs/`;
 export const SITE_URL = 'www.konektron.orkneytech.com.br';
-export const CONTACT_EMAIL = 'konektron@konektron.orkneytech.com.br';
+export const CONTACT_EMAIL = 'konektron@orkneytech-lab.com';
 
 // Rótulos dinâmicos de migalhas (ex.: nome do projeto), definidos pela própria página
 const CrumbContext = createContext(null);
@@ -190,6 +190,7 @@ function SideMenu({ open, onClose }) {
             item('/', 'house', 'nav.home', { end: true }),
             item(authed ? '/projects' : '/signin', 'folder2-open', 'nav.myProjects'),
             item('/engineering', 'grid-3x3-gap', 'nav.engineering'),
+            item('/plans', 'gem', 'nav.plans'),
           ])}
           {authed && group('account', [
             item('/profile', 'person-circle', 'nav.profile'),

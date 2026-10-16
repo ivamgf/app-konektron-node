@@ -83,6 +83,16 @@ export const contactApi = {
   send: (body) => api.post('/contact', body),
 };
 
+// Assinaturas (Checkout Recorrente do PagBank): o checkout devolve o payUrl para onde o app redireciona
+export const billingApi = {
+  plans: () => api.get('/billing/plans', undefined, { auth: false }),
+  subscription: () => api.get('/billing/subscription'),
+  // acceptTerms: o usuário marcou o aceite dos termos e da cobrança recorrente
+  checkout: (plan, acceptTerms) => api.post('/billing/checkout', { plan, acceptTerms }),
+  refresh: (id) => api.post(`/billing/subscriptions/${id}/refresh`),
+  cancel: () => api.post('/billing/subscription/cancel'),
+};
+
 // Arquivo anexado a um registro (ontologia, diagrama BPMN): <caminho do registro>/file
 export const fileApi = (itemPath) => ({
   upload: (file) => api.upload(`${itemPath}/file`, file),
@@ -121,4 +131,5 @@ export const adminApi = {
   messages: (query) => api.get('/admin/contact-messages', query),
   updateMessage: (id, body) => api.patch(`/admin/contact-messages/${id}`, body),
   removeMessage: (id) => api.del(`/admin/contact-messages/${id}`),
+  subscriptions: (query) => api.get('/admin/subscriptions', query),
 };

@@ -7,6 +7,7 @@ import { SaveButton, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.jsx';
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
+import { PlanCards } from '../billing/Billing.jsx';
 import { useSubmit } from '../../lib/hooks.js';
 
 // Planos e seções (espelha a API: config/plans.js). Kanban está em todos os planos.
@@ -32,7 +33,6 @@ export const SECTION_ICONS = {
   scrum: 'arrow-repeat',
   kanban: 'kanban',
 };
-const FEATURED_PLAN = 'standard';
 
 export function Home() {
   const { t } = useI18n();
@@ -144,41 +144,7 @@ export function Home() {
         <div className="container-xl px-3">
           <h2 className="kt-home-heading" id="kt-home-plans">{t('home.plansTitle')}</h2>
           <p className="kt-home-sub">{t('home.plansLead')}</p>
-          <div className="row g-4 pt-2">
-            {Object.entries(PLAN_SECTIONS).map(([plan, included]) => {
-              const featured = plan === FEATURED_PLAN;
-              return (
-                <div className="col-md-4" key={plan}>
-                  <article className={`kt-home-plan ${featured ? 'is-featured' : ''}`} aria-labelledby={`kt-plan-${plan}`}>
-                    {featured && <span className="kt-home-ribbon">{t('home.recommended')}</span>}
-                    <header>
-                      <h3 id={`kt-plan-${plan}`}>{t(`plans.${plan}`)}</h3>
-                      <small>{t(`home.tagline.${plan}`)}</small>
-                    </header>
-                    <ul>
-                      {SECTION_KEYS.map((key) => {
-                        const has = included.includes(key);
-                        return (
-                          <li key={key} className={has ? '' : 'is-off'}>
-                            <i className={`bi ${has ? 'bi-check-circle-fill' : 'bi-dash-circle'} me-2`} aria-hidden="true" />
-                            <span className="visually-hidden">{has ? t('common.yes') : t('common.no')}: </span>
-                            {t(`sections.${key}.name`)}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {!authed && (
-                      <footer>
-                        <Link to="/signup" className={`btn w-100 ${featured ? 'btn-accent fw-bold' : 'btn-outline-primary'}`}>
-                          {plan === 'free' ? t('home.start') : t('home.choose')}
-                        </Link>
-                      </footer>
-                    )}
-                  </article>
-                </div>
-              );
-            })}
-          </div>
+          <PlanCards />
           <p className="kt-home-note mt-4 mb-0">
             <i className="bi bi-shield-check me-1" aria-hidden="true" /> {t('home.adminNote')}
           </p>

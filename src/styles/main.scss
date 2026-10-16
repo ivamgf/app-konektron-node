@@ -772,6 +772,22 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
     }
   }
 }
+// Preço do plano (cartões e checkout)
+.kt-plan-price,
+.kt-checkout-price {
+  strong {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  span {
+    font-size: 0.875rem;
+    opacity: 0.85;
+  }
+}
+.kt-checkout-price strong {
+  font-size: 2rem;
+  color: $brand-color-primary-blue;
+}
 .kt-home-ribbon {
   position: absolute;
   top: -12px;
