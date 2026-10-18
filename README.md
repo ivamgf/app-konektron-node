@@ -64,6 +64,17 @@ configuração (`pages/projects/resources.jsx`), com os mesmos enums e limites d
 - **Domínios separados**: `VITE_API_URL=https://api.seudominio/api/v1` no build, e o domínio do
   app em `CORS_ORIGINS` e `APP_URL` no `.env` da API (`APP_URL` monta os links de e-mail).
 
+**Docker (EasyPanel ou VPS):** o Dockerfile fica em `.github/workflows/Dockerfile`, com o contexto
+do build na raiz. Ele gera o `dist/` com Node e o serve no Nginx (porta 80, *fallback* das rotas,
+cache longo em `/assets/` e saúde em `/healthz`). O `VITE_API_URL` é obrigatório e entra como
+build arg, porque o Vite o embute nos arquivos; mudar a URL exige novo build. No EasyPanel, defina
+`VITE_API_URL` nas variáveis do serviço (elas também chegam ao build) e a porta 80.
+
+```bash
+docker build -f .github/workflows/Dockerfile --build-arg VITE_API_URL=https://api.seudominio/api/v1 -t konektron-app .
+docker run -d --name konektron-app -p 8080:80 --restart unless-stopped konektron-app
+```
+
 ## Testes
 
 - `npm test`: Vitest — i18n (paridade de chaves pt-BR/en/es), conversão de formulários, o cliente
