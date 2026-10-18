@@ -1,0 +1,14 @@
+# Lido pelo BuildKit por estar ao lado do Dockerfile (nome <Dockerfile>.dockerignore).
+# Os caminhos são relativos ao contexto do build: a raiz do repositório.
+# .github fica de fora da exclusão: o nginx.conf é copiado de .github/workflows.
+node_modules
+dist
+npm-debug.log*
+.env
+.env.*
+!.env.example
+.git
+.idea
+.vscode
+coverage
+docs
