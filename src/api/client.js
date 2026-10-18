@@ -1,5 +1,12 @@
 // Cliente HTTP da API KonekTron: JSON, token de acesso e renovação automática da sessão.
-const BASE_URL = (import.meta.env.VITE_API_URL ?? '/api/v1').replace(/\/$/, '');
+// A URL vem do /config.js gerado quando o container sobe (.github/workflows/runtime-config.sh);
+// sem ele, vale a do build (VITE_API_URL) ou o proxy /api/v1 do Vite em desenvolvimento.
+export const API_BASE_URL = (
+  globalThis.__KONEKTRON_CONFIG__?.apiUrl ||
+  import.meta.env.VITE_API_URL ||
+  '/api/v1'
+).replace(/\/$/, '');
+const BASE_URL = API_BASE_URL;
 const REFRESH_KEY = 'kt.refreshToken';
 
 export class ApiError extends Error {

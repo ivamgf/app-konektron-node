@@ -66,13 +66,14 @@ configuração (`pages/projects/resources.jsx`), com os mesmos enums e limites d
 
 **Docker (EasyPanel ou VPS):** o Dockerfile fica em `.github/workflows/Dockerfile`, com o contexto
 do build na raiz. Ele gera o `dist/` com Node e o serve no Nginx (porta 80, *fallback* das rotas,
-cache longo em `/assets/` e saúde em `/healthz`). O `VITE_API_URL` é obrigatório e entra como
-build arg, porque o Vite o embute nos arquivos; mudar a URL exige novo build. No EasyPanel, defina
-`VITE_API_URL` nas variáveis do serviço (elas também chegam ao build) e a porta 80.
+cache longo em `/assets/` e saúde em `/healthz`). A URL da API vem da variável `VITE_API_URL`
+**quando o container sobe**: o `runtime-config.sh` grava o `/config.js`, lido pelo `index.html`
+antes do app. Trocar a URL exige só reiniciar o container, sem novo build. No EasyPanel, defina
+`VITE_API_URL` nas variáveis do serviço e a porta 80.
 
 ```bash
-docker build -f .github/workflows/Dockerfile --build-arg VITE_API_URL=https://api.seudominio/api/v1 -t konektron-app .
-docker run -d --name konektron-app -p 8080:80 --restart unless-stopped konektron-app
+docker build -f .github/workflows/Dockerfile -t konektron-app .
+docker run -d --name konektron-app -e VITE_API_URL=https://api.seudominio/api/v1 -p 8080:80 --restart unless-stopped konektron-app
 ```
 
 ## Testes
