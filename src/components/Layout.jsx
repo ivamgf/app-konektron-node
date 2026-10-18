@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, ScrollRestoration, useLocation, useMatches, useNavigate } from 'react-router';
-import { session } from '../api/client.js';
+import { API_BASE_URL, session } from '../api/client.js';
 import { useAuth } from '../auth/AuthProvider.jsx';
 import { LANGUAGES, useI18n } from '../i18n/I18nProvider.jsx';
 import { useTheme } from '../lib/theme.js';
@@ -8,7 +8,7 @@ import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
 import { UnsavedProvider } from './unsaved.jsx';
 
-const API_DOCS_URL = `${(import.meta.env.VITE_API_URL ?? '/api/v1').replace(/\/$/, '')}/docs/`;
+const API_DOCS_URL = `${API_BASE_URL}/docs/`;
 export const SITE_URL = 'www.orkneytech-lab.com';
 export const CONTACT_EMAIL = 'konektron@orkneytech-lab.com';
 
