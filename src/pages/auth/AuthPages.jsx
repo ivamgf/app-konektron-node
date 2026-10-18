@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { authApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
+import GoogleSignIn from '../../auth/GoogleSignIn.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { BrandMark, IconInput, Loading, Panel } from '../../components/ui.jsx';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
@@ -78,16 +79,15 @@ export function Signin() {
         <button type="submit" className="btn btn-primary w-100 fw-bold mt-2" disabled={busy}>
           {busy ? t('common.loading') : t('auth.signinButton')}
         </button>
-        <button type="button" className="btn btn-outline-primary w-100 mt-4 text-body" disabled title={t('auth.googleSoon')}>
-          <i className="bi bi-google text-primary me-3" aria-hidden="true" />
-          {t('auth.google')}
-        </button>
-        <p className="small text-body-secondary text-center mt-1 mb-0">{t('auth.googleSoon')}</p>
+      </form>
+      {/* fora do <form>: o aceite dos termos do Google abre um modal com botões próprios */}
+      <div className="kt-form">
+        <GoogleSignIn context="signin" />
         <div className="d-flex justify-content-between kt-auth-links mt-3">
           <Link to="/recover">{t('auth.forgot')}</Link>
           <Link to="/signup">{t('auth.noAccount')}</Link>
         </div>
-      </form>
+      </div>
     </AuthLayout>
   );
 }
@@ -147,6 +147,10 @@ export function Signup() {
           <Link to="/signin">{t('auth.haveAccount')}</Link>
         </div>
       </form>
+      {/* com a caixa de termos marcada, a conta Google nova é criada sem perguntar de novo */}
+      <div className="kt-form">
+        <GoogleSignIn context="signup" acceptTerms={values.acceptTerms} />
+      </div>
     </AuthLayout>
   );
 }

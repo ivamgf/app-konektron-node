@@ -99,30 +99,39 @@ function SocialTab({ profile, onSaved }) {
 
 function SecurityTab() {
   const { t } = useI18n();
-  const { user, replaceTokens, logout } = useAuth();
+  const { user, replaceTokens, reloadUser, logout } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [pwd, setPwd] = useState({ currentPassword: '', password: '', confirmPassword: '' });
   const [deleting, setDeleting] = useState(false);
-  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  // Conta criada pelo Google não tem senha: define a primeira sem a atual e confirma a exclusão com o e-mail
+  const hasPassword = user.hasPassword !== false;
 
-  const change = useSubmit((body) => authApi.changePassword(body), {
-    onSuccess: (tokens) => {
-      replaceTokens(tokens); // as outras sessões caem; esta continua com tokens novos
-      setPwd({ currentPassword: '', password: '', confirmPassword: '' });
-      toast.success(t('profile.passwordChanged'));
+  const change = useSubmit(
+    ({ currentPassword, ...body }) => authApi.changePassword(hasPassword ? { currentPassword, ...body } : body),
+    {
+      onSuccess: async (tokens) => {
+        replaceTokens(tokens); // as outras sessões caem; esta continua com tokens novos
+        setPwd({ currentPassword: '', password: '', confirmPassword: '' });
+        toast.success(t(hasPassword ? 'profile.passwordChanged' : 'profile.passwordSet'));
+        if (!hasPassword) await reloadUser().catch(() => {});
+      },
     },
-  });
-  const remove = useSubmit((password) => authApi.deleteAccount(password), {
-    onSuccess: async () => {
-      await logout().catch(() => {});
-      toast.success(t('profile.deleted'));
-      navigate('/');
+  );
+  const remove = useSubmit(
+    (value) => authApi.deleteAccount(hasPassword ? { password: value } : { confirmEmail: value.trim() }),
+    {
+      onSuccess: async () => {
+        await logout().catch(() => {});
+        toast.success(t('profile.deleted'));
+        navigate('/');
+      },
     },
-  });
+  );
 
   const pwdFields = [
-    { name: 'currentPassword', label: 'profile.currentPassword', type: 'password', col: 'col-md-4' },
+    ...(hasPassword ? [{ name: 'currentPassword', label: 'profile.currentPassword', type: 'password', col: 'col-md-4' }] : []),
     { name: 'password', label: 'profile.newPassword', type: 'password', col: 'col-md-4' },
     { name: 'confirmPassword', label: 'auth.confirmPassword', type: 'password', col: 'col-md-4' },
   ];
@@ -143,9 +152,16 @@ function SecurityTab() {
         <dd className="col-sm-9">{t(`roles.${user.role}`)}</dd>
         <dt className="col-sm-3">{t('profile.plan')}</dt>
         <dd className="col-sm-9">{t(`plans.${user.plan}`)}</dd>
+        <dt className="col-sm-3">Google</dt>
+        <dd className="col-sm-9">
+          <span className={`badge ${user.googleLinked ? 'text-bg-success' : 'text-bg-secondary'}`}>
+            {user.googleLinked ? t('profile.googleLinked') : t('profile.googleNotLinked')}
+          </span>
+        </dd>
       </dl>
 
-      <h2 className="h2">{t('profile.changePassword')}</h2>
+      <h2 className="h2">{t(hasPassword ? 'profile.changePassword' : 'profile.setPassword')}</h2>
+      {!hasPassword && <p className="text-body-secondary">{t('profile.setPasswordHint')}</p>}
       <form className="mb-4" noValidate
         onSubmit={(e) => { e.preventDefault(); if (!mismatch) change.submit(pwd); }}>
         <div className="row">
@@ -161,8 +177,8 @@ function SecurityTab() {
             </div>
           ))}
         </div>
-        <button type="submit" className="btn btn-primary" disabled={change.busy || !pwd.currentPassword || !pwd.password}>
-          {change.busy ? t('common.saving') : t('profile.changePassword')}
+        <button type="submit" className="btn btn-primary" disabled={change.busy || (hasPassword && !pwd.currentPassword) || !pwd.password}>
+          {change.busy ? t('common.saving') : t(hasPassword ? 'profile.changePassword' : 'profile.setPassword')}
         </button>
       </form>
 
@@ -183,17 +199,18 @@ function SecurityTab() {
           footer={
             <>
               <button type="button" className="btn btn-outline-secondary" onClick={() => setDeleting(false)}>{t('common.cancel')}</button>
-              <button type="submit" form="kt-delete-account" className="btn btn-danger" disabled={remove.busy || !deletePassword}>
+              <button type="submit" form="kt-delete-account" className="btn btn-danger" disabled={remove.busy || !deleteConfirm}>
                 {t('common.delete')}
               </button>
             </>
           }
         >
-          <form id="kt-delete-account" onSubmit={(e) => { e.preventDefault(); remove.submit(deletePassword); }}>
-            <p>{t('profile.deleteWarning')}</p>
-            <label className="form-label fw-semibold" htmlFor="delete-password">{t('auth.password')}</label>
-            <input id="delete-password" type="password" className="form-control" autoComplete="current-password"
-              value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} />
+          <form id="kt-delete-account" onSubmit={(e) => { e.preventDefault(); remove.submit(deleteConfirm); }}>
+            <p>{t(hasPassword ? 'profile.deleteWarning' : 'profile.deleteWarningGoogle')}</p>
+            <label className="form-label fw-semibold" htmlFor="delete-confirm">{t(hasPassword ? 'auth.password' : 'auth.email')}</label>
+            <input id="delete-confirm" type={hasPassword ? 'password' : 'email'} className="form-control"
+              autoComplete={hasPassword ? 'current-password' : 'off'} placeholder={hasPassword ? undefined : user.email}
+              value={deleteConfirm} onChange={(e) => setDeleteConfirm(e.target.value)} />
           </form>
         </Modal>
       )}

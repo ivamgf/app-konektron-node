@@ -76,6 +76,13 @@ docker build -f .github/workflows/Dockerfile -t konektron-app .
 docker run -d --name konektron-app -e VITE_API_URL=https://api.seudominio/api/v1 -p 8080:80 --restart unless-stopped konektron-app
 ```
 
+**Login com Google:** defina `VITE_GOOGLE_CLIENT_ID` (o mesmo ID do cliente OAuth do
+`GOOGLE_CLIENT_ID` da API), também lido quando o container sobe. Sem ele, o botão do Google não
+aparece. No Google Cloud, o domínio do app (e `http://localhost:5173`, para desenvolvimento) vai em
+"Origens JavaScript autorizadas" do cliente OAuth. O botão é o oficial do Google Identity Services;
+conta nova pede o aceite dos Termos antes de ser criada, e conta só Google define a primeira senha
+e confirma a exclusão com o e-mail no Perfil › Segurança.
+
 ## Testes
 
 - `npm test`: Vitest — i18n (paridade de chaves pt-BR/en/es), conversão de formulários, o cliente

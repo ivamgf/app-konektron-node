@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.6.0 — 2026-10-18
+
+### Adicionado
+- **Login com Google** (requer a API 5.1.0): botão oficial do Google Identity Services nas telas de entrada e
+  de cadastro. Conta nova pede o aceite dos Termos de Uso num modal (no cadastro, a caixa de termos já marcada
+  dispensa a pergunta). O ID do cliente vem de `VITE_GOOGLE_CLIENT_ID`, lido quando o container sobe pelo
+  `/config.js`; sem ele, o botão não aparece.
+- Perfil › Segurança mostra se a conta está vinculada ao Google. Conta só Google define a primeira senha sem a
+  senha atual e confirma a exclusão da conta digitando o e-mail.
+
+### Alterado
+- A configuração de execução (`/config.js`) fica em `src/lib/config.js`, com a URL da API e o ID do Google.
+
 ## 2.5.0 — 2026-10-16
 
 ### Adicionado
