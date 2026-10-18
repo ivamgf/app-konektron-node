@@ -4,6 +4,7 @@ import { api } from './client.js';
 export const authApi = {
   register: (body) => api.post('/auth/register', body, { auth: false }),
   login: (body) => api.post('/auth/login', body, { auth: false }),
+  google: (body) => api.post('/auth/google', body, { auth: false }), // { credential, acceptTerms? }
   verifyEmail: (token) => api.post('/auth/verify-email', { token }, { auth: false }),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }, { auth: false }),
   resetPassword: (body) => api.post('/auth/reset-password', body, { auth: false }),
@@ -11,7 +12,8 @@ export const authApi = {
   me: () => api.get('/auth/me'),
   changePassword: (body) => api.post('/auth/change-password', body),
   resendVerification: () => api.post('/auth/resend-verification'),
-  deleteAccount: (password) => api.del('/auth/me', { password }),
+  // { password } ou, em conta só Google, { confirmEmail }
+  deleteAccount: (body) => api.del('/auth/me', body),
 };
 
 export const profileApi = {

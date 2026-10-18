@@ -57,6 +57,11 @@ export function AuthProvider({ children }) {
       isAdmin: user?.role === 'admin' && user?.plan === 'master',
       login: async (credentials) => applySession(await authApi.login(credentials)),
       register: async (data) => applySession(await authApi.register(data)),
+      // Devolve { user, created }: created = conta criada agora pelo Google
+      loginWithGoogle: async (body) => {
+        const result = await authApi.google(body);
+        return { user: applySession(result), created: Boolean(result.created) };
+      },
       // Após trocar a senha a API devolve tokens novos (as outras sessões caem)
       replaceTokens: (tokens) => session.set(tokens),
       reloadUser: async () => {

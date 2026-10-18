@@ -3,8 +3,8 @@
 #   docker build -f .github/workflows/Dockerfile -t konektron-app .
 #   docker run -d --name konektron-app -e VITE_API_URL=https://api.seudominio/api/v1 -p 8080:80 --restart unless-stopped konektron-app
 #
-# A URL da API é lida da variável VITE_API_URL quando o container sobe (runtime-config.sh),
-# não no build: trocar a URL exige só reiniciar o container.
+# A URL da API (VITE_API_URL) e o ID do cliente do Google (VITE_GOOGLE_CLIENT_ID) são lidos quando o
+# container sobe (runtime-config.sh), não no build: trocá-los exige só reiniciar o container.
 
 # 1) Build do Vite
 FROM node:24.21.0-alpine AS build
