@@ -1,0 +1,246 @@
+// ---------------------------------------------------------------- Diagnóstico de dados
+.kt-dd-section,
+.kt-dd-toc,
+.kt-flow,
+.kt-radar {
+  --dd-blue: #{$brand-color-primary-blue};
+  --dd-accent: #c25e00; // laranja escurecido: 4,5:1 sobre o branco
+  --dd-line: #6c7a83;
+  --dd-grid: #{$card-line};
+  --dd-node-bg: #{$white};
+  --dd-text: #{$body-color};
+}
+[data-bs-theme='dark'] {
+  .kt-dd-section,
+  .kt-dd-toc,
+  .kt-flow,
+  .kt-radar {
+    --dd-blue: #4cc3ea;
+    --dd-accent: #ffa047;
+    --dd-line: #a9b7c0;
+    --dd-grid: #3d4a52;
+    --dd-node-bg: #1f2a30;
+    --dd-text: #e6edf1;
+  }
+}
+
+// índice da página
+.kt-dd-toc-list {
+  columns: 2 16rem;
+  li {
+    break-inside: avoid;
+  }
+}
+.kt-dd-section {
+  scroll-margin-top: 90px;
+  .card-header h3 {
+    font-size: 1.05rem;
+  }
+}
+
+// tabelas largas: cada controle com largura mínima, rolagem lateral dentro da tabela
+.kt-dd-table {
+  min-width: 100%;
+  td {
+    vertical-align: top;
+  }
+  textarea {
+    min-height: 2.4rem;
+  }
+}
+.kt-dd-indicators {
+  max-width: 34rem;
+  caption {
+    caption-side: top;
+  }
+}
+.kt-dd-defs dt {
+  font-weight: 600;
+}
+
+// barra de salvar sempre à vista no fim da página
+.kt-dd-savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0 0.75rem 4.5rem; // não fica sob o botão de acessibilidade
+  background: var(--bs-body-bg);
+  border-top: 1px solid var(--bs-border-color);
+}
+
+// maturidade
+.kt-dd-dimension .kt-dd-rubric {
+  border-left: 4px solid var(--dd-blue);
+  padding: 0.5rem 0.75rem;
+  background: var(--bs-tertiary-bg);
+}
+.kt-dd-rubric-list li {
+  margin-bottom: 0.35rem;
+  &.is-selected {
+    font-weight: 600;
+  }
+}
+.kt-dd-levels li {
+  margin-bottom: 0.15rem;
+}
+
+// radar
+.kt-radar {
+  max-width: 460px;
+  overflow: visible;
+}
+.kt-radar-ring {
+  fill: none;
+  stroke: var(--dd-grid);
+}
+.kt-radar-axis {
+  stroke: var(--dd-grid);
+}
+.kt-radar-label {
+  fill: var(--dd-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+.kt-radar-tick {
+  fill: var(--dd-line);
+  font-size: 10px;
+}
+.kt-radar-area {
+  fill: color-mix(in srgb, var(--dd-blue) 28%, transparent);
+  stroke: var(--dd-blue);
+  stroke-width: 2.5;
+}
+.kt-radar-target {
+  fill: none;
+  stroke: var(--dd-accent);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+.kt-radar-dot {
+  fill: var(--dd-blue);
+}
+.kt-radar-key,
+.kt-flow-key {
+  display: inline-block;
+  width: 1.75rem;
+  height: 0;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  border-top: 3px solid var(--dd-blue, #{$brand-color-primary-blue});
+  &.is-target,
+  &.is-manual {
+    border-top: 3px dashed var(--dd-accent, #c25e00);
+  }
+}
+.kt-flow-key {
+  border-top-color: var(--dd-line, #6c7a83);
+}
+
+// diagrama dos fluxos
+.kt-flow svg {
+  display: block;
+  height: auto;
+}
+.kt-flow-node {
+  fill: var(--dd-node-bg);
+  stroke: var(--dd-line);
+  stroke-width: 1.5;
+}
+.kt-flow-label {
+  fill: var(--dd-text);
+  font-size: 13px;
+}
+.kt-flow-edge {
+  stroke: var(--dd-line);
+  stroke-width: 2;
+  &.is-manual {
+    stroke: var(--dd-accent);
+    stroke-dasharray: 7 5;
+  }
+}
+.kt-flow-arrow {
+  fill: var(--dd-line);
+}
+
+// roteiro de fases
+.kt-roadmap > li {
+  position: relative;
+}
+.kt-roadmap-phase {
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.5rem;
+  &.is-golive {
+    border: 2px solid $brand-color-primary-blue;
+    background: color-mix(in srgb, #{$brand-color-primary-blue} 8%, transparent);
+  }
+}
+.kt-roadmap-gate {
+  margin: -0.15rem 0 0.6rem 1rem;
+  color: var(--bs-link-color);
+  .bi {
+    color: $brand-color-primary-blue;
+  }
+}
+
+// cronograma
+.kt-gantt-track {
+  position: relative;
+  height: 0.9rem;
+  min-width: 12rem;
+  background: var(--bs-tertiary-bg);
+  border-radius: 0.25rem;
+}
+.kt-gantt-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 0.25rem;
+  background: $brand-color-primary-blue;
+  &.is-done {
+    background: #11866a;
+  }
+  &.is-late,
+  &.is-blocked {
+    background: #c0392b;
+  }
+  &.is-in_progress {
+    background: #c25e00;
+  }
+}
+.kt-dd-signature {
+  display: inline-block;
+  min-width: 10rem;
+  border-bottom: 1px solid var(--bs-border-color);
+  height: 1.5rem;
+}
+
+@media print {
+  .kt-dd-section {
+    break-inside: auto;
+    border: 0 !important;
+    .card-header {
+      background: none !important;
+      border-bottom: 2px solid #fe7d05;
+    }
+  }
+  .kt-dd-table,
+  .kt-sheet {
+    font-size: 9pt;
+  }
+  .kt-dd-table :is(input, select, textarea),
+  .kt-sheet :is(input, select, textarea) {
+    border: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    appearance: none;
+  }
+  .kt-sheet button,
+  .kt-ai-button,
+  .kt-dd-savebar {
+    display: none !important;
+  }
+}

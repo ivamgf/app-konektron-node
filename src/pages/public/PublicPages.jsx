@@ -10,7 +10,7 @@ import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useSubmit } from '../../lib/hooks.js';
 
 // Seções (espelha a API: config/plans.js). Todos os planos, inclusive o Free, acessam todas.
-export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban'];
+export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban', 'data-diagnosis'];
 export const IMPLEMENTED = SECTION_KEYS;
 // Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
 export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
@@ -24,6 +24,7 @@ export const SECTION_ICONS = {
   'crisp-dm': 'bar-chart-steps',
   scrum: 'arrow-repeat',
   kanban: 'kanban',
+  'data-diagnosis': 'clipboard-data',
 };
 
 export function Home() {

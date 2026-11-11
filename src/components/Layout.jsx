@@ -4,6 +4,7 @@ import { API_BASE_URL, session } from '../api/client.js';
 import { useAuth } from '../auth/AuthProvider.jsx';
 import { LANGUAGES, useI18n } from '../i18n/I18nProvider.jsx';
 import { useTheme } from '../lib/theme.js';
+import { AccessibilityLink } from './Accessibility.jsx';
 import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
 import { UnsavedProvider } from './unsaved.jsx';
@@ -399,6 +400,7 @@ export default function Layout() {
         <a href="#kt-main" className="visually-hidden-focusable">
           {t('app.skip')}
         </a>
+        <AccessibilityLink />
         <header className="kt-header kt-no-print">
           <div className="h-100 d-flex align-items-center justify-content-between px-3">
             <Link to="/" className="kt-brand">

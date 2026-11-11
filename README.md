@@ -30,15 +30,19 @@ src/
 ├── auth/                      AuthProvider (sessão), guards (RequireAuth, RequireAdmin, GuestOnly)
 ├── i18n/                      en.js (padrão), pt-BR.js — RNF5
 ├── components/                Layout (cabeçalho, menu, rodapé), ui, forms, ResourceManager, Toasts,
-│                              sections (sub-navegação, arquivo, editor de linhas)
-├── content/                   termos de uso, tarefas do CRISP-DM, planilhas do CommonKADS (PT/EN/ES)
-├── lib/hooks.js               useAsync, useSubmit, formatação de datas
+│                              sections (sub-navegação, arquivo, editor de linhas), Accessibility (painel
+│                              WCAG 2.2), AiAssist / AiSettings (botão de IA dos campos e Perfil › IA),
+│                              ExportButtons (PDF, DOCX e CSV dos relatórios: lib/exportReport.js)
+├── content/                   termos de uso, tarefas do CRISP-DM, planilhas do CommonKADS, modelos e rubrica do
+│                              diagnóstico de dados (PT/EN/ES)
+├── lib/                       hooks.js (useAsync, useSubmit, datas), a11y.js (preferências de acessibilidade),
+│                              ai.js (IA com a conta do usuário), dataDiagnosis.js (indicadores e maturidade)
 ├── pages/
 │   ├── public/                Início, Sobre, Contatos, Termos, 404
 │   ├── auth/                  Entrar, Cadastrar, Recuperar, Nova senha, Confirmar e-mail
 │   ├── app/                   Projetos, Engenharia, Perfil
 │   ├── projects/              ProjectLayout, SystemAnalysis, CrispDm, Ontologies, Bpm, CommonKads,
-│   │                          FunctionPoints, Scrum, Kanban, resources (configuração CRUD)
+│   │                          FunctionPoints, Scrum, Kanban, DataDiagnosis, resources (configuração CRUD)
 │   └── admin/                 Resumo, Usuários, Logs
 └── styles/                    _tokens.scss (Design System), main.scss (Bootstrap + componentes)
 ```

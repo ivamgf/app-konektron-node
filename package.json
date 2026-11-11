@@ -1,6 +1,6 @@
 {
   "name": "app-konektron-node",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "App web do KonekTron - Engenharia de Software e Análise de Dados",
   "private": true,
   "type": "module",
@@ -15,10 +15,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.6.0",
     "@fontsource/inter": "5.3.0",
     "@fontsource/roboto": "5.3.0",
     "bootstrap": "5.3.8",
     "bootstrap-icons": "1.13.1",
+    "docx": "9.14.0",
+    "pdfmake": "0.3.12",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-router": "7.18.4"

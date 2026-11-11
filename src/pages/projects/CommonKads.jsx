@@ -1,14 +1,16 @@
 // CommonKADS: planilhas dos modelos de organização, tarefa, agente, conhecimento, comunicação e
 // projeto (Schreiber et al., 2000) e a extensão MAS-CommonKADS. As planilhas em linhas (OM-3/TM-1,
 // OM-4/TM-2, AM-1/MAS, CM-1/CM-2) são cadastros; as demais são editadas no formato da planilha.
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { commonkadsApi, resourceApi } from '../../api/endpoints.js';
+import { AiButton } from '../../components/AiAssist.jsx';
 import { enumOptions } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { RowsEditor, SectionLayout, StatCards } from '../../components/sections.jsx';
 import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
+import ExportButtons from '../../components/ExportButtons.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { EmptyState, Loading } from '../../components/ui.jsx';
 import { ckText, sheetCode } from '../../content/commonkads.js';
@@ -219,6 +221,10 @@ function WorksheetCard({ project, sheet, onSaved }) {
                     <div className="kt-sheet-guide-inline d-md-none">{guide}</div>
                     <textarea id={id} className="form-control" rows={3} maxLength={20000} value={content[f]}
                       onChange={(e) => setContent((c) => ({ ...c, [f]: e.target.value }))} />
+                    <div className="text-end mt-1">
+                      <AiButton label={label} help={guide} value={content[f] ?? ''} maxLength={20000}
+                        onApply={(text) => setContent((c) => ({ ...c, [f]: text }))} />
+                    </div>
                   </td>
                 </tr>
               );
@@ -348,7 +354,14 @@ function SheetControl({ row, id, value, onChange }) {
       );
     }
     default:
-      return <textarea id={id} className="form-control" rows={row.rows ?? 3} maxLength={row.maxLength ?? 10000} value={value} onChange={(e) => onChange(e.target.value)} />;
+      return (
+        <>
+          <textarea id={id} className="form-control" rows={row.rows ?? 3} maxLength={row.maxLength ?? 10000} value={value} onChange={(e) => onChange(e.target.value)} />
+          <div className="text-end mt-1">
+            <AiButton label={row.label} help={row.guide} value={value ?? ''} maxLength={row.maxLength ?? 10000} onApply={onChange} />
+          </div>
+        </>
+      );
   }
 }
 
@@ -1018,6 +1031,7 @@ function Document() {
   const { t, locale } = useI18n();
   const { project } = useProject();
   const report = useAsync(() => commonkadsApi.report(project.id), [project.id]);
+  const reportRef = useRef(null);
   if (report.loading && !report.data) return <Loading small />;
   if (!report.data) return null;
   const r = report.data;
@@ -1123,15 +1137,16 @@ function Document() {
   };
 
   return (
-    <article className="kt-report">
-      <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <article className="kt-report" ref={reportRef}>
+      {/* título e subtítulo vão para o arquivo pelo ExportButtons */}
+      <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3" data-export="skip">
         <div>
           <h2 className="mt-0 border-0">{t('ck.reportTitle')}</h2>
           <p className="text-body-secondary mb-0">{r.project.name} · v{r.project.version} · {formatDate(r.generatedAt, locale)}</p>
         </div>
-        <button type="button" className="btn btn-accent kt-no-print" onClick={() => window.print()}>
-          <i className="bi bi-printer me-1" aria-hidden="true" />{t('common.print')}
-        </button>
+        <ExportButtons targetRef={reportRef} title={t('ck.reportTitle')}
+          subtitle={`${r.project.name} · v${r.project.version} · ${formatDate(r.generatedAt, locale)}`}
+          fileName={`${t('ck.reportTitle')} ${r.project.name}`} />
       </div>
       {MODELS.map((model) => (
         <section key={model}>

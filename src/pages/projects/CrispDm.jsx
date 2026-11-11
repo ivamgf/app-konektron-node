@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { crispdmApi, resourceApi } from '../../api/endpoints.js';
+import { AiButton } from '../../components/AiAssist.jsx';
 import { enumOptions } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
+import ExportButtons from '../../components/ExportButtons.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { EmptyState, Loading } from '../../components/ui.jsx';
@@ -141,14 +143,21 @@ function PhaseCard({ projectId, phase, onSaved }) {
                   {enumOptions(t, 'decision', ENUMS.decision).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               ) : (
-                <textarea id={`${phase.phase}-${task}`} className="form-control" rows={3} value={content[task]}
-                  onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))} />
+                <>
+                  <textarea id={`${phase.phase}-${task}`} className="form-control" rows={3} value={content[task]}
+                    onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))} />
+                  <div className="text-end mt-1">
+                    <AiButton label={taskLabel(locale, task)} value={content[task] ?? ''}
+                      onApply={(text) => setContent((c) => ({ ...c, [task]: text }))} />
+                  </div>
+                </>
               )}
             </div>
           ))}
         </div>
         <label className="form-label fw-semibold" htmlFor={`${phase.phase}-notes`}>{t('sa.notes')}</label>
-        <textarea id={`${phase.phase}-notes`} className="form-control mb-3" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <textarea id={`${phase.phase}-notes`} className="form-control" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+        <div className="text-end mt-1 mb-3"><AiButton label={t('sa.notes')} value={notes ?? ''} onApply={setNotes} /></div>
         {errors.content && <div className="text-danger small mb-2">{String(errors.content)}</div>}
         <SaveButton busy={busy} dirty={dirty} />
       </form>
@@ -270,19 +279,21 @@ function Report() {
   const { t, locale } = useI18n();
   const { project } = useProject();
   const data = useAsync(() => crispdmApi.report(project.id), [project.id]);
+  const reportRef = useRef(null);
   if (data.loading && !data.data) return <Loading small />;
   if (!data.data) return null;
   const r = data.data;
   return (
-    <article className="kt-report">
-      <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <article className="kt-report" ref={reportRef}>
+      {/* título e subtítulo vão para o arquivo pelo ExportButtons */}
+      <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3" data-export="skip">
         <div>
           <h2 className="mt-0 border-0">{t('dm.reportTitle')}</h2>
           <p className="text-body-secondary mb-0">{r.project.name} · v{r.project.version} · {formatDate(r.generatedAt, locale)}</p>
         </div>
-        <button type="button" className="btn btn-accent kt-no-print" onClick={() => window.print()}>
-          <i className="bi bi-printer me-1" aria-hidden="true" />{t('common.print')}
-        </button>
+        <ExportButtons targetRef={reportRef} title={t('dm.reportTitle')}
+          subtitle={`${r.project.name} · v${r.project.version} · ${formatDate(r.generatedAt, locale)}`}
+          fileName={`${t('dm.reportTitle')} ${r.project.name}`} />
       </div>
 
       {r.phases.map((p) => (

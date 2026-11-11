@@ -72,7 +72,7 @@ export function StatCards({ items }) {
     <div className="row g-3 mb-4">
       {items.map(([label, value, icon]) => (
         <div className="col-6 col-md-4 col-xl" key={label}>
-          <div className="card kt-stat h-100">
+          <div className="card kt-stat h-100" data-export-label={label} data-export-value={value}>
             <div className="card-body py-2">
               {icon && <i className={`bi bi-${icon} text-primary`} aria-hidden="true" />}
               <div className="kt-stat-value">{value}</div>
@@ -239,13 +239,53 @@ export function FileCard({ itemPath, record, accept, onChange, help }) {
   );
 }
 
+// Célula editável do RowsEditor
+function RowCell({ c, value, onChange, label }) {
+  const common = { 'aria-label': label, value: value ?? '' };
+  switch (c.type) {
+    case 'select':
+      return (
+        <select className="form-select form-select-sm" {...common} onChange={(e) => onChange(e.target.value)}>
+          {c.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      );
+    case 'score': // nota de 1 a 5 (ou vazia)
+      return (
+        <select className="form-select form-select-sm" {...common} onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}>
+          <option value="">—</option>
+          {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+        </select>
+      );
+    case 'number':
+      return (
+        <input type="number" className="form-control form-control-sm" {...common} min={c.min ?? 0} step={c.step ?? 1}
+          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))} />
+      );
+    case 'date':
+      return <input type="date" className="form-control form-control-sm" {...common} onChange={(e) => onChange(e.target.value)} />;
+    case 'textarea':
+      return (
+        <textarea className="form-control form-control-sm" rows={c.rows ?? 2} maxLength={c.maxLength} {...common}
+          onChange={(e) => onChange(e.target.value)} />
+      );
+    default:
+      return <input className="form-control form-control-sm" maxLength={c.maxLength} {...common} onChange={(e) => onChange(e.target.value)} />;
+  }
+}
+
 /**
  * Lista editável de linhas (ex.: itens de informação e mensagens do CM-2).
- * columns: [{ name, label, type?: 'text' | 'select', options?, required?, width? }]
+ * columns: [{ name, label, type?: 'text' | 'select' | 'score' | 'number' | 'date' | 'textarea', options?, required?,
+ *             width?, maxLength?, render?(row) (coluna só de leitura, calculada) }]
  */
-export function RowsEditor({ caption, columns, rows, onChange, addLabel, empty }) {
+export function RowsEditor({ caption, columns, rows, onChange, addLabel, empty, className = '' }) {
   const { t } = useI18n();
-  const blank = () => Object.fromEntries(columns.map((c) => [c.name, c.type === 'select' ? (c.options[0]?.value ?? '') : '']));
+  const blank = () =>
+    Object.fromEntries(
+      columns
+        .filter((c) => !c.render)
+        .map((c) => [c.name, c.type === 'select' ? (c.options[0]?.value ?? '') : ['score', 'number'].includes(c.type) ? null : '']),
+    );
   const set = (i, name, value) => onChange(rows.map((r, j) => (j === i ? { ...r, [name]: value } : r)));
   const move = (i, d) => {
     const next = [...rows];
@@ -255,12 +295,12 @@ export function RowsEditor({ caption, columns, rows, onChange, addLabel, empty }
   return (
     <div className="mb-3">
       <div className="table-responsive">
-        <table className="table table-sm align-middle kt-sheet mb-2">
+        <table className={`table table-sm align-middle kt-sheet mb-2 ${className}`}>
           <caption className="visually-hidden">{caption}</caption>
           <thead>
             <tr>
               <th scope="col" className="kt-sheet-n">Nº</th>
-              {columns.map((c) => <th scope="col" key={c.name} style={{ width: c.width }}>{c.label}{c.required && ' *'}</th>)}
+              {columns.map((c) => <th scope="col" key={c.name} style={{ width: c.width, minWidth: c.minWidth }}>{c.label}{c.required && ' *'}</th>)}
               <th scope="col"><span className="visually-hidden">{t('common.actions')}</span></th>
             </tr>
           </thead>
@@ -273,14 +313,8 @@ export function RowsEditor({ caption, columns, rows, onChange, addLabel, empty }
                 <td className="kt-sheet-n">{i + 1}</td>
                 {columns.map((c) => (
                   <td key={c.name}>
-                    {c.type === 'select' ? (
-                      <select className="form-select form-select-sm" value={row[c.name] ?? ''} aria-label={`${c.label} ${i + 1}`}
-                        onChange={(e) => set(i, c.name, e.target.value)}>
-                        {c.options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                      </select>
-                    ) : (
-                      <input className="form-control form-control-sm" value={row[c.name] ?? ''} aria-label={`${c.label} ${i + 1}`}
-                        maxLength={c.maxLength} onChange={(e) => set(i, c.name, e.target.value)} />
+                    {c.render ? c.render(row) : (
+                      <RowCell c={c} value={row[c.name]} label={`${c.label} ${i + 1}`} onChange={(v) => set(i, c.name, v)} />
                     )}
                   </td>
                 ))}

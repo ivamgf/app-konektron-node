@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.7.0 — 2026-11-11
+
+### Adicionado
+- **IA nos cadastros dos projetos** (requer a API 5.2.0): botão "IA" em todo campo de texto longo (inclusive as
+  planilhas do CommonKADS e as tarefas do CRISP-DM) para gerar, melhorar, resumir ou traduzir o texto com a conta do
+  próprio usuário — Claude (SDK oficial `@anthropic-ai/sdk`, com fallback no servidor quando o modelo recusa), GPT,
+  Gemini, OpenRouter (conexão OAuth sem copiar a chave) ou Ollama local. Com a conta conectada, um clique gera o
+  texto dentro do sistema, sem abrir o site da IA ("Gerar novamente" refaz com outra ação ou pedido). Só sem chave
+  o botão copia o pedido e abre ChatGPT, Claude, Copilot ou Gemini na web. O pedido leva o contexto do projeto e do documento; o resultado é editável antes de
+  entrar no campo. Perfil › IA guarda a chave só no navegador (sessão, ou lembrada se o usuário pedir).
+- **Acessibilidade (WCAG 2.2 / WAI-ARIA)**: botão fixo (Alt+Shift+A) com tamanho do texto (90% a 200%), zoom da página
+  (até 200%), alto contraste, tons de cinza, fonte mais legível, espaçamento do texto, links sublinhados, foco
+  reforçado, cursor grande, guia de leitura e pausa das animações, salvos no navegador e aplicados antes de abrir a
+  página. Link "Opções de acessibilidade" junto do "Pular para o conteúdo"; VLibras (Libras) em português. Foco visível
+  em todos os controles, alvos mínimos de 24 px e modo de alto contraste do Windows.
+- **Diagnóstico de dados** (nova aba em qualquer projeto): Inventário preliminar das bases e sistemas, Relatório de
+  diagnóstico das fontes e fluxos de dados e Plano de trabalho para implantação de sistema, seguindo os modelos, com
+  linhas de exemplo opcionais, índice, impressão/PDF, diagrama dos fluxos (manuais tracejados) e cronograma.
+  No relatório, a **avaliação de maturidade** tem um combobox de nível (1 Inicial a 5 Otimizado) por dimensão com a
+  rubrica do nível escolhido, nível-alvo, peso, sugestão pelos indicadores objetivos, radar, nota consolidada
+  (média ponderada) e as lacunas levadas ao plano de ação.
+
+- **Exportação dos relatórios em PDF, Word (DOCX) e CSV**: Análise de Sistemas, CRISP-DM, CommonKADS e os três
+  documentos do Diagnóstico de dados. O relatório da tela vira o arquivo (títulos, campos, tabelas, checklists e
+  listas), no navegador; tabelas largas saem em paisagem e o CSV abre no Excel com acentos (`;` em PT/ES, `,` em EN).
+  `pdfmake` e `docx` são carregados só no clique.
+
+### Alterado
+- Modais num portal no `<body>`, em pilha (Esc fecha só o de cima) e com o foco preso no diálogo.
+- Abas do Perfil no padrão WAI-ARIA (setas, Home e End; painel ligado à aba).
+- Tamanhos de fonte em `px` passaram a `rem`, acompanhando o tamanho do texto escolhido.
+
 ## 2.6.0 — 2026-10-18
 
 ### Adicionado

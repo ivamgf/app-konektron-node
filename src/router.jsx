@@ -15,6 +15,7 @@ import {
   CkAgentDetail, CkAgents, CkCommunication, CkDesign, CkDocument, CkImpact, CkKnowledge, CkKnowledgeDetail, CkKnowledgeModel,
   CkLayout, CkOrganization, CkOverview, CkTaskDetail, CkTasks, CkTransactionDetail,
 } from './pages/projects/CommonKads.jsx';
+import { DdEditor, DdLayout, DdList, DdOverview } from './pages/projects/DataDiagnosis.jsx';
 import { FpCountDetail, FpCounts, FpLayout } from './pages/projects/FunctionPoints.jsx';
 import { OnCatalog, OnDetail, OnLayout } from './pages/projects/Ontologies.jsx';
 import ProjectLayout, { useProject } from './pages/projects/ProjectLayout.jsx';
@@ -164,6 +165,18 @@ export const routes = [
                       ...detailRoutes('sprints', 'scrum.nav.sprints', <ScrumSprints />, 'scrumSprint', ':sprintId', <ScrumSprintDetail />, 'scrum.sprint'),
                       { path: 'events', element: <ScrumEvents />, handle: crumb('scrum.nav.events') },
                       { path: 'artifacts', element: <ScrumArtifacts />, handle: crumb('scrum.nav.artifacts') },
+                    ],
+                  },
+                  // Diagnóstico de dados (qualquer tipo de projeto)
+                  {
+                    path: 'data-diagnosis',
+                    element: <DdLayout />,
+                    handle: crumb('project.tabs.dataDiagnosis'),
+                    children: [
+                      { index: true, element: <DdOverview /> },
+                      ...detailRoutes('inventories', 'dd.nav.inventories', <DdList kind="inventories" />, 'ddInventory', ':docId', <DdEditor kind="inventories" />, 'dd.inventory'),
+                      ...detailRoutes('reports', 'dd.nav.reports', <DdList kind="reports" />, 'ddReport', ':docId', <DdEditor kind="reports" />, 'dd.report'),
+                      ...detailRoutes('plans', 'dd.nav.plans', <DdList kind="plans" />, 'ddPlan', ':docId', <DdEditor kind="plans" />, 'dd.plan'),
                     ],
                   },
                   // Kanban (qualquer tipo de projeto)

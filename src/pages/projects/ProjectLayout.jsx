@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, Navigate, Outlet, useNavigate, useOutletContext, useParams } from 'react-router';
 import { projectsApi } from '../../api/endpoints.js';
+import { AiContextProvider } from '../../components/AiAssist.jsx';
 import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
 import { useToast } from '../../components/Toasts.jsx';
@@ -15,6 +16,7 @@ const SHARED_TABS = [
   ['bpm', 'bpm', 'bezier2', 'bpm'],
   ['commonkads', 'commonkads', 'journal-richtext', 'commonkads'],
   ['scrum', 'scrum', 'arrow-repeat', 'scrum'],
+  ['data-diagnosis', 'dataDiagnosis', 'clipboard-data', 'data-diagnosis'],
 ];
 
 const TABS = {
@@ -97,6 +99,25 @@ export default function ProjectLayout() {
   const [editing, setEditing] = useState(false);
   const project = useAsync(() => projectsApi.get(projectId), [projectId]);
   useCrumbLabel('project', project.data?.name);
+  // contexto que acompanha os pedidos de IA dos campos deste projeto
+  const p0 = project.data;
+  const ai = useMemo(
+    () =>
+      p0 && {
+        projectId: p0.id,
+        describe: () =>
+          [
+            `${t('project.name')}: ${p0.name}`,
+            `${t('project.type')}: ${t(`project.types.${p0.type}`)}`,
+            p0.version && `${t('project.version')}: ${p0.version}`,
+            p0.description && `${t('project.description')}: ${p0.description}`,
+            `${t('ai.page')}: ${document.title}`,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+      },
+    [p0, t],
+  );
 
   if (project.loading && !project.data) return <Loading />;
   if (!project.data) return <NotFound />;
@@ -145,9 +166,15 @@ export default function ProjectLayout() {
             </li>
           ))}
         </ul>
-        <Outlet context={{ project: p, reloadProject: project.reload }} />
+        <AiContextProvider value={ai}>
+          <Outlet context={{ project: p, reloadProject: project.reload }} />
+        </AiContextProvider>
       </ContentCard>
-      {editing && <EditProjectModal project={p} onClose={() => setEditing(false)} onSaved={project.setData} />}
+      {editing && (
+        <AiContextProvider value={ai}>
+          <EditProjectModal project={p} onClose={() => setEditing(false)} onSaved={project.setData} />
+        </AiContextProvider>
+      )}
     </div>
   );
 }
