@@ -31,6 +31,8 @@ export const projectsApi = {
   create: (body) => api.post('/projects', body),
   update: (id, body) => api.patch(`/projects/${id}`, body),
   remove: (id) => api.del(`/projects/${id}`),
+  // auditoria do uso de IA num campo (sem o texto nem a chave): { feature, mode, provider, model }
+  aiUsage: (id, body) => api.post(`/projects/${id}/ai-usage`, body),
 };
 
 export const systemAnalysisApi = {
@@ -125,4 +127,11 @@ export const adminApi = {
   // a API envia por e-mail ao remetente (SMTP do sistema) e registra a resposta
   replyMessage: (id, message) => api.post(`/admin/contact-messages/${id}/reply`, { message }),
   removeMessage: (id) => api.del(`/admin/contact-messages/${id}`),
+};
+
+// Diagnóstico de dados (qualquer projeto): inventários, relatórios de diagnóstico e planos de implantação.
+// Os cadastros usam resourceApi(`/projects/:id/data-diagnosis/<tipo>`).
+export const dataDiagnosisApi = {
+  overview: (pid) => api.get(`/projects/${pid}/data-diagnosis`),
+  docs: (pid, kind) => resourceApi(`/projects/${pid}/data-diagnosis/${kind}`),
 };

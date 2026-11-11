@@ -115,13 +115,13 @@ $theme-colors: map-merge($theme-colors, $custom-theme-colors);
 }
 .ds-label {
   font-family: $font-sans;
-  font-size: 12px;
+  font-size: 0.75rem; // rem: acompanha o tamanho do texto (WCAG 1.4.4)
   line-height: 20px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 .ds-caption {
-  font-size: 12px;
+  font-size: 0.75rem; // rem: acompanha o tamanho do texto (WCAG 1.4.4)
   line-height: 16px;
 }
 
@@ -482,7 +482,7 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   display: inline-block;
   font-family: $font-sans;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 0.75rem; // rem: acompanha o tamanho do texto (WCAG 1.4.4)
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: rgba($white, 0.15);
@@ -2094,11 +2094,11 @@ $sheet-blue-light: #cfe2f3;
 }
 .kt-chart-axis {
   fill: var(--chart-text);
-  font-size: 11px;
+  font-size: 0.6875rem;
 }
 .kt-chart-value {
   fill: var(--bs-body-color);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
 }
 .kt-chart-line {
@@ -2761,3 +2761,7 @@ $dark-link: #5cc6ec;
     content: none;
   }
 }
+
+// Acessibilidade (painel WCAG 2.2) e diagnóstico de dados
+@import 'a11y';
+@import 'data-diagnosis';

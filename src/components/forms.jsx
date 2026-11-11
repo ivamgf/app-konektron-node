@@ -1,6 +1,7 @@
 // Campos de formulário guiados por configuração (usados pelo ResourceManager e telas de edição)
 import { useId } from 'react';
 import { useI18n } from '../i18n/I18nProvider.jsx';
+import { AiButton } from './AiAssist.jsx';
 
 /**
  * Campo: { name, label, type, options, required, help, maxLength, rows, min, max, step, col }
@@ -150,12 +151,24 @@ export function FieldInput({ field, value, onChange, error }) {
       );
   }
 
+  const labelEl = (
+    <label className="form-label fw-semibold" htmlFor={id}>
+      {t(field.label)}
+      {field.required && <span className="text-danger" aria-hidden="true"> *</span>}
+    </label>
+  );
+  // textos livres dos cadastros de projeto: botão de IA ao lado do rótulo (some fora de um projeto)
+  const withAi = field.type === 'textarea' && field.ai !== false && !field.readOnly;
+
   return (
     <div className={`mb-3 ${field.col ?? 'col-12'}`}>
-      <label className="form-label fw-semibold" htmlFor={id}>
-        {t(field.label)}
-        {field.required && <span className="text-danger" aria-hidden="true"> *</span>}
-      </label>
+      {withAi ? (
+        <div className="d-flex align-items-end justify-content-between gap-2 kt-field-head">
+          {labelEl}
+          <AiButton label={t(field.label)} help={field.help ? t(field.help) : field.aiHelp} value={value ?? ''}
+            maxLength={field.maxLength} onApply={(text) => onChange(field.name, text)} />
+        </div>
+      ) : labelEl}
       {control}
       {field.help && <div className="form-text" id={helpId}>{t(field.help)}</div>}
       {error && <div className="invalid-feedback d-block" id={errorId}>{error}</div>}

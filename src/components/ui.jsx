@@ -1,5 +1,6 @@
 // Componentes visuais do protótipo / Design System KonekTron
 import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useI18n } from '../i18n/I18nProvider.jsx';
 import { useTheme } from '../lib/theme.js';
 
@@ -132,7 +133,14 @@ export function Pagination({ page, pageSize, total, onChange }) {
   );
 }
 
-// Modal acessível sem o JS do Bootstrap: foco inicial, Esc fecha, fundo bloqueado
+// Modais abertos, do mais antigo ao mais novo: Esc e Tab valem só para o de cima (ex.: IA sobre um cadastro)
+const modalStack = [];
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), ' +
+  'textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
+
+// Modal acessível sem o JS do Bootstrap (padrão de diálogo do WAI-ARIA): foco inicial, Tab preso no
+// diálogo, Esc fecha, fundo bloqueado e o foco volta para quem abriu. Fica num portal no <body>,
+// fora de formulários da página.
 export function Modal({ title, onClose, children, footer, size = '' }) {
   const { t } = useI18n();
   const dialogRef = useRef(null);
@@ -146,18 +154,43 @@ export function Modal({ title, onClose, children, footer, size = '' }) {
   useEffect(() => {
     const previous = document.activeElement;
     const node = dialogRef.current;
+    const token = {};
+    modalStack.push(token);
     node?.querySelector('input, select, textarea, button:not(.btn-close)')?.focus();
-    const onKey = (e) => e.key === 'Escape' && onCloseRef.current();
+    const onKey = (e) => {
+      if (modalStack.at(-1) !== token) return;
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !node) return;
+      const items = [...node.querySelectorAll(FOCUSABLE)].filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items.at(-1);
+      if (!node.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      } else if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', onKey);
     document.body.classList.add('modal-open');
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('modal-open');
+      modalStack.splice(modalStack.indexOf(token), 1);
+      if (!modalStack.length) document.body.classList.remove('modal-open');
       previous?.focus?.();
     };
   }, []);
 
-  return (
+  return createPortal(
     <>
       <div
         className="modal fade show d-block"
@@ -180,7 +213,8 @@ export function Modal({ title, onClose, children, footer, size = '' }) {
         </div>
       </div>
       <div className="modal-backdrop fade show" />
-    </>
+    </>,
+    document.body,
   );
 }
 

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { authApi, profileApi } from '../../api/endpoints.js';
 import { useAuth } from '../../auth/AuthProvider.jsx';
 import { FieldGrid, toFormValues, toPayload } from '../../components/forms.jsx';
+import AiSettings from '../../components/AiSettings.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
@@ -12,8 +13,8 @@ import { useAsync, useSubmit } from '../../lib/hooks.js';
 import { addressConfig } from '../projects/resources.jsx';
 import { VerifyBanner } from './Dashboard.jsx';
 
-const TABS = ['personal', 'social', 'addresses', 'security'];
-const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', security: 'shield-lock' };
+const TABS = ['personal', 'social', 'addresses', 'security', 'ai'];
+const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', security: 'shield-lock', ai: 'stars' };
 
 function PersonalTab({ profile, onSaved }) {
   const { t, setLocale } = useI18n();
@@ -222,7 +223,8 @@ export default function Profile() {
   const { t } = useI18n();
   const [params] = useSearchParams();
   // ?tab=: abre direto numa aba (ex.: ?tab=security)
-  const [tab, setTab] = useState(() => (TABS.includes(params.get('tab')) ? params.get('tab') : 'personal'));
+  const [tab, setTab] = useState(() =>
+    params.get('code') ? 'ai' : TABS.includes(params.get('tab')) ? params.get('tab') : 'personal');
   const profile = useAsync(() => profileApi.get(), []);
   const addresses = addressConfig(t);
 
@@ -230,17 +232,30 @@ export default function Profile() {
     <div className="container-xl px-3 mt-3">
       <VerifyBanner />
       <ContentCard icon="person-circle" as="h1" title={t('profile.title')}>
-        <ul className="nav nav-underline kt-tabs mb-4" role="tablist">
+        {/* abas no padrão WAI-ARIA: só a aba ativa entra no Tab; setas, Home e End trocam de aba */}
+        <ul className="nav nav-underline kt-tabs mb-4" role="tablist" aria-label={t('profile.title')}
+          onKeyDown={(e) => {
+            const i = TABS.indexOf(tab);
+            const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: TABS.length - 1 }[e.key];
+            if (next === undefined) return;
+            e.preventDefault();
+            const key = TABS[(next + TABS.length) % TABS.length];
+            setTab(key);
+            document.getElementById(`profile-tab-${key}`)?.focus();
+          }}>
           {TABS.map((key) => (
             <li className="nav-item" key={key} role="presentation">
-              <button type="button" role="tab" aria-selected={tab === key}
-                className={`nav-link ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
+              <button type="button" role="tab" id={`profile-tab-${key}`} aria-selected={tab === key} aria-controls="profile-panel"
+                tabIndex={tab === key ? 0 : -1} className={`nav-link ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
                 <i className={`bi bi-${ICONS[key]} me-1`} aria-hidden="true" />{t(`profile.${key}`)}
               </button>
             </li>
           ))}
         </ul>
-        {tab === 'addresses' ? (
+        <div id="profile-panel" role="tabpanel" aria-labelledby={`profile-tab-${tab}`}>
+        {tab === 'ai' ? (
+          <AiSettings />
+        ) : tab === 'addresses' ? (
           <ResourceManager path="/addresses" {...addresses} />
         ) : tab === 'security' ? (
           <SecurityTab />
@@ -253,6 +268,7 @@ export default function Profile() {
             <SocialTab key="social" profile={profile.data} onSaved={profile.setData} />
           )
         ) : null}
+        </div>
       </ContentCard>
     </div>
   );

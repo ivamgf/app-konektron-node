@@ -10,6 +10,22 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      VLibras (Governo Federal, gov.br/vlibras): tradutor de português para Libras.
+      Fica fora do #root para o React não mexer no widget; some com a interface em outro idioma (main.scss).
+    -->
+    <div vw class="enabled notranslate" translate="no">
+      <div vw-access-button class="active"></div>
+      <div vw-plugin-wrapper>
+        <div class="vw-plugin-top-wrapper"></div>
+      </div>
+    </div>
+    <script
+      defer
+      src="https://vlibras.gov.br/app/vlibras-plugin.js"
+      onload="new window.VLibras.Widget('https://vlibras.gov.br/app')"
+      onerror="console.warn('VLibras indisponível (o plugin não carregou).')"
+    ></script>
     <!-- Configuração de execução (URL da API), gerada quando o container sobe -->
     <script src="/config.js"></script>
     <script type="module" src="/src/main.jsx"></script>
