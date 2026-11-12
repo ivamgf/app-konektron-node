@@ -10,14 +10,14 @@ import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useSubmit } from '../../lib/hooks.js';
 import { PlanCards } from '../billing/Billing.jsx';
 
-// Seções e planos (espelha a API: config/plans.js). "Análise" é a do tipo do projeto: Análise de Sistemas ou CRISP-DM.
+// Seções e planos (espelha a API: config/plans.js). CRISP-DM é exclusivo do Master.
 export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban', 'data-diagnosis'];
 export const IMPLEMENTED = SECTION_KEYS;
 // Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
 export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
 export const PLAN_SECTIONS = {
-  free: ['system-analysis', 'crisp-dm', 'scrum', 'kanban'],
-  standard: ['system-analysis', 'crisp-dm', 'bpm', 'scrum', 'kanban', 'function-point'],
+  free: ['system-analysis', 'scrum', 'kanban'],
+  standard: ['system-analysis', 'bpm', 'scrum', 'kanban', 'function-point'],
   master: SECTION_KEYS,
 };
 export const PLAN_KEYS = Object.keys(PLAN_SECTIONS);

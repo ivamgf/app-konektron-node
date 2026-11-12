@@ -20,8 +20,8 @@ const CATALOG = {
   enabled: true, sandbox: true, currency: 'BRL', interval: 'MONTH',
   plans: [
     { plan: 'free', amount: 0, sections: PLAN_SECTIONS.free, ai: true, projectLimit: 3 },
-    { plan: 'standard', amount: 7990, sections: PLAN_SECTIONS.standard, ai: true, projectLimit: null },
-    { plan: 'master', amount: 17900, sections: SECTION_KEYS, ai: true, projectLimit: null },
+    { plan: 'standard', amount: 4990, sections: PLAN_SECTIONS.standard, ai: true, projectLimit: null },
+    { plan: 'master', amount: 7990, sections: SECTION_KEYS, ai: true, projectLimit: null },
   ],
 };
 
@@ -53,7 +53,7 @@ describe('utilitários da assinatura', () => {
   });
 
   it('seções bloqueadas para o participante: as do plano do dono fora do plano dele', () => {
-    expect(blockedFor('master', 'free').sort()).toEqual(['bpm', 'commonkads', 'data-diagnosis', 'function-point', 'ontologies']);
+    expect(blockedFor('master', 'free').sort()).toEqual(['bpm', 'commonkads', 'crisp-dm', 'data-diagnosis', 'function-point', 'ontologies']);
     expect(blockedFor('free', 'master')).toEqual([]);
   });
 });
@@ -119,8 +119,8 @@ describe('planos, cota do Free, assinatura e compartilhamento', () => {
     renderAt('/plans');
     expect(await screen.findByRole('heading', { name: 'Planos', level: 1 })).toBeInTheDocument();
     const standard = screen.getByRole('article', { name: 'Standard' });
-    await waitFor(() => expect(within(standard).getByText(/79,90/)).toBeInTheDocument());
-    expect(within(screen.getByRole('article', { name: 'Master' })).getByText(/179,00/)).toBeInTheDocument();
+    await waitFor(() => expect(within(standard).getByText(/49,90/)).toBeInTheDocument());
+    expect(within(screen.getByRole('article', { name: 'Master' })).getByText(/79,90/)).toBeInTheDocument();
     expect(screen.getAllByText('Integração com IA')).toHaveLength(3);
     expect(within(screen.getByRole('article', { name: 'Free' })).getByText('Seu plano atual')).toBeInTheDocument();
     expect(within(standard).getByRole('link', { name: 'Assinar' })).toHaveAttribute('href', '/checkout/standard');
@@ -133,7 +133,7 @@ describe('planos, cota do Free, assinatura e compartilhamento', () => {
     expect(submit).toBeDisabled();
     fireEvent.change(cpf, { target: { value: '52998224725' } });
     expect(cpf).toHaveValue('529.982.247-25');
-    fireEvent.click(screen.getByLabelText(/autorizo a cobrança mensal de R\$\s79,90/));
+    fireEvent.click(screen.getByLabelText(/autorizo a cobrança mensal de R\$\s49,90/));
     fireEvent.click(submit);
     const link = await screen.findByRole('link', { name: /Abrir a fatura/ });
     expect(link).toHaveAttribute('href', 'https://sandbox.asaas.com/i/abc123');
