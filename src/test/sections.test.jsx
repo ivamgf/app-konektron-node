@@ -44,8 +44,8 @@ describe('planos e seções', () => {
   });
 
   it('seções por plano, como na API (config/plans.js)', () => {
-    expect([...PLAN_SECTIONS.free].sort()).toEqual(['crisp-dm', 'kanban', 'scrum', 'system-analysis']);
-    expect([...PLAN_SECTIONS.standard].sort()).toEqual(['bpm', 'crisp-dm', 'function-point', 'kanban', 'scrum', 'system-analysis']);
+    expect([...PLAN_SECTIONS.free].sort()).toEqual(['kanban', 'scrum', 'system-analysis']);
+    expect([...PLAN_SECTIONS.standard].sort()).toEqual(['bpm', 'function-point', 'kanban', 'scrum', 'system-analysis']);
     for (const s of SECTION_KEYS) expect(canAccessSection({ role: 'client', plan: 'master' }, s)).toBe(true);
     expect(canAccessSection({ role: 'client', plan: 'free' }, 'bpm')).toBe(false);
     expect(canAccessSection({ role: 'client', plan: 'standard' }, 'ontologies')).toBe(false);

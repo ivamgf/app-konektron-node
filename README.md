@@ -54,8 +54,8 @@ configuração (`pages/projects/resources.jsx`), com os mesmos enums e limites d
 
 ## Planos e compartilhamento
 
-- **Free** (análise, Scrum e Kanban, até 3 projetos, excluídos após 3 meses sem uso), **Standard** (R$ 79,90/mês:
-  + BPM e Pontos de Função) e **Master** (R$ 179,00/mês: todas as seções), todos com IA. As regras espelham a API
+- **Free** (Análise de Sistemas, Scrum e Kanban, até 3 projetos, excluídos após 3 meses sem uso), **Standard** (R$ 49,90/mês:
+  + BPM e Pontos de Função) e **Master** (R$ 79,90/mês: todas as seções, inclusive CRISP-DM), todos com IA. As regras espelham a API
   em `pages/public/PublicPages.jsx` (`PLAN_SECTIONS`).
 - `/plans` mostra os planos; `/checkout/:plan` pede o CPF/CNPJ e o aceite e gera a fatura do Asaas (Pix, boleto ou
   cartão), com o botão "Já paguei: conferir". Perfil › Assinatura mostra a situação, as faturas e o cancelamento.

@@ -13,7 +13,7 @@ import { FREE_INACTIVE_MONTHS, FREE_PROJECT_LIMIT, PLAN_SECTIONS, SECTION_KEYS }
 
 export const PAID_PLANS = ['standard', 'master'];
 // Preços de referência (a API manda os valores vigentes em /billing/plans)
-const FALLBACK_PRICES = { free: 0, standard: 7990, master: 17900 };
+const FALLBACK_PRICES = { free: 0, standard: 4990, master: 7990 };
 const FEATURED_PLAN = 'standard';
 const STATUS_BADGE = {
   active: 'text-bg-success', pending: 'text-bg-info', overdue: 'text-bg-warning', canceled: 'text-bg-secondary',

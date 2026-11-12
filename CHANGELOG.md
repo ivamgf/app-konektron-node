@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.10.0 — 2026-11-12
+
+### Alterado
+- Planos (requer a API 5.5.0): Standard R$ 49,90/mês e Master R$ 79,90/mês; CRISP-DM passa a ser exclusivo do
+  Master (sai do Free e do Standard). Termos de Uso e README atualizados.
+
 ## 2.9.0 — 2026-11-12
 
 ### Adicionado
