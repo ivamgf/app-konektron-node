@@ -12,9 +12,10 @@ import { LANGUAGES, useI18n } from '../../i18n/I18nProvider.jsx';
 import { useAsync, useSubmit } from '../../lib/hooks.js';
 import { addressConfig } from '../projects/resources.jsx';
 import { VerifyBanner } from './Dashboard.jsx';
+import { SubscriptionTab } from '../billing/Billing.jsx';
 
-const TABS = ['personal', 'social', 'addresses', 'security', 'ai'];
-const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', security: 'shield-lock', ai: 'stars' };
+const TABS = ['personal', 'social', 'addresses', 'subscription', 'security', 'ai'];
+const ICONS = { personal: 'person', social: 'share', addresses: 'geo-alt', subscription: 'credit-card', security: 'shield-lock', ai: 'stars' };
 
 function PersonalTab({ profile, onSaved }) {
   const { t, setLocale } = useI18n();
@@ -257,6 +258,8 @@ export default function Profile() {
           <AiSettings />
         ) : tab === 'addresses' ? (
           <ResourceManager path="/addresses" {...addresses} />
+        ) : tab === 'subscription' ? (
+          <SubscriptionTab />
         ) : tab === 'security' ? (
           <SecurityTab />
         ) : profile.loading && !profile.data ? (

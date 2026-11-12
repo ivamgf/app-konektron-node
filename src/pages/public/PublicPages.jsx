@@ -8,13 +8,27 @@ import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useSubmit } from '../../lib/hooks.js';
+import { PlanCards } from '../billing/Billing.jsx';
 
-// Seções (espelha a API: config/plans.js). Todos os planos, inclusive o Free, acessam todas.
+// Seções e planos (espelha a API: config/plans.js). "Análise" é a do tipo do projeto: Análise de Sistemas ou CRISP-DM.
 export const SECTION_KEYS = ['system-analysis', 'ontologies', 'bpm', 'function-point', 'commonkads', 'crisp-dm', 'scrum', 'kanban', 'data-diagnosis'];
 export const IMPLEMENTED = SECTION_KEYS;
 // Tipo de projeto exigido; ausente = qualquer tipo (Ontologias, BPM, CommonKADS, Scrum, Kanban)
 export const SECTION_PROJECT_TYPE = { 'system-analysis': 'software', 'function-point': 'software', 'crisp-dm': 'data_analysis' };
-export const canAccessSection = (user, section) => Boolean(user) && SECTION_KEYS.includes(section);
+export const PLAN_SECTIONS = {
+  free: ['system-analysis', 'crisp-dm', 'scrum', 'kanban'],
+  standard: ['system-analysis', 'crisp-dm', 'bpm', 'scrum', 'kanban', 'function-point'],
+  master: SECTION_KEYS,
+};
+export const PLAN_KEYS = Object.keys(PLAN_SECTIONS);
+// Free: projetos que a conta pode criar (excluir não devolve a vaga) e meses sem uso até a exclusão
+export const FREE_PROJECT_LIMIT = 3;
+export const FREE_INACTIVE_MONTHS = 3;
+// Administrador com plano Master vê tudo; os demais, as seções do próprio plano
+export const canAccessSection = (user, section) =>
+  Boolean(user) && ((user.role === 'admin' && user.plan === 'master') || (PLAN_SECTIONS[user.plan] ?? []).includes(section));
+// Planos (do menor ao maior) que incluem a seção
+export const plansWithSection = (section) => PLAN_KEYS.filter((plan) => PLAN_SECTIONS[plan].includes(section));
 export const SECTION_ICONS = {
   'system-analysis': 'diagram-3',
   ontologies: 'diagram-2',
@@ -36,6 +50,7 @@ export function Home() {
   const stats = [
     [SECTION_KEYS.length, 'sections'],
     [IMPLEMENTED.length, 'available'],
+    [PLAN_KEYS.length, 'plans'],
   ];
 
   return (
@@ -129,6 +144,17 @@ export function Home() {
               );
             })}
           </ul>
+        </div>
+      </section>
+
+      <section className="kt-home-band kt-home-plans kt-on-color" aria-labelledby="kt-home-plans">
+        <div className="container-xl px-3">
+          <h2 className="kt-home-heading" id="kt-home-plans">{t('home.plansTitle')}</h2>
+          <p className="kt-home-sub">{t('home.plansLead')}</p>
+          <PlanCards />
+          <p className="kt-home-note mt-4 mb-0">
+            <i className="bi bi-shield-check me-1" aria-hidden="true" /> {t('billing.plansNote')}
+          </p>
         </div>
       </section>
 

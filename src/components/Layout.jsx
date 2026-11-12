@@ -191,6 +191,7 @@ function SideMenu({ open, onClose }) {
             item('/', 'house', 'nav.home', { end: true }),
             item(authed ? '/projects' : '/signin', 'folder2-open', 'nav.myProjects'),
             item('/engineering', 'grid-3x3-gap', 'nav.engineering'),
+            item('/plans', 'gem', 'nav.plans'),
           ])}
           {authed && group('account', [
             item('/profile', 'person-circle', 'nav.profile'),

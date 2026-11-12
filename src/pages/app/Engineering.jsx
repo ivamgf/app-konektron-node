@@ -26,14 +26,14 @@ const SECTION_COLORS = {
 
 function SectionGrid({ sections, authed }) {
   const { t } = useI18n();
-  const available = sections.filter((s) => s.implemented).length;
+  const available = sections.filter((s) => s.implemented && (s.enabled ?? true)).length;
   const soon = sections.filter((s) => !s.implemented).length;
   return (
     <>
       <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
         <span className="kt-pill is-on">
           <i className="bi bi-check-circle-fill me-1" aria-hidden="true" />
-          {t('sections.summaryAvailable', { count: available })}
+          {authed ? t('sections.summaryInPlan', { count: available }) : t('sections.summaryAvailable', { count: available })}
         </span>
         <span className="kt-pill is-soon">
           <i className="bi bi-hourglass-split me-1" aria-hidden="true" />{t('sections.summarySoon', { count: soon })}
@@ -41,8 +41,8 @@ function SectionGrid({ sections, authed }) {
       </div>
       <ul className="row g-4 list-unstyled mb-0">
         {sections.map((s) => {
-          const usable = s.implemented;
-          const state = usable ? 'is-available' : 'is-soon';
+          const usable = s.implemented && (s.enabled ?? true);
+          const state = !s.implemented ? 'is-soon' : usable ? 'is-available' : 'is-locked';
           return (
             <li className="col-sm-6 col-lg-4" key={s.key}>
               <article className={`kt-tile ${state}`} style={{ '--sec': SECTION_COLORS[s.key] }} aria-labelledby={`sec-${s.key}`}>
@@ -54,11 +54,22 @@ function SectionGrid({ sections, authed }) {
                 <div className="kt-tile-body">
                   <p>{t(`sections.${s.key}.text`)}</p>
                   <div className="d-flex flex-wrap gap-2 mb-3">
+                    {authed && s.implemented && (
+                      <span className={`kt-tile-chip ${s.enabled ? 'is-on' : 'is-off'}`}>
+                        <i className={`bi ${s.enabled ? 'bi-unlock' : 'bi-lock'} me-1`} aria-hidden="true" />
+                        {s.enabled ? t('sections.inPlan') : t('sections.notInPlan')}
+                      </span>
+                    )}
                     <span className="kt-tile-chip">
                       <i className="bi bi-folder2 me-1" aria-hidden="true" />
                       {s.projectType ? t(`project.types.${s.projectType}`) : t('sections.anyProject')}
                     </span>
                   </div>
+                  {authed && s.implemented && !usable && (
+                    <Link to="/plans" className="btn btn-sm btn-outline-primary">
+                      {t('billing.seePlans')} <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
+                    </Link>
+                  )}
                   {usable && (
                     <Link to={authed ? '/projects' : '/signin'} className="btn btn-sm kt-tile-cta">
                       {authed ? t('sections.openProjects') : t('nav.signin')} <i className="bi bi-arrow-right ms-1" aria-hidden="true" />
