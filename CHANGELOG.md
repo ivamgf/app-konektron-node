@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.8.0 — 2026-11-11
+
+### Adicionado
+- **Planos e assinatura pelo Asaas** (requer a API 5.3.0): página `/plans` e faixa de planos na home (Free, Standard
+  R$ 79,90/mês e Master R$ 179,00/mês, todos com IA); `/checkout/:plan` com CPF/CNPJ, aceite e a fatura do Asaas (Pix,
+  boleto ou cartão) e a conferência do pagamento; aba Perfil › Assinatura com situação, faturas, troca e cancelamento
+  (arrependimento em 7 dias). Item "Planos" no menu.
+- **Limites do Free**: "Novo projeto" desabilitado depois de 3 projetos criados (excluir não libera a vaga), com
+  convite para assinar; cada projeto mostra a data de exclusão por 3 meses sem uso.
+- **Seções por plano**: abas fora do plano com cadeado e explicação (plano próprio, plano do dono ou acesso só ao
+  Kanban); Engenharia mostra o que está no plano.
+- **Compartilhamento de projetos**: o dono convida pelo e-mail (projeto inteiro ou só o Kanban), muda o acesso ou
+  remove; o participante vê o projeto em "Compartilhados comigo", pode sair e não altera nem exclui o projeto.
+- Termos de Uso com planos, cobrança pelo Asaas, compartilhamento e cancelamento.
+
 ## 2.7.0 — 2026-11-11
 
 ### Adicionado

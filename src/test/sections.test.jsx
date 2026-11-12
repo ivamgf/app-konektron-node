@@ -6,7 +6,7 @@ import { AuthProvider } from '../auth/AuthProvider.jsx';
 import { ToastProvider } from '../components/Toasts.jsx';
 import { CK_TEXT } from '../content/commonkads.js';
 import { I18nProvider } from '../i18n/I18nProvider.jsx';
-import { canAccessSection, IMPLEMENTED, SECTION_KEYS } from '../pages/public/PublicPages.jsx';
+import { canAccessSection, IMPLEMENTED, PLAN_SECTIONS, plansWithSection, SECTION_KEYS } from '../pages/public/PublicPages.jsx';
 import { routes } from '../router.jsx';
 
 // Planilhas como a API devolve (modules/commonkads/commonkads.constants.js)
@@ -43,11 +43,15 @@ describe('planos e seções', () => {
     for (const s of ['ontologies', 'bpm', 'commonkads']) expect(IMPLEMENTED).toContain(s);
   });
 
-  it('todos os planos, inclusive o Free, acessam todas as seções, como na API', () => {
-    for (const plan of ['free', 'standard', 'master']) {
-      for (const s of SECTION_KEYS) expect(canAccessSection({ role: 'client', plan }, s)).toBe(true);
-    }
+  it('seções por plano, como na API (config/plans.js)', () => {
+    expect([...PLAN_SECTIONS.free].sort()).toEqual(['crisp-dm', 'kanban', 'scrum', 'system-analysis']);
+    expect([...PLAN_SECTIONS.standard].sort()).toEqual(['bpm', 'crisp-dm', 'function-point', 'kanban', 'scrum', 'system-analysis']);
+    for (const s of SECTION_KEYS) expect(canAccessSection({ role: 'client', plan: 'master' }, s)).toBe(true);
+    expect(canAccessSection({ role: 'client', plan: 'free' }, 'bpm')).toBe(false);
+    expect(canAccessSection({ role: 'client', plan: 'standard' }, 'ontologies')).toBe(false);
+    expect(canAccessSection({ role: 'admin', plan: 'master' }, 'commonkads')).toBe(true);
     expect(canAccessSection(null, 'kanban')).toBe(false);
+    expect(plansWithSection('function-point')).toEqual(['standard', 'master']);
   });
 });
 
@@ -143,7 +147,9 @@ const sprintDetail = {
 const ROUTES = {
   '/auth/refresh': { accessToken: 'acc', refreshToken: 'ref2' },
   '/auth/me': { id: 'u1', email: 'ana@ex.com', role: 'client', plan: 'master', emailVerified: true },
-  [`/projects/${P}`]: { id: P, name: 'Projeto X', type: 'data_analysis', version: '1.0', description: null, ...stamp },
+  [`/projects/${P}`]: {
+    id: P, name: 'Projeto X', type: 'data_analysis', version: '1.0', description: null, access: 'owner', sections: SECTION_KEYS, ...stamp,
+  },
   [`/projects/${P}/commonkads`]: {
     progress: 6, worksheets: worksheets.map((w) => ({ ...w, filled: Object.keys(w.content).length })),
     counts: { tasks: 1, knowledgeIntensiveTasks: 1, knowledge: 1, bottlenecks: 1, agents: 2, humanAgents: 1, systemAgents: 1, transactions: 1 },
@@ -417,13 +423,32 @@ describe('páginas das seções novas', () => {
     expect(writes[0].body).toEqual({ content: { organizationalContext: 'Missão' } });
   });
 
-  it('o plano Free também abre a seção, sem bloqueio', async () => {
+  it('seção fora do plano: aba com cadeado, explicação e link para os planos', async () => {
+    const project = ROUTES[`/projects/${P}`];
     ROUTES['/auth/me'] = { ...ROUTES['/auth/me'], plan: 'free' };
+    ROUTES[`/projects/${P}`] = { ...project, sections: PLAN_SECTIONS.free };
     try {
       renderAt(`/projects/${P}/commonkads/organization`);
-      expect(await screen.findByLabelText('Contexto organizacional')).toBeInTheDocument();
+      expect(await screen.findByText('Esta seção faz parte do(s) plano(s) Master.')).toBeInTheDocument();
+      expect(screen.queryByLabelText('Contexto organizacional')).not.toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Ver planos' })).toHaveAttribute('href', '/plans');
+      expect(screen.getAllByLabelText('Fora do seu plano').length).toBeGreaterThan(0);
     } finally {
       ROUTES['/auth/me'] = { ...ROUTES['/auth/me'], plan: 'master' };
+      ROUTES[`/projects/${P}`] = project;
+    }
+  });
+
+  it('participante só do Kanban: as outras páginas levam ao quadro', async () => {
+    const project = ROUTES[`/projects/${P}`];
+    ROUTES[`/projects/${P}`] = { ...project, access: 'kanban', sections: ['kanban'], ownerEmail: 'dono@ex.com' };
+    try {
+      const router = renderAt(`/projects/${P}/commonkads`);
+      await waitFor(() => expect(router.state.location.pathname).toBe(`/projects/${P}/kanban`));
+      expect(screen.queryByRole('button', { name: 'Excluir projeto' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: /CommonKADS/ })).not.toBeInTheDocument();
+    } finally {
+      ROUTES[`/projects/${P}`] = project;
     }
   });
 });

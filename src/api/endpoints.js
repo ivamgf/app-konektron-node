@@ -33,6 +33,11 @@ export const projectsApi = {
   remove: (id) => api.del(`/projects/${id}`),
   // auditoria do uso de IA num campo (sem o texto nem a chave): { feature, mode, provider, model }
   aiUsage: (id, body) => api.post(`/projects/${id}/ai-usage`, body),
+  // compartilhamento: o dono convida pelo e-mail com acesso 'project' (o projeto inteiro) ou 'kanban'
+  members: (id) => api.get(`/projects/${id}/members`),
+  addMember: (id, body) => api.post(`/projects/${id}/members`, body),
+  updateMember: (id, memberId, access) => api.patch(`/projects/${id}/members/${memberId}`, { access }),
+  removeMember: (id, memberId) => api.del(`/projects/${id}/members/${memberId}`),
 };
 
 export const systemAnalysisApi = {
@@ -80,6 +85,16 @@ export const scrumApi = {
   // publica no Kanban as tasks da sprint que ainda não estão lá (devolve a sprint atualizada)
   publishKanban: (pid, id, body) => api.post(`/projects/${pid}/scrum/sprints/${id}/publish-kanban`, body),
   moveItem: (pid, id, position) => api.post(`/projects/${pid}/scrum/items/${id}/move`, { position }),
+};
+
+// Planos e assinaturas (Asaas): assinar devolve o link da fatura (Pix, boleto ou cartão)
+export const billingApi = {
+  plans: () => api.get('/billing/plans', undefined, { auth: false }),
+  subscription: () => api.get('/billing/subscription'),
+  // acceptTerms: o usuário marcou o aceite dos termos e da cobrança mensal
+  subscribe: (body) => api.post('/billing/subscribe', { ...body, acceptTerms: true }),
+  refresh: () => api.post('/billing/subscription/refresh'),
+  cancel: () => api.post('/billing/subscription/cancel'),
 };
 
 // Formulário de contato (público; com sessão, a mensagem fica ligada ao usuário)

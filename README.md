@@ -41,7 +41,8 @@ src/
 │   ├── public/                Início, Sobre, Contatos, Termos, 404
 │   ├── auth/                  Entrar, Cadastrar, Recuperar, Nova senha, Confirmar e-mail
 │   ├── app/                   Projetos, Engenharia, Perfil
-│   ├── projects/              ProjectLayout, SystemAnalysis, CrispDm, Ontologies, Bpm, CommonKads,
+│   ├── billing/               Planos, assinatura (fatura do Asaas) e Perfil › Assinatura
+│   ├── projects/              ProjectLayout (abas por plano), Share (compartilhamento), SystemAnalysis, CrispDm, Ontologies, Bpm, CommonKads,
 │   │                          FunctionPoints, Scrum, Kanban, DataDiagnosis, resources (configuração CRUD)
 │   └── admin/                 Resumo, Usuários, Logs
 └── styles/                    _tokens.scss (Design System), main.scss (Bootstrap + componentes)
@@ -50,6 +51,17 @@ src/
 **ResourceManager**: os 11 recursos com CRUD da API (requisitos, histórias, diagramas, objetivos,
 datasets, campos, passos, modelos, métricas, endereços) usam um único componente guiado por
 configuração (`pages/projects/resources.jsx`), com os mesmos enums e limites da API.
+
+## Planos e compartilhamento
+
+- **Free** (análise, Scrum e Kanban, até 3 projetos, excluídos após 3 meses sem uso), **Standard** (R$ 79,90/mês:
+  + BPM e Pontos de Função) e **Master** (R$ 179,00/mês: todas as seções), todos com IA. As regras espelham a API
+  em `pages/public/PublicPages.jsx` (`PLAN_SECTIONS`).
+- `/plans` mostra os planos; `/checkout/:plan` pede o CPF/CNPJ e o aceite e gera a fatura do Asaas (Pix, boleto ou
+  cartão), com o botão "Já paguei: conferir". Perfil › Assinatura mostra a situação, as faturas e o cancelamento.
+- No Free com a cota esgotada, o botão "Novo projeto" fica desabilitado (excluir não libera a vaga).
+- No projeto, as abas fora do plano têm cadeado e mostram por quê; o botão de pessoas abre o compartilhamento (o dono
+  convida pelo e-mail para o projeto inteiro ou só o Kanban). Quem tem acesso só ao Kanban vai direto ao quadro.
 
 ## Sessão
 
