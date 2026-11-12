@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.9.0 — 2026-11-12
+
+### Adicionado
+- Administração › Usuários: chave "Master vitalício (sem cobrança)", que fixa o plano em Master, e selo "Vitalício" na
+  lista. O recurso não é divulgado fora da administração.
+
+### Alterado
+- Conta isenta de cobrança vê "Sua conta já tem acesso total, sem cobrança" em Assinatura e no checkout.
+
 ## 2.8.0 — 2026-11-11
 
 ### Adicionado

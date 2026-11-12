@@ -809,6 +809,9 @@ export default {
     planHelp: 'The plan changes with the subscription (Asaas). A change made here lasts until the next charge updates the plan. Every new account starts on Free.',
     accessYes: 'Has access to administration (Administrator + Master).',
     accessNo: 'No access to administration: only the Administrator role with the Master plan has it.',
+    lifetime: 'Lifetime Master (no charge)',
+    lifetimeBadge: 'Lifetime',
+    lifetimeHelp: 'Full access forever, with no Asaas charge. Only the administration grants it; it is not offered in the system.',
   },
   about: {
     title: 'About',
@@ -908,7 +911,7 @@ export default {
     plansNote: 'Monthly fee through Asaas, paid by Pix, bank slip or credit card. Cancel anytime in your profile.',
     unknownPlan: 'This plan does not exist or is not sold by subscription.',
     seePlans: 'See plans',
-    adminNote: 'Administrator accounts already have full access, with no subscription.',
+    adminNote: 'Your account already has full access, with no charge.',
     unavailable: 'Online subscription is not available right now.',
     alreadySubscribed: 'You already subscribe to the {plan} plan.',
     checkout: 'Subscription',
