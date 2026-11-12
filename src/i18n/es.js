@@ -809,6 +809,9 @@ export default {
     planHelp: 'El plan cambia con la suscripción (Asaas). Un cambio hecho aquí vale hasta que el próximo cobro actualice el plan. Toda cuenta nueva empieza en Free.',
     accessYes: 'Accede a la administración (Administrador + Master).',
     accessNo: 'No accede a la administración: solo el rol Administrador con el plan Master accede.',
+    lifetime: 'Master vitalicio (sin cobro)',
+    lifetimeBadge: 'Vitalicio',
+    lifetimeHelp: 'Acceso total para siempre, sin cobro en Asaas. Solo la administración lo concede; no se ofrece en el sistema.',
   },
   about: {
     title: 'Acerca de',
@@ -908,7 +911,7 @@ export default {
     plansNote: 'Cuota mensual por Asaas, pagada con Pix, boleto o tarjeta de crédito. Cancela cuando quieras en tu perfil.',
     unknownPlan: 'Este plan no existe o no se vende por suscripción.',
     seePlans: 'Ver planes',
-    adminNote: 'Las cuentas de administrador ya tienen acceso total, sin suscripción.',
+    adminNote: 'Tu cuenta ya tiene acceso total, sin cobro.',
     unavailable: 'La suscripción en línea no está disponible en este momento.',
     alreadySubscribed: 'Ya estás suscrito al plan {plan}.',
     checkout: 'Suscripción',

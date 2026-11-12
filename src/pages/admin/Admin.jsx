@@ -112,7 +112,7 @@ const hasAdminAccess = (u) => u.role === 'admin' && u.plan === 'master';
 function EditUserModal({ user, isSelf, onClose, onSaved }) {
   const { t } = useI18n();
   const toast = useToast();
-  const [values, setValues] = useState({ role: user.role, plan: user.plan, isActive: user.isActive });
+  const [values, setValues] = useState({ role: user.role, plan: user.plan, isActive: user.isActive, lifetime: Boolean(user.lifetime) });
   const { submit, busy } = useSubmit((body) => adminApi.updateUser(user.id, body), {
     onSuccess: () => {
       toast.success(t('common.saved'));
@@ -145,7 +145,7 @@ function EditUserModal({ user, isSelf, onClose, onSaved }) {
           {ROLES.map((r) => <option key={r} value={r}>{t(`roles.${r}`)}</option>)}
         </select>
         <label className="form-label fw-semibold" htmlFor="u-plan">{t('profile.plan')}</label>
-        <select id="u-plan" className="form-select mb-1" value={values.plan} disabled={isSelf}
+        <select id="u-plan" className="form-select mb-1" value={values.lifetime ? 'master' : values.plan} disabled={isSelf || values.lifetime}
           aria-describedby="u-plan-help" onChange={(e) => setValues((v) => ({ ...v, plan: e.target.value }))}>
           {PLANS.map((p) => <option key={p} value={p}>{t(`plans.${p}`)}</option>)}
         </select>
@@ -154,6 +154,13 @@ function EditUserModal({ user, isSelf, onClose, onSaved }) {
           <i className={`bi ${admin ? 'bi-shield-check' : 'bi-shield-x'} me-1`} aria-hidden="true" />
           {admin ? t('admin.accessYes') : t('admin.accessNo')}
         </p>
+        <div className="form-check form-switch mb-1">
+          <input id="u-lifetime" type="checkbox" className="form-check-input" role="switch" checked={values.lifetime} disabled={isSelf}
+            aria-describedby="u-lifetime-help"
+            onChange={(e) => setValues((v) => ({ ...v, lifetime: e.target.checked, ...(e.target.checked && { plan: 'master' }) }))} />
+          <label className="form-check-label" htmlFor="u-lifetime">{t('admin.lifetime')}</label>
+        </div>
+        <div className="form-text mb-3" id="u-lifetime-help">{t('admin.lifetimeHelp')}</div>
         <div className="form-check form-switch">
           <input id="u-active" type="checkbox" className="form-check-input" role="switch" checked={values.isActive} disabled={isSelf}
             onChange={(e) => setValues((v) => ({ ...v, isActive: e.target.checked }))} />
@@ -238,7 +245,10 @@ export function AdminUsers() {
                         {t(`roles.${u.role}`)}
                         {hasAdminAccess(u) && <span className="badge text-bg-primary ms-1" title={t('admin.accessYes')}>{t('admin.title')}</span>}
                       </td>
-                      <td>{t(`plans.${u.plan}`)}</td>
+                      <td>
+                        {t(`plans.${u.plan}`)}
+                        {u.lifetime && <span className="badge text-bg-dark ms-1" title={t('admin.lifetimeHelp')}>{t('admin.lifetimeBadge')}</span>}
+                      </td>
                       <td>{u.isActive ? <i className="bi bi-check-lg text-success" aria-label={t('common.yes')} /> : <i className="bi bi-x-lg text-danger" aria-label={t('common.no')} />}</td>
                       <td>{formatDate(u.lastLoginAt, locale)}</td>
                       <td className="kt-table-actions">

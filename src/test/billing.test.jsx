@@ -161,4 +161,21 @@ describe('planos, cota do Free, assinatura e compartilhamento', () => {
     const fp = screen.getByRole('link', { name: /Pontos de Função/ });
     expect(within(fp).getByLabelText('Fora do seu plano')).toBeInTheDocument();
   });
+
+  it('administrador concede o Master vitalício (sem cobrança) no painel', async () => {
+    ROUTES['/auth/me'] = { id: 'u1', email: 'ana@ex.com', role: 'admin', plan: 'master', emailVerified: true };
+    ROUTES['/admin/users'] = {
+      data: [{ id: 'u2', email: 'bruno@ex.com', role: 'client', plan: 'free', lifetime: false, isActive: true, emailVerifiedAt: '2026-11-01T10:00:00Z', lastLoginAt: null, createdAt: '2026-11-01T10:00:00Z' }],
+      page: 1, pageSize: 20, total: 1,
+    };
+    renderAt('/admin/users');
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar bruno@ex.com' }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.click(within(dialog).getByLabelText('Master vitalício (sem cobrança)'));
+    expect(within(dialog).getByLabelText('Plano')).toBeDisabled();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+    await waitFor(() =>
+      expect(writes.find((w) => w.path === '/admin/users/u2')?.body).toEqual({ role: 'client', plan: 'master', isActive: true, lifetime: true }),
+    );
+  });
 });
