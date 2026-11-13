@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.13.0 — 2026-11-12
+
+### Alterado
+- CRISP-DM › Fases: as 6 etapas viram um acordeão (Bootstrap). "1. Entendimento do negócio" vem aberta; ao clicar
+  noutra etapa, a aberta fecha e a clicada abre (clicar na aberta fecha). O link de uma etapa na visão geral
+  (`/phases#data_understanding`) abre e rola até ela. O formulário fechado continua montado, então o que foi digitado
+  não se perde, e o cabeçalho mostra um lápis quando há alterações não salvas.
+
 ## 2.12.0 — 2026-11-12
 
 ### Adicionado
