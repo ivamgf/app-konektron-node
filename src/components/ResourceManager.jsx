@@ -20,6 +20,7 @@ import { EmptyState, Loading, Modal } from './ui.jsx';
  * @param {Function} [p.transform] ajusta o corpo antes de enviar (ex.: texto -> número)
  * @param {Function} [p.onChange] chamado após criar/editar/excluir
  * @param {Function} [p.afterCreate] (registro) => void, ex.: abrir o detalhe para enviar o arquivo
+ * @param {Function} [p.actions]  ({ reload }) => botões extras ao lado de "Novo" (ex.: importar CSV)
  */
 export default function ResourceManager({
   path,
@@ -32,6 +33,7 @@ export default function ResourceManager({
   transform = (payload) => payload,
   onChange,
   afterCreate,
+  actions,
 }) {
   const { t } = useI18n();
   const toast = useToast();
@@ -109,10 +111,13 @@ export default function ResourceManager({
             </div>
           ))}
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => open('new')}>
-          <i className="bi bi-plus-lg me-1" aria-hidden="true" />
-          {t('common.new')}
-        </button>
+        <div className="d-flex flex-wrap gap-2">
+          {actions?.({ reload: async () => { await list.reload(); onChange?.(); } })}
+          <button type="button" className="btn btn-primary" onClick={() => open('new')}>
+            <i className="bi bi-plus-lg me-1" aria-hidden="true" />
+            {t('common.new')}
+          </button>
+        </div>
       </div>
 
       {list.loading && !list.data ? (

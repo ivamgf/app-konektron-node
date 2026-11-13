@@ -5,13 +5,86 @@ import ResourceManager from '../../components/ResourceManager.jsx';
 import ExportButtons from '../../components/ExportButtons.jsx';
 import { useToast } from '../../components/Toasts.jsx';
 import { sameValues, SaveButton, saveShortcut, useUnsavedChanges } from '../../components/unsaved.jsx';
-import { EmptyState, Loading } from '../../components/ui.jsx';
+import { EmptyState, Loading, Modal } from '../../components/ui.jsx';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { formatDate, useAsync, useSubmit } from '../../lib/hooks.js';
 import { RequireType, useProject } from './ProjectLayout.jsx';
 import { diagramConfig, requirementConfig, userStoryConfig } from './resources.jsx';
 
 const base = (project) => `/projects/${project.id}/system-analysis`;
+
+// Modelo de projeto: traz análise, requisitos, casos de uso e diagramas prontos (a API não apaga nem duplica)
+function TemplateModal({ project, onClose, onApplied }) {
+  const { t } = useI18n();
+  const toast = useToast();
+  const list = useAsync(() => systemAnalysisApi.templates(project.id), [project.id]);
+  const [chosen, setChosen] = useState('');
+  const templates = list.data ?? [];
+  const key = chosen || templates[0]?.key || '';
+  const current = templates.find((tpl) => tpl.key === key);
+  const { submit, busy } = useSubmit(() => systemAnalysisApi.applyTemplate(project.id, key), {
+    onSuccess: (r) => {
+      const created = { requirements: r.requirements.created, userStories: r.userStories.created, diagrams: r.diagrams.created };
+      const any = r.analysis.filled.length + created.requirements + created.userStories + created.diagrams > 0;
+      toast.success(t(any ? 'sa.template.applied' : 'sa.template.nothing', created));
+      onApplied(r);
+      onClose();
+    },
+  });
+  return (
+    <Modal
+      title={t('sa.template.title')}
+      onClose={onClose}
+      size="modal-lg"
+      footer={
+        <>
+          <button type="button" className="btn btn-outline-secondary" onClick={onClose}>{t('common.cancel')}</button>
+          <button type="button" className="btn btn-primary" disabled={busy || !current} onClick={() => submit()}>
+            <i className="bi bi-magic me-1" aria-hidden="true" />
+            {busy ? t('sa.template.applying') : t('sa.template.apply')}
+          </button>
+        </>
+      }
+    >
+      <p>{t('sa.template.intro')}</p>
+      {list.loading && !list.data ? <Loading small /> : templates.length === 0 ? (
+        <EmptyState>{t('sa.template.none')}</EmptyState>
+      ) : (
+        <fieldset>
+          <legend className="kt-field-label">{t('sa.template.choose')}</legend>
+          {templates.map((tpl) => (
+            <div className="form-check mb-3" key={tpl.key}>
+              <input className="form-check-input" type="radio" name="kt-template" id={`kt-template-${tpl.key}`}
+                value={tpl.key} checked={tpl.key === key} onChange={() => setChosen(tpl.key)} />
+              <label className="form-check-label" htmlFor={`kt-template-${tpl.key}`}>
+                <strong>{tpl.name}</strong>
+                <span className="d-block small text-body-secondary">{tpl.description}</span>
+                <span className="d-block small">{t('sa.template.counts', tpl.counts)}</span>
+              </label>
+            </div>
+          ))}
+        </fieldset>
+      )}
+      <p className="small text-body-secondary mb-0">
+        <i className="bi bi-info-circle me-1" aria-hidden="true" />{t('sa.template.keep')}
+      </p>
+    </Modal>
+  );
+}
+
+export function TemplateButton({ onApplied }) {
+  const { t } = useI18n();
+  const { project } = useProject();
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => setOpen(true)} aria-haspopup="dialog">
+        <i className="bi bi-file-earmark-text me-1" aria-hidden="true" />{t('sa.template.button')}
+      </button>
+      {open && <TemplateModal project={project} onClose={() => setOpen(false)} onApplied={onApplied} />}
+    </>
+  );
+}
 
 function CountTable({ title, counts, enumName }) {
   const { t } = useI18n();
@@ -48,6 +121,9 @@ function Overview() {
   const { analysis, counts } = data.data;
   return (
     <>
+      <div className="d-flex justify-content-end mb-3 kt-no-print">
+        <TemplateButton onApplied={data.reload} />
+      </div>
       <div className="row g-3 mb-4">
         {[
           ['requirements', counts.requirements.total, 'list-check'],
@@ -109,7 +185,16 @@ function Analysis() {
   const { project } = useProject();
   const data = useAsync(() => systemAnalysisApi.analysis(project.id), [project.id]);
   if (data.loading && !data.data) return <Loading small />;
-  return data.data ? <AnalysisForm initial={data.data} projectId={project.id} /> : null;
+  if (!data.data) return null;
+  return (
+    <>
+      <div className="d-flex justify-content-end mb-3 kt-no-print">
+        <TemplateButton onApplied={data.reload} />
+      </div>
+      {/* o modelo preenche campos vazios: a chave refaz o formulário com o que veio da API */}
+      <AnalysisForm key={data.data.updatedAt ?? 'new'} initial={data.data} projectId={project.id} />
+    </>
+  );
 }
 
 function Requirements() {

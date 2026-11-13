@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.12.0 — 2026-11-12
+
+### Adicionado
+- CRISP-DM › Datasets (requer a API 5.7.0): botão **Importar CSV** para cadastrar de uma vez a lista de datasets do
+  projeto, uma linha por dataset. O arquivo é lido no navegador (separador `;`, `,` ou tabulação, aspas e BOM do
+  Excel), com cabeçalhos aceitos em português, inglês ou espanhol, números como `48.000` e datas `31/01/2026`. Mostra a
+  prévia e as colunas ignoradas, oferece um modelo CSV para baixar e, se a API recusar alguma linha, aponta a linha do
+  arquivo com o erro. `ResourceManager` ganhou a prop `actions` para botões extras ao lado de "Novo".
+
+## 2.11.0 — 2026-11-12
+
+### Adicionado
+- Análise de Sistemas (requer a API 5.6.0): botão **Usar modelo** na visão geral e na aba Análise, que abre a escolha
+  do modelo e aplica ao projeto o conteúdo pronto da ERS "Cadastro, Autenticação e Perfil de Usuário" — textos da
+  análise, 50 requisitos, 10 casos de uso e 14 diagramas. Nada é apagado nem duplicado; o formulário da análise
+  recarrega com os textos aplicados. Traduções em pt-BR, en e es.
+
 ## 2.10.0 — 2026-11-12
 
 ### Alterado
