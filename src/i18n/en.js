@@ -64,6 +64,7 @@ export default {
     projects: 'Projects',
     engineering: 'Engineering',
     terms: 'Terms',
+    faq: 'FAQ',
     docs: 'Docs',
     contacts: 'Contacts',
     profile: 'Profile',
@@ -877,6 +878,8 @@ export default {
     another: 'Send another message',
     or: 'Prefer your e-mail app?',
   },
+  help: { title: 'Learn how to use KoneKtron', lead: 'Download the PDF tutorial with the illustrated step-by-step guide — from sign-up to the final report (in Portuguese) — or check the frequently asked questions.', tutorial: 'Download tutorial (PDF)' },
+  faq: { title: 'Frequently asked questions', lead: 'Quick answers to the most common questions about your account, projects, plans and AI.', footer: 'KoneKtron · Help', search: 'Search the questions', searchPlaceholder: 'E.g.: password, report, cancel', noResults: 'No question found. Try other words or contact us.', moreTitle: 'Still have questions?', moreText: 'See the full PDF tutorial or send a message to the team.' },
   theme: { dark: 'Dark theme', light: 'Light theme', toDark: 'Switch to the dark theme', toLight: 'Switch to the light theme' },
   terms: { title: 'Terms of Use' },
   a11y: {

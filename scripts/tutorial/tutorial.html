@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Tutorial do KoneKtron</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  @page :first { margin: 0; }
+  :root { --blue: #0a8cc2; --navy: #0b3d5c; --orange: #ff7a00; --ink: #1d2733; --muted: #5b6b7a; --soft: #eef7fc; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Inter, Arial, sans-serif; color: var(--ink); font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { color: var(--navy); line-height: 1.2; }
+  h2 { font-size: 19pt; margin: 0 0 4mm; padding-bottom: 2mm; border-bottom: 2.5px solid var(--orange); break-after: avoid; }
+  h3 { font-size: 12.5pt; margin: 6mm 0 2mm; break-after: avoid; }
+  p { margin: 0 0 2.6mm; }
+  ol, ul { margin: 0 0 3mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; }
+  b, strong { color: var(--navy); }
+  .ui { font-weight: 600; color: var(--blue); white-space: nowrap; }
+  section.chapter { break-before: page; }
+  .num { display: inline-block; background: var(--orange); color: #fff; border-radius: 6px; padding: 0 2.4mm; margin-right: 2mm; font-size: 14pt; }
+  figure { margin: 3mm 0 4mm; break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; max-height: 100mm; border: 1px solid #b9cfdc; border-radius: 6px; }
+  figure.small img { max-height: 80mm; }
+  figcaption { font-size: 8.8pt; color: var(--muted); margin-top: 1.5mm; }
+  .tip { background: var(--soft); border-left: 4px solid var(--blue); border-radius: 4px; padding: 2.5mm 4mm; margin: 3mm 0; break-inside: avoid; }
+  .tip.warn { border-left-color: var(--orange); background: #fff4ea; }
+  .tip b { color: var(--blue); }
+  .tip.warn b { color: #b85400; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 4mm; font-size: 9.6pt; break-inside: avoid; }
+  th { background: var(--navy); color: #fff; text-align: left; padding: 2mm 3mm; }
+  td { border-bottom: 1px solid #d7e4ec; padding: 1.8mm 3mm; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6fafc; }
+  /* capa */
+  .cover { height: 297mm; display: flex; flex-direction: column; justify-content: space-between; padding: 26mm 22mm 20mm;
+    background: linear-gradient(135deg, #0a8cc2 0%, #0b5f8a 55%, #0b3d5c 100%); color: #fff; position: relative; overflow: hidden; }
+  .cover::after { content: ''; position: absolute; right: -40mm; bottom: -30mm; width: 150mm; height: 150mm; background: var(--orange); transform: rotate(28deg); opacity: .9; }
+  .cover .top { position: relative; z-index: 1; }
+  .cover .brand { display: flex; align-items: center; gap: 4mm; font-size: 15pt; font-weight: 700; letter-spacing: .5px; }
+  .cover .brand img { width: 18mm; height: 18mm; background: #fff; border-radius: 4mm; padding: 1.5mm; }
+  .cover h1 { color: #fff; font-size: 38pt; margin: 34mm 0 6mm; }
+  .cover .lead { font-size: 14pt; max-width: 130mm; opacity: .95; }
+  .cover .meta { position: relative; z-index: 1; font-size: 10pt; opacity: .9; }
+  /* sumário */
+  .toc ol { list-style: none; padding: 0; counter-reset: c; }
+  .toc li { display: flex; gap: 3mm; padding: 2.2mm 0; border-bottom: 1px dashed #c9dbe6; font-size: 11pt; }
+  .toc li span:first-child { color: var(--orange); font-weight: 700; width: 8mm; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; align-items: start; }
+  .two figure { margin-top: 0; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="top">
+    <div class="brand"><img src="{{brand}}" alt=""> KoneKtron</div>
+    <h1>Tutorial do usuário</h1>
+    <p class="lead">Passo a passo para documentar projetos de software e de análise de dados no KoneKtron — do cadastro ao relatório final.</p>
+  </div>
+  <div class="meta">Engineering &amp; Design · OrkneyTech<br>Versão {{version}} · {{date}}</div>
+</div>
+
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol>
+    <li><span>1</span> Conhecendo o KoneKtron</li>
+    <li><span>2</span> Criar conta e entrar</li>
+    <li><span>3</span> Menu, idioma, tema e acessibilidade</li>
+    <li><span>4</span> Criar um projeto</li>
+    <li><span>5</span> Navegar pelo projeto</li>
+    <li><span>6</span> Análise de Sistemas: análise, modelos, requisitos e diagramas</li>
+    <li><span>7</span> Escrever com ajuda da IA</li>
+    <li><span>8</span> Organizar tarefas no Kanban</li>
+    <li><span>9</span> Compartilhar o projeto com a equipe</li>
+    <li><span>10</span> Gerar o relatório</li>
+    <li><span>11</span> Planos e assinatura</li>
+    <li><span>12</span> Dicas e onde encontrar ajuda</li>
+  </ol>
+  <div class="tip"><b>Como usar este tutorial.</b> Os capítulos seguem a ordem natural de uso. Os nomes de botões e menus aparecem <span class="ui">assim</span>, exatamente como na tela. As imagens usam um projeto de exemplo, "Agendamento Online".</div>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">1</span>Conhecendo o KoneKtron</h2>
+  <p>O KoneKtron é um sistema on-line para documentar projetos de engenharia em um só lugar. Cada projeto reúne as <b>seções de engenharia</b> que você precisa e, ao final, gera um relatório pronto para entregar.</p>
+  <table>
+    <tr><th style="width:32%">Seção</th><th>Para que serve</th></tr>
+    <tr><td>Análise de Sistemas</td><td>Objetivo, escopo, requisitos funcionais e não funcionais, regras de negócio, histórias de usuário e diagramas.</td></tr>
+    <tr><td>Pontos de Função</td><td>Contagem IFPUG, total de PF e estimativa de esforço e custo.</td></tr>
+    <tr><td>CRISP-DM</td><td>As seis fases da ciência de dados: objetivos, datasets, preparação, modelos e métricas.</td></tr>
+    <tr><td>BPM</td><td>Arquitetura de processos, SIPOC, diagnóstico e diagramas BPMN (AS IS / TO BE).</td></tr>
+    <tr><td>Ontologias e CommonKADS</td><td>Catálogo de ontologias e planilhas dos modelos de conhecimento.</td></tr>
+    <tr><td>Diagnóstico de dados</td><td>Inventário de bases, diagnóstico das fontes e plano de implantação.</td></tr>
+    <tr><td>Scrum e Kanban</td><td>Backlog, sprints, eventos e o quadro de tarefas da equipe.</td></tr>
+  </table>
+  <p>O uso segue três passos: <b>crie um projeto</b>, <b>documente e organize</b> nas seções e <b>gere o relatório</b>. As seções disponíveis dependem do seu plano (capítulo 11).</p>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">2</span>Criar conta e entrar</h2>
+  <h3>Cadastro</h3>
+  <ol>
+    <li>Na página inicial, clique em <span class="ui">Criar conta grátis</span>.</li>
+    <li>Informe seu e-mail e uma senha com no mínimo 8 caracteres, repita a senha e marque <span class="ui">Aceito os termos de uso</span>.</li>
+    <li>Clique em <span class="ui">Cadastrar</span> e abra o link de confirmação enviado ao seu e-mail.</li>
+  </ol>
+  <div class="tip"><b>Não recebeu o e-mail?</b> Confira o spam. Se o link expirou, abra-o mesmo assim e clique em <span class="ui">Enviar novo link</span>.</div>
+  <figure class="small"><img src="{{img:cadastro}}" alt=""><figcaption>Tela de cadastro. Também é possível criar a conta com o Google.</figcaption></figure>
+  <h3>Entrar</h3>
+  <p>Clique em <span class="ui">Entrar</span>, informe e-mail e senha (ou use o botão do Google). Se esqueceu a senha, use <span class="ui">Esqueceu a senha</span> e siga o link enviado por e-mail.</p>
+  <figure class="small"><img src="{{img:entrar}}" alt=""><figcaption>Tela de entrada.</figcaption></figure>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">3</span>Menu, idioma, tema e acessibilidade</h2>
+  <p>O botão <span class="ui">Menu</span>, no canto superior direito, dá acesso a tudo: seus projetos, as seções de engenharia, os planos, o seu perfil e a ajuda (Sobre, Perguntas frequentes, Contatos e Termos).</p>
+  <figure><img src="{{img:menu}}" alt=""><figcaption>Menu lateral. Na parte de baixo ficam o tema (claro/escuro) e o idioma (PT, EN, ES).</figcaption></figure>
+  <ul>
+    <li><b>Idioma:</b> português, inglês ou espanhol, no rodapé do menu ou no seletor <span class="ui">PT</span> do topo.</li>
+    <li><b>Tema:</b> claro ou escuro, no rodapé do menu.</li>
+    <li><b>Acessibilidade:</b> o botão redondo no canto inferior esquerdo oferece alto contraste, fonte legível, guia de leitura, cursor grande e outros ajustes; o botão azul à direita abre a tradução em Libras.</li>
+    <li><b>Navegação:</b> a trilha no topo (ex.: Início / Projetos / Agendamento Online) e o botão <span class="ui">Voltar</span> levam de volta às telas anteriores.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">4</span>Criar um projeto</h2>
+  <p>Em <span class="ui">Meus projetos</span> você vê seus projetos e os compartilhados com você, com filtros por tipo e por dono.</p>
+  <figure class="small"><img src="{{img:projetos}}" alt=""><figcaption>Lista de projetos.</figcaption></figure>
+  <ol>
+    <li>Clique em <span class="ui">Novo projeto</span>.</li>
+    <li>Dê um nome, escolha o <b>tipo</b> e, se quiser, uma descrição e a versão.</li>
+    <li>Clique em <span class="ui">Criar</span>.</li>
+  </ol>
+  <div class="tip warn"><b>Escolha bem o tipo:</b> ele não pode ser alterado depois. <b>Software</b> libera Análise de Sistemas e Pontos de Função; <b>Análise de dados</b> libera o CRISP-DM. As demais seções funcionam nos dois tipos.</div>
+  <figure class="small"><img src="{{img:novo-projeto}}" alt=""><figcaption>Criação de projeto.</figcaption></figure>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">5</span>Navegar pelo projeto</h2>
+  <p>Ao abrir um projeto, as abas logo abaixo do nome levam a cada seção. A <span class="ui">Visão geral</span> mostra o andamento da documentação.</p>
+  <figure><img src="{{img:visao-geral}}" alt=""><figcaption>Visão geral do projeto.</figcaption></figure>
+  <p>Os três botões no cabeçalho do projeto são, da esquerda para a direita:</p>
+  <ul>
+    <li><b>Compartilhar</b> (ícone de pessoas) — convida outras contas (capítulo 9);</li>
+    <li><b>Configurações</b> (engrenagem) — altera nome, descrição e versão;</li>
+    <li><b>Excluir</b> (lixeira) — apaga o projeto, sem possibilidade de desfazer.</li>
+  </ul>
+  <div class="tip"><b>Salvar:</b> cada formulário tem o botão <span class="ui">Salvar</span>; o atalho <b>Ctrl+S</b> também funciona. Se você tentar sair com alterações não salvas, o sistema avisa.</div>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">6</span>Análise de Sistemas</h2>
+  <h3>Análise</h3>
+  <p>A aba <span class="ui">Análise</span> reúne os textos principais do documento: <b>objetivo</b>, <b>escopo</b>, <b>descrição técnica</b> e <b>observações</b>. Preencha cada campo e clique em <span class="ui">Salvar</span>.</p>
+  <figure><img src="{{img:analise}}" alt=""><figcaption>Aba Análise, com o botão Usar modelo e os botões de IA ao lado dos campos.</figcaption></figure>
+  <h3>Começar a partir de um modelo</h3>
+  <p>Para não começar do zero, clique em <span class="ui">Usar modelo</span>, escolha uma Especificação de Requisitos de Software (ERS) pronta e clique em <span class="ui">Aplicar modelo</span>. Há modelos para <b>sistema web</b>, <b>app mobile</b> e <b>app desktop</b> (com ou sem internet).</p>
+  <figure class="small"><img src="{{img:usar-modelo}}" alt=""><figcaption>Escolha do modelo, com a quantidade de requisitos, casos de uso e diagramas de cada um.</figcaption></figure>
+  <div class="tip"><b>Nada é apagado.</b> O modelo só preenche os campos vazios e cria os itens que ainda não existem. Depois, adapte os textos entre colchetes, como [Nome] e [SIGLA], ao seu projeto.</div>
+
+  <h3>Requisitos e histórias de usuário</h3>
+  <p>Na aba <span class="ui">Requisitos</span>, cadastre cada requisito com código (ex.: RF01), título, tipo (funcional, não funcional, de domínio ou regra de negócio), prioridade (MoSCoW) e situação. Use os filtros para encontrar requisitos rapidamente.</p>
+  <figure><img src="{{img:requisitos}}" alt=""><figcaption>Lista de requisitos com filtros.</figcaption></figure>
+  <p>Na aba <span class="ui">Histórias de usuário</span>, escreva "Como… quero… para…", os critérios de aceitação, os pontos e o requisito relacionado, garantindo a rastreabilidade.</p>
+
+  <h3>Diagramas</h3>
+  <p>Na aba <span class="ui">Diagramas</span>, registre diagramas de casos de uso, classes, sequência, atividades, componentes, MER e outros. Você pode colar o código-fonte (Mermaid ou PlantUML) ou informar o link de uma imagem.</p>
+  <figure><img src="{{img:diagramas}}" alt=""><figcaption>Diagramas do projeto.</figcaption></figure>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">7</span>Escrever com ajuda da IA</h2>
+  <p>Ao lado dos campos de texto há o botão <span class="ui">IA</span>. Ele pode <b>gerar</b>, <b>melhorar</b>, <b>resumir</b> ou <b>traduzir</b> o conteúdo do campo, levando em conta o projeto.</p>
+  <div class="two">
+    <figure><img src="{{img:ia}}" alt=""><figcaption>Janela da IA.</figcaption></figure>
+    <div>
+      <ol>
+        <li>Clique em <span class="ui">IA</span> ao lado do campo.</li>
+        <li>Escolha o que fazer e, se quiser, um pedido adicional (ex.: "em tópicos").</li>
+        <li><b>Com conta de IA conectada:</b> clique em <span class="ui">Gerar com minha conta</span>.<br><b>Sem conta:</b> clique em <span class="ui">Copiar pedido e abrir</span>, cole no ChatGPT, Claude, Gemini ou Copilot e traga a resposta para o campo <span class="ui">Resultado</span>.</li>
+        <li>Revise e use <span class="ui">Acrescentar ao texto</span> ou <span class="ui">Substituir o texto</span>. Depois, salve.</li>
+      </ol>
+    </div>
+  </div>
+  <h3>Conectar a sua conta de IA</h3>
+  <p>Em <span class="ui">Perfil</span> › aba <span class="ui">IA</span>, escolha o provedor (Claude, GPT, Gemini, OpenRouter ou Ollama), informe a chave de API e clique em <span class="ui">Testar conexão</span>.</p>
+  <figure class="small"><img src="{{img:perfil-ia}}" alt=""><figcaption>Configuração do assistente de IA no Perfil.</figcaption></figure>
+  <div class="tip warn"><b>Privacidade e custo:</b> a chave fica só no seu navegador e vai direto ao provedor, nunca ao servidor do KoneKtron; o custo fica na sua conta de IA. Em computadores compartilhados, não marque "Lembrar neste navegador". A IA pode errar: revise sempre.</div>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">8</span>Organizar tarefas no Kanban</h2>
+  <p>A aba <span class="ui">Kanban</span> existe em todos os projetos. Num quadro novo, clique em <span class="ui">Criar colunas padrão</span> (A fazer, Em andamento, Concluído) ou crie as suas com <span class="ui">Nova coluna</span>.</p>
+  <figure><img src="{{img:kanban}}" alt=""><figcaption>Quadro Kanban com prioridade, prazo e responsável em cada cartão.</figcaption></figure>
+  <ul>
+    <li><span class="ui">Adicionar cartão</span> cria uma tarefa com título, descrição, prioridade, prazo e responsável.</li>
+    <li>Arraste os cartões entre as colunas ou use as setas ← → de cada cartão.</li>
+    <li>O <b>limite WIP</b> (ex.: 2 / 3) avisa quando há trabalho demais em andamento numa coluna.</li>
+    <li>Cartões com prazo vencido aparecem como <b>Atrasado</b>.</li>
+  </ul>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">9</span>Compartilhar o projeto com a equipe</h2>
+  <p>O dono do projeto clica no botão <b>Compartilhar</b> (ícone de pessoas, no cabeçalho do projeto), informa o e-mail da conta da outra pessoa, escolhe o acesso e clica em <span class="ui">Convidar</span>.</p>
+  <figure class="small"><img src="{{img:compartilhar}}" alt=""><figcaption>Compartilhamento: projeto inteiro ou só o Kanban.</figcaption></figure>
+  <ul>
+    <li><b>Projeto inteiro:</b> a pessoa vê e edita as seções do projeto.</li>
+    <li><b>Só o Kanban:</b> a pessoa acessa apenas o quadro de tarefas.</li>
+    <li>Cada participante usa as seções do próprio plano que também estão no plano do dono.</li>
+    <li>Só o dono altera as configurações, exclui ou compartilha o projeto. Quem participa pode usar <span class="ui">Sair do projeto</span>.</li>
+  </ul>
+  <div class="tip"><b>Importante:</b> a pessoa convidada precisa ter uma conta no KoneKtron com o e-mail informado.</div>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">10</span>Gerar o relatório</h2>
+  <p>A aba <span class="ui">Relatório</span> monta automaticamente a documentação do projeto com tudo o que foi cadastrado. Use os botões do topo para exportar:</p>
+  <figure><img src="{{img:relatorio}}" alt=""><figcaption>Relatório de Análise de Sistemas com as opções de exportação.</figcaption></figure>
+  <table>
+    <tr><th style="width:22%">Botão</th><th>Resultado</th></tr>
+    <tr><td><span class="ui">Imprimir</span></td><td>Abre a impressão do navegador (também permite "Salvar como PDF").</td></tr>
+    <tr><td><span class="ui">PDF</span></td><td>Baixa o relatório pronto em PDF.</td></tr>
+    <tr><td><span class="ui">Word</span></td><td>Baixa um arquivo DOCX editável.</td></tr>
+    <tr><td><span class="ui">CSV</span></td><td>Baixa as tabelas (requisitos, histórias etc.) para planilhas.</td></tr>
+  </table>
+  <p>Em projetos de análise de dados, o relatório reúne as fases do CRISP-DM. As seções CommonKADS e Diagnóstico de dados também oferecem a exportação (PDF, Word e CSV) nas próprias telas.</p>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">11</span>Planos e assinatura</h2>
+  <p>A página <span class="ui">Planos</span> compara o que cada plano inclui e mostra os valores atualizados.</p>
+  <figure><img src="{{img:planos}}" alt=""><figcaption>Planos Free, Standard e Master.</figcaption></figure>
+  <table>
+    <tr><th style="width:18%">Plano</th><th>O que inclui</th></tr>
+    <tr><td>Free</td><td>Análise de Sistemas, Scrum e Kanban, IA e compartilhamento. Até 3 projetos; projetos sem uso por 3 meses são excluídos (abrir o projeto renova o prazo).</td></tr>
+    <tr><td>Standard</td><td>Tudo do Free, mais BPM e Pontos de Função, com projetos ilimitados.</td></tr>
+    <tr><td>Master</td><td>Todas as seções, inclusive CRISP-DM, Ontologias, CommonKADS e Diagnóstico de dados.</td></tr>
+  </table>
+  <h3>Assinar, pagar e cancelar</h3>
+  <ol>
+    <li>Clique em <span class="ui">Assinar</span> no plano desejado, informe o CPF ou CNPJ do pagador, aceite os termos e clique em <span class="ui">Gerar fatura</span>.</li>
+    <li>Pague pela página segura do Asaas, com Pix, boleto ou cartão. Pix e cartão costumam ser confirmados na hora; boleto, em até 3 dias úteis.</li>
+    <li>Acompanhe em <span class="ui">Perfil</span> › <span class="ui">Assinatura</span>: situação, faturas, troca de plano e cancelamento.</li>
+  </ol>
+  <figure class="small"><img src="{{img:perfil-assinatura}}" alt=""><figcaption>Aba Assinatura do Perfil.</figcaption></figure>
+  <div class="tip"><b>Direito de arrependimento:</b> cancelando em até 7 dias do primeiro pagamento, você recebe o valor integral. Depois disso, a cobrança para e o plano continua até o fim do mês pago. Seus projetos continuam salvos.</div>
+</section>
+
+<section class="chapter">
+  <h2><span class="num">12</span>Dicas e onde encontrar ajuda</h2>
+  <h3>Boas práticas</h3>
+  <ul>
+    <li>Use códigos padronizados (RF01, RNF01, UC01) para manter a rastreabilidade entre requisitos, histórias e diagramas.</li>
+    <li>Comece pelos modelos prontos e adapte; é mais rápido do que escrever do zero.</li>
+    <li>Revise sempre o texto gerado por IA antes de salvar.</li>
+    <li>Atualize a versão do projeto (em Configurações) a cada entrega relevante e gere o relatório da versão.</li>
+    <li>No plano Free, abra seus projetos ao menos uma vez a cada 3 meses para que não sejam excluídos.</li>
+  </ul>
+  <h3>Sua conta</h3>
+  <ul>
+    <li><span class="ui">Perfil</span> › <span class="ui">Dados pessoais</span>: nome, apelido, empresa, idioma e outros dados.</li>
+    <li><span class="ui">Perfil</span> › <span class="ui">Segurança</span>: alterar ou definir senha, sair de todos os dispositivos e excluir a conta.</li>
+  </ul>
+  <h3>Precisa de ajuda?</h3>
+  <ul>
+    <li><b>Perguntas frequentes:</b> menu › <span class="ui">Perguntas frequentes</span>, com busca por palavra-chave.</li>
+    <li><b>Contatos:</b> menu › <span class="ui">Contatos</span>, formulário que chega direto à equipe.</li>
+    <li><b>E-mail:</b> konektron@orkneytech-lab.com · <b>Site:</b> www.orkneytech-lab.com</li>
+  </ul>
+  <div class="tip"><b>Bom trabalho!</b> Do primeiro requisito ao relatório final, o KoneKtron mantém toda a documentação do seu projeto organizada em um só lugar.</div>
+</section>
+
+</body>
+</html>

@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/AuthProvider.jsx';
 import { CONTACT_EMAIL, SITE_URL } from '../../components/Layout.jsx';
 import { SaveButton, useUnsavedChanges } from '../../components/unsaved.jsx';
 import { BrandMark, ContentCard, Panel, ThemeToggle } from '../../components/ui.jsx';
+import { FAQ } from '../../content/faq.js';
 import { TERMS } from '../../content/terms.js';
 import { useI18n } from '../../i18n/I18nProvider.jsx';
 import { useSubmit } from '../../lib/hooks.js';
@@ -110,6 +111,20 @@ export function Home() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section className="kt-home-band kt-home-help" aria-labelledby="kt-home-help">
+        <div className="container-xl px-3">
+          <div className="kt-contact-card d-flex flex-wrap align-items-center justify-content-between gap-4">
+            <div style={{ maxWidth: 680 }}>
+              <h2 className="kt-home-heading mb-2" id="kt-home-help">
+                <i className="bi bi-mortarboard me-2" aria-hidden="true" />{t('help.title')}
+              </h2>
+              <p className="mb-0">{t('help.lead')}</p>
+            </div>
+            <HelpLinks />
+          </div>
         </div>
       </section>
 
@@ -339,6 +354,100 @@ export function Terms() {
           </button>
         </div>
       </Panel>
+    </div>
+  );
+}
+
+// Tutorial em PDF (public/docs), gerado por scripts/tutorial/build.mjs
+export const TUTORIAL_URL = '/docs/tutorial-konektron.pdf';
+
+// Botões "Baixar tutorial (PDF)" e "Perguntas frequentes", usados na página inicial e no FAQ
+function HelpLinks({ faq = true, light = false }) {
+  const { t } = useI18n();
+  return (
+    <div className="d-flex flex-wrap gap-3">
+      <a href={TUTORIAL_URL} download className={`btn ${light ? 'btn-light' : 'btn-primary'} fw-semibold`}>
+        <i className="bi bi-file-earmark-pdf me-1" aria-hidden="true" />{t('help.tutorial')}
+      </a>
+      {faq && (
+        <Link to="/faq" className={`btn ${light ? 'btn-outline-light' : 'btn-outline-primary'}`}>
+          <i className="bi bi-question-circle me-1" aria-hidden="true" />{t('nav.faq')}
+        </Link>
+      )}
+    </div>
+  );
+}
+
+// Busca sem acento e sem diferenciar maiúsculas
+const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+export function Faq() {
+  const { t, locale } = useI18n();
+  const groups = FAQ[locale] ?? FAQ['pt-BR'];
+  const fill = (text) => text.replaceAll('{limit}', FREE_PROJECT_LIMIT).replaceAll('{months}', FREE_INACTIVE_MONTHS);
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(() => new Set(['0-0']));
+  const baseId = useId();
+  const q = fold(query.trim());
+  const visible = groups
+    .map((g, gi) => ({
+      ...g,
+      items: g.items.map(([question, answer], i) => ({ id: `${gi}-${i}`, question, answer: fill(answer) }))
+        .filter((it) => !q || fold(`${it.question} ${it.answer}`).includes(q)),
+    }))
+    .filter((g) => g.items.length);
+  const toggle = (id) => setOpen((s) => {
+    const next = new Set(s);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+
+  return (
+    <div className="container-xl px-3 mt-3" style={{ maxWidth: 1232 }}>
+      <ContentCard icon="question-circle" title={t('faq.title')} as="h1" footer={t('faq.footer')}>
+        <p className="mb-3">{t('faq.lead')}</p>
+        <div className="mb-4" style={{ maxWidth: 480 }}>
+          <label className="form-label fw-semibold" htmlFor={`${baseId}-q`}>{t('faq.search')}</label>
+          <input id={`${baseId}-q`} type="search" className="form-control" value={query}
+            placeholder={t('faq.searchPlaceholder')} onChange={(e) => setQuery(e.target.value)} />
+        </div>
+        {visible.length === 0 && <p role="status">{t('faq.noResults')}</p>}
+        {visible.map((g) => (
+          <section key={g.group} className="mb-4" aria-label={g.group}>
+            <h2 className="h3 mb-3">{g.group}</h2>
+            <div className="accordion kt-terms">
+              {g.items.map((it) => {
+                const isOpen = Boolean(q) || open.has(it.id);
+                const headId = `${baseId}-h${it.id}`;
+                const bodyId = `${baseId}-b${it.id}`;
+                return (
+                  <div className="accordion-item" key={it.id}>
+                    <h3 className="accordion-header" id={headId}>
+                      <button type="button" className={`accordion-button ${isOpen ? '' : 'collapsed'}`}
+                        aria-expanded={isOpen} aria-controls={bodyId} onClick={() => toggle(it.id)}>
+                        {it.question}
+                      </button>
+                    </h3>
+                    <div id={bodyId} className={`accordion-collapse collapse ${isOpen ? 'show' : ''}`} role="region" aria-labelledby={headId}>
+                      <div className="accordion-body">{it.answer}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+        <div className="kt-contact-card mt-4">
+          <h2 className="h3 mb-2">{t('faq.moreTitle')}</h2>
+          <p className="mb-3">{t('faq.moreText')}</p>
+          <div className="d-flex flex-wrap gap-3">
+            <HelpLinks faq={false} />
+            <Link to="/contacts" className="btn btn-outline-primary">
+              <i className="bi bi-chat-dots me-1" aria-hidden="true" />{t('nav.contacts')}
+            </Link>
+          </div>
+        </div>
+      </ContentCard>
     </div>
   );
 }
