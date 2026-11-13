@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.14.0 — 2026-11-13
+
+### Adicionado
+- **Tutorial do usuário em PDF** (`public/docs/tutorial-konektron.pdf`, 18 páginas com capturas do sistema): conta,
+  menu e acessibilidade, projetos, Análise de Sistemas e modelos prontos, IA, Kanban, compartilhamento, relatório,
+  planos e assinatura. Baixado pela nova seção **"Aprenda a usar o KoneKtron"** da página inicial e pelo FAQ.
+  O roteiro para regenerá-lo (capturas e build com o Chrome) está em `scripts/tutorial/`.
+- **Perguntas frequentes** (`/faq`, também no menu em "Ajuda e informações"): 20 perguntas em 5 grupos (primeiros
+  passos, projetos e seções, planos e pagamento, IA, conta e segurança), em português, inglês e espanhol, com busca
+  que ignora acentos. As regras do Free (limite de projetos e meses sem uso) vêm das mesmas constantes do app.
+
+### Alterado
+- ESLint passa a verificar também arquivos `.mjs`.
+
 ## 2.13.0 — 2026-11-12
 
 ### Alterado

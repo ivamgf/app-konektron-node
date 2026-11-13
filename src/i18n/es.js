@@ -64,6 +64,7 @@ export default {
     projects: 'Proyectos',
     engineering: 'Ingeniería',
     terms: 'Términos',
+    faq: 'Preguntas frecuentes',
     docs: 'Docs',
     contacts: 'Contacto',
     profile: 'Perfil',
@@ -877,6 +878,8 @@ export default {
     another: 'Enviar otro mensaje',
     or: '¿Prefieres tu programa de correo?',
   },
+  help: { title: 'Aprende a usar KoneKtron', lead: 'Descarga el tutorial en PDF con la guía paso a paso ilustrada — del registro al informe final (en portugués) — o consulta las preguntas frecuentes.', tutorial: 'Descargar tutorial (PDF)' },
+  faq: { title: 'Preguntas frecuentes', lead: 'Respuestas rápidas a las dudas más comunes sobre la cuenta, los proyectos, los planes y la IA.', footer: 'KoneKtron · Ayuda', search: 'Buscar en las preguntas', searchPlaceholder: 'Ej.: contraseña, informe, cancelar', noResults: 'No se encontró ninguna pregunta. Prueba otras palabras o escríbenos.', moreTitle: '¿Todavía tienes dudas?', moreText: 'Mira el tutorial completo en PDF o envía un mensaje al equipo.' },
   theme: { dark: 'Tema oscuro', light: 'Tema claro', toDark: 'Cambiar al tema oscuro', toLight: 'Cambiar al tema claro' },
   terms: { title: 'Términos de Uso' },
   a11y: {

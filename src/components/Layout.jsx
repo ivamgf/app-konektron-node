@@ -205,6 +205,7 @@ function SideMenu({ open, onClose }) {
           ])}
           {group('help', [
             item('/about', 'info-circle', 'nav.about'),
+            item('/faq', 'question-circle', 'nav.faq'),
             item('/contacts', 'chat-dots', 'nav.contacts'),
             item('/terms', 'file-earmark-text', 'nav.terms'),
             item(API_DOCS_URL, 'code-slash', 'nav.apiDocs', { external: true }),

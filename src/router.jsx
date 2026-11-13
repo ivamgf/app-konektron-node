@@ -24,7 +24,7 @@ import {
   ScrumArtifacts, ScrumBacklog, ScrumEvents, ScrumLayout, ScrumOverview, ScrumProject, ScrumSprintDetail, ScrumSprints,
 } from './pages/projects/Scrum.jsx';
 import { SaAnalysis, SaDiagrams, SaOverview, SaReport, SaRequirements, SaUserStories } from './pages/projects/SystemAnalysis.jsx';
-import { About, Contacts, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
+import { About, Contacts, Faq, Home, NotFound, Terms } from './pages/public/PublicPages.jsx';
 
 // Visão geral conforme o tipo do projeto
 function ProjectOverview() {
@@ -56,6 +56,7 @@ export const routes = [
       { path: 'about', element: <About />, handle: crumb('nav.about') },
       { path: 'contacts', element: <Contacts />, handle: crumb('nav.contacts') },
       { path: 'terms', element: <Terms />, handle: crumb('nav.terms') },
+      { path: 'faq', element: <Faq />, handle: crumb('nav.faq') },
       { path: 'engineering', element: <Engineering />, handle: crumb('nav.engineering') },
       { path: 'plans', element: <Plans />, handle: crumb('nav.plans') },
       { path: 'verify-email', element: <VerifyEmail />, handle: crumb('auth.verifyTitle') },
