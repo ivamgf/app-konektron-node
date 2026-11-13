@@ -4,6 +4,7 @@ import { crispdmApi, resourceApi } from '../../api/endpoints.js';
 import { AiButton } from '../../components/AiAssist.jsx';
 import { enumOptions } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
+import DatasetCsvImport from '../../components/DatasetCsvImport.jsx';
 import ResourceManager from '../../components/ResourceManager.jsx';
 import ExportButtons from '../../components/ExportButtons.jsx';
 import { useToast } from '../../components/Toasts.jsx';
@@ -186,7 +187,8 @@ function Datasets() {
   const { project } = useProject();
   return (
     <ResourceManager path={`${base(project)}/datasets`} {...datasetConfig(t)}
-      rowLink={(row) => `/projects/${project.id}/datasets/${row.id}`} />
+      rowLink={(row) => `/projects/${project.id}/datasets/${row.id}`}
+      actions={({ reload }) => <DatasetCsvImport projectId={project.id} onImported={reload} />} />
   );
 }
 

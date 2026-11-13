@@ -55,6 +55,8 @@ export const crispdmApi = {
   report: (pid) => api.get(`/projects/${pid}/crisp-dm/report`),
   phases: (pid) => api.get(`/projects/${pid}/crisp-dm/phases`),
   updatePhase: (pid, phase, body) => api.patch(`/projects/${pid}/crisp-dm/phases/${phase}`, body),
+  // lista de datasets lida de um CSV: tudo ou nada; nomes que já existem são pulados ({ created, skipped })
+  importDatasets: (pid, datasets) => api.post(`/projects/${pid}/crisp-dm/datasets/import`, { datasets }),
 };
 
 // Seções para qualquer tipo de projeto. Os cadastros usam resourceApi (abaixo).
