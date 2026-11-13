@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.11.0 — 2026-11-12
+
+### Adicionado
+- Análise de Sistemas (requer a API 5.6.0): botão **Usar modelo** na visão geral e na aba Análise, que abre a escolha
+  do modelo e aplica ao projeto o conteúdo pronto da ERS "Cadastro, Autenticação e Perfil de Usuário" — textos da
+  análise, 50 requisitos, 10 casos de uso e 14 diagramas. Nada é apagado nem duplicado; o formulário da análise
+  recarrega com os textos aplicados. Traduções em pt-BR, en e es.
+
 ## 2.10.0 — 2026-11-12
 
 ### Alterado

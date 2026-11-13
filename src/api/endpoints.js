@@ -45,6 +45,9 @@ export const systemAnalysisApi = {
   report: (pid) => api.get(`/projects/${pid}/system-analysis/report`),
   analysis: (pid) => api.get(`/projects/${pid}/system-analysis/analysis`),
   updateAnalysis: (pid, body) => api.patch(`/projects/${pid}/system-analysis/analysis`, body),
+  // modelos de projeto: aplicar não apaga nada e não duplica (códigos e títulos existentes são pulados)
+  templates: (pid) => api.get(`/projects/${pid}/system-analysis/templates`),
+  applyTemplate: (pid, key) => api.post(`/projects/${pid}/system-analysis/templates/${key}/apply`),
 };
 
 export const crispdmApi = {
