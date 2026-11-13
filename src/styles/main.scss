@@ -1044,6 +1044,22 @@ $home-orange-text-bg: #b35500; // laranja com texto branco por cima (4,6:1, WCAG
   }
 }
 
+// Acordeão das etapas do CRISP-DM: título no tamanho das seções e etapa aberta destacada em azul
+.kt-phases {
+  .accordion-button {
+    font-family: $font-sans;
+    font-weight: 700;
+    font-size: 1.15rem;
+    gap: 0.25rem;
+    &:not(.collapsed) {
+      color: $brand-color-primary-blue;
+    }
+  }
+  .accordion-item {
+    scroll-margin-top: 1rem;
+  }
+}
+
 .kt-stat {
   border-left: 4px solid $brand-color-primary-blue;
   .kt-stat-value {

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react';
-import { Link, useParams } from 'react-router';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useParams } from 'react-router';
 import { crispdmApi, resourceApi } from '../../api/endpoints.js';
 import { AiButton } from '../../components/AiAssist.jsx';
 import { enumOptions } from '../../components/forms.jsx';
@@ -80,7 +80,9 @@ function Overview() {
   );
 }
 
-function PhaseCard({ projectId, phase, onSaved }) {
+// Etapa como item de acordeão (Bootstrap, controlado pelo React): o formulário fechado continua montado,
+// então o que foi digitado não se perde ao abrir outra etapa
+function PhaseCard({ projectId, phase, onSaved, open, onToggle }) {
   const { t, locale } = useI18n();
   const toast = useToast();
   const initialContent = Object.fromEntries(phase.tasks.map((k) => [k, phase.content?.[k] ?? '']));
@@ -114,66 +116,96 @@ function PhaseCard({ projectId, phase, onSaved }) {
   };
 
   return (
-    <section className="card mb-4" id={phase.phase} aria-labelledby={`${phase.phase}-title`}>
-      <div className="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
-        <h3 className="h3 mb-0" id={`${phase.phase}-title`}>{phase.order}. {phaseName(phase, locale)}</h3>
-        <span className={`badge ${STATUS_BADGE[phase.status]}`}>{t(`enums.phaseStatus.${phase.status}`)}</span>
-      </div>
-      <form className="card-body" onSubmit={save} onKeyDown={saveShortcut} noValidate>
-        <div className="row">
-          <div className="col-md-4 mb-3">
-            <label className="form-label fw-semibold" htmlFor={`${phase.phase}-status`}>{t('common.status')}</label>
-            <select id={`${phase.phase}-status`} className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
-              {enumOptions(t, 'phaseStatus', ENUMS.phaseStatus).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
-          </div>
-          <div className="col-md-8 mb-3 small text-body-secondary align-self-end">
-            {phase.startedAt && `${t('dm.startedAt')}: ${formatDate(phase.startedAt, locale)}`}
-            {phase.completedAt && ` · ${t('dm.completedAt')}: ${formatDate(phase.completedAt, locale)}`}
-          </div>
-        </div>
-        <h4 className="h4">{t('dm.tasks')}</h4>
-        <div className="row">
-          {phase.tasks.map((task) => (
-            <div className="col-lg-6 mb-3" key={task}>
-              <label className="form-label fw-semibold" htmlFor={`${phase.phase}-${task}`}>{taskLabel(locale, task)}</label>
-              {task === 'decision' ? (
-                <select id={`${phase.phase}-${task}`} className="form-select" value={content[task]}
-                  onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))}>
-                  <option value="">{t('common.none')}</option>
-                  {enumOptions(t, 'decision', ENUMS.decision).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-              ) : (
-                <>
-                  <textarea id={`${phase.phase}-${task}`} className="form-control" rows={3} value={content[task]}
-                    onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))} />
-                  <div className="text-end mt-1">
-                    <AiButton label={taskLabel(locale, task)} value={content[task] ?? ''}
-                      onApply={(text) => setContent((c) => ({ ...c, [task]: text }))} />
-                  </div>
-                </>
-              )}
+    <section className="accordion-item" id={phase.phase}>
+      <h3 className="accordion-header" id={`${phase.phase}-title`}>
+        <button type="button" className={`accordion-button ${open ? '' : 'collapsed'}`} aria-expanded={open}
+          aria-controls={`${phase.phase}-body`} onClick={onToggle}>
+          <span className="flex-grow-1">{phase.order}. {phaseName(phase, locale)}</span>
+          {dirty && <i className="bi bi-pencil-fill small me-2 text-warning" title={t('common.unsaved')} aria-label={t('common.unsaved')} />}
+          <span className={`badge ${STATUS_BADGE[phase.status]} me-3`}>{t(`enums.phaseStatus.${phase.status}`)}</span>
+        </button>
+      </h3>
+      <div id={`${phase.phase}-body`} className={`accordion-collapse collapse ${open ? 'show' : ''}`} role="region"
+        aria-labelledby={`${phase.phase}-title`}>
+        <form className="accordion-body" onSubmit={save} onKeyDown={saveShortcut} noValidate>
+          <div className="row">
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold" htmlFor={`${phase.phase}-status`}>{t('common.status')}</label>
+              <select id={`${phase.phase}-status`} className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+                {enumOptions(t, 'phaseStatus', ENUMS.phaseStatus).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             </div>
-          ))}
-        </div>
-        <label className="form-label fw-semibold" htmlFor={`${phase.phase}-notes`}>{t('sa.notes')}</label>
-        <textarea id={`${phase.phase}-notes`} className="form-control" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
-        <div className="text-end mt-1 mb-3"><AiButton label={t('sa.notes')} value={notes ?? ''} onApply={setNotes} /></div>
-        {errors.content && <div className="text-danger small mb-2">{String(errors.content)}</div>}
-        <SaveButton busy={busy} dirty={dirty} />
-      </form>
+            <div className="col-md-8 mb-3 small text-body-secondary align-self-end">
+              {phase.startedAt && `${t('dm.startedAt')}: ${formatDate(phase.startedAt, locale)}`}
+              {phase.completedAt && ` · ${t('dm.completedAt')}: ${formatDate(phase.completedAt, locale)}`}
+            </div>
+          </div>
+          <h4 className="h4">{t('dm.tasks')}</h4>
+          <div className="row">
+            {phase.tasks.map((task) => (
+              <div className="col-lg-6 mb-3" key={task}>
+                <label className="form-label fw-semibold" htmlFor={`${phase.phase}-${task}`}>{taskLabel(locale, task)}</label>
+                {task === 'decision' ? (
+                  <select id={`${phase.phase}-${task}`} className="form-select" value={content[task]}
+                    onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))}>
+                    <option value="">{t('common.none')}</option>
+                    {enumOptions(t, 'decision', ENUMS.decision).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                ) : (
+                  <>
+                    <textarea id={`${phase.phase}-${task}`} className="form-control" rows={3} value={content[task]}
+                      onChange={(e) => setContent((c) => ({ ...c, [task]: e.target.value }))} />
+                    <div className="text-end mt-1">
+                      <AiButton label={taskLabel(locale, task)} value={content[task] ?? ''}
+                        onApply={(text) => setContent((c) => ({ ...c, [task]: text }))} />
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+          <label className="form-label fw-semibold" htmlFor={`${phase.phase}-notes`}>{t('sa.notes')}</label>
+          <textarea id={`${phase.phase}-notes`} className="form-control" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          <div className="text-end mt-1 mb-3"><AiButton label={t('sa.notes')} value={notes ?? ''} onApply={setNotes} /></div>
+          {errors.content && <div className="text-danger small mb-2">{String(errors.content)}</div>}
+          <SaveButton busy={busy} dirty={dirty} />
+        </form>
+      </div>
     </section>
   );
 }
 
+// Acordeão das 6 etapas: uma aberta por vez; abre a do link (#data_understanding, vindo da visão geral)
+// ou, por padrão, a primeira (Entendimento do negócio)
 function Phases() {
   const { project } = useProject();
+  const { hash } = useLocation();
   const phases = useAsync(() => crispdmApi.phases(project.id), [project.id]);
+  const [open, setOpen] = useState(() => decodeURIComponent(hash.slice(1)) || null);
+  const list = phases.data ?? [];
+  const current = list.some((p) => p.phase === open) ? open : open === '' ? null : list[0]?.phase;
+
+  // rola até a etapa do link uma vez, quando a lista chega (salvar depois não rola de novo)
+  const scrolled = useRef(false);
+  const loaded = !!phases.data;
+  useEffect(() => {
+    if (!hash || !loaded || scrolled.current) return;
+    scrolled.current = true;
+    document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView?.({ block: 'start' });
+  }, [hash, loaded]);
+
   if (phases.loading && !phases.data) return <Loading small />;
   const replace = (updated) => phases.setData(phases.data.map((p) => (p.phase === updated.phase ? updated : p)));
-  return (phases.data ?? []).map((p) => (
-    <PhaseCard key={`${p.phase}-${p.updatedAt}`} projectId={project.id} phase={p} onSaved={replace} />
-  ));
+  return (
+    <div className="accordion kt-phases">
+      {list.map((p) => (
+        <PhaseCard key={`${p.phase}-${p.updatedAt}`} projectId={project.id} phase={p} onSaved={replace}
+          open={current === p.phase}
+          // clicar na aberta fecha; em outra, fecha a aberta e abre a clicada
+          onToggle={() => setOpen(current === p.phase ? '' : p.phase)} />
+      ))}
+    </div>
+  );
 }
 
 function Objectives() {
