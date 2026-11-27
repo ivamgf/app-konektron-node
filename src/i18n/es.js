@@ -130,6 +130,13 @@ export default {
     resent: 'Si tu cuenta todavía no está confirmada, enviamos un nuevo enlace.',
     notVerified: 'Tu correo todavía no está confirmado.',
     signedOut: 'Cerraste la sesión.',
+    idle: {
+      title: 'Tu sesión está por expirar',
+      text: 'Por seguridad, la sesión se cierra tras {minutes} minutos sin uso. Se cerrará en {time}.',
+      unsaved: 'Los cambios no guardados se perderán.',
+      stay: 'Seguir conectado',
+      signedOut: 'Tu sesión se cerró tras {minutes} minutos sin uso. Inicia sesión de nuevo para continuar.',
+    },
   },
   home: {
     plansTitle: 'Planes',

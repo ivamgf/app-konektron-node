@@ -51,6 +51,18 @@ export function toCsv(rows, sep = ';') {
   return rows.map((r) => r.map(cell).join(sep)).join('\r\n');
 }
 
+// Baixa o CSV como arquivo (com BOM, para o Excel reconhecer o UTF-8)
+export function downloadCsv(csv, fileName) {
+  const url = URL.createObjectURL(new Blob(['﻿', csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // "Nº de linhas" → "nodelinhas": sem acento, minúsculas, só letras e dígitos
 export const normalizeHeader = (h) =>
   h.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');

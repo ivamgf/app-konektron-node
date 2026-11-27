@@ -130,6 +130,13 @@ export default {
     resent: 'If your account is not confirmed yet, a new link was sent.',
     notVerified: 'Your e-mail is not confirmed yet.',
     signedOut: 'You have signed out.',
+    idle: {
+      title: 'Your session is about to expire',
+      text: 'For security, the session ends after {minutes} minutes of inactivity. You will be signed out in {time}.',
+      unsaved: 'Unsaved changes will be lost.',
+      stay: 'Stay signed in',
+      signedOut: 'Your session ended after {minutes} minutes of inactivity. Sign in again to continue.',
+    },
   },
   home: {
     plansTitle: 'Plans',

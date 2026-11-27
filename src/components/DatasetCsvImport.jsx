@@ -4,7 +4,7 @@ import { useId, useState } from 'react';
 import { ApiError } from '../api/client.js';
 import { crispdmApi } from '../api/endpoints.js';
 import { useI18n } from '../i18n/I18nProvider.jsx';
-import { csvToDatasets, DATASET_FIELDS, toCsv } from '../lib/csv.js';
+import { csvToDatasets, DATASET_FIELDS, downloadCsv, toCsv } from '../lib/csv.js';
 import { useToast } from './Toasts.jsx';
 import { Modal } from './ui.jsx';
 
@@ -24,14 +24,7 @@ function downloadTemplate(t) {
     ['clientes_2025', 'CRM', 'csv', 's3://dados/clientes.csv', '48000', '12', '5242880', '31/01/2026', 'Cadastro de clientes ativos', 'Sem e-mails duplicados'],
     ['vendas_2025', 'ERP', 'parquet', 's3://dados/vendas', '1200000', '25', '', '2026-02-28', '', ''],
   ]);
-  const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'datasets.csv';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  downloadCsv(csv, 'datasets.csv');
 }
 
 function ImportModal({ projectId, onClose, onImported }) {

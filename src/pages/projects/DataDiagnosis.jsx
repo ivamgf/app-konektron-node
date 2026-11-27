@@ -6,6 +6,7 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { dataDiagnosisApi } from '../../api/endpoints.js';
 import { AiContextProvider, useAiContext } from '../../components/AiAssist.jsx';
 import ExportButtons from '../../components/ExportButtons.jsx';
+import FlowsCsvImport from '../../components/FlowsCsvImport.jsx';
 import { FieldGrid } from '../../components/forms.jsx';
 import { useCrumbLabel } from '../../components/Layout.jsx';
 import { RowsEditor, SectionLayout, StatCards } from '../../components/sections.jsx';
@@ -568,7 +569,8 @@ function ReportBody({ c, set, d, locale }) {
         ]} />
       </Section>
 
-      <Section id="rep-flows" title={s.flows} help={h.flows}>
+      <Section id="rep-flows" title={s.flows} help={h.flows}
+        actions={<FlowsCsvImport d={d} rows={c.flows ?? []} onImport={(v) => set('flows', v)} />}>
         <FlowDiagram flows={c.flows ?? []} sources={c.sources ?? []} d={d} />
         <Table d={d} caption={s.flows} rows={c.flows} onChange={(v) => set('flows', v)} columns={[
           { name: 'code', label: f.code, maxLength: 20, minWidth: '5rem' },

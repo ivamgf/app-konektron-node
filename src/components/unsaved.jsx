@@ -2,13 +2,21 @@
 // antes de sair da página — por link, botão Voltar ou fechando a aba. Um único bloqueio para a
 // página inteira, pois o React Router aceita só um useBlocker ativo por vez.
 import { createContext, useCallback, useContext, useEffect, useId, useState } from 'react';
-import { useBlocker } from 'react-router';
+import { useBlocker, useLocation } from 'react-router';
 import { useI18n } from '../i18n/I18nProvider.jsx';
 
 const UnsavedContext = createContext(null);
 
+// Saída forçada (sessão encerrada por inatividade): a próxima navegação não pergunta nada.
+// Volta ao normal quando a página muda.
+let forcedLeave = false;
+export function leaveWithoutAsking() {
+  forcedLeave = true;
+}
+
 export function UnsavedProvider({ children }) {
   const { t } = useI18n();
+  const { pathname } = useLocation();
   const [dirtyForms, setDirtyForms] = useState({});
   const register = useCallback(
     (id, dirty) => setDirtyForms((prev) => (Boolean(prev[id]) === dirty ? prev : { ...prev, [id]: dirty })),
@@ -18,10 +26,13 @@ export function UnsavedProvider({ children }) {
 
   const blocker = useBlocker(
     useCallback(
-      ({ currentLocation, nextLocation }) => hasUnsaved && currentLocation.pathname !== nextLocation.pathname,
+      ({ currentLocation, nextLocation }) => !forcedLeave && hasUnsaved && currentLocation.pathname !== nextLocation.pathname,
       [hasUnsaved],
     ),
   );
+  useEffect(() => {
+    forcedLeave = false;
+  }, [pathname]);
   useEffect(() => {
     if (blocker.state !== 'blocked') return;
     if (window.confirm(t('common.unsavedConfirm'))) blocker.proceed();
@@ -32,6 +43,7 @@ export function UnsavedProvider({ children }) {
   useEffect(() => {
     if (!hasUnsaved) return undefined;
     const onUnload = (e) => {
+      if (forcedLeave) return;
       e.preventDefault();
       e.returnValue = '';
     };

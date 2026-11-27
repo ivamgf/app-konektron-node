@@ -130,6 +130,13 @@ export default {
     resent: 'Se a conta ainda não foi confirmada, um novo link foi enviado.',
     notVerified: 'Seu e-mail ainda não foi confirmado.',
     signedOut: 'Você saiu da sua conta.',
+    idle: {
+      title: 'Sua sessão vai expirar',
+      text: 'Por segurança, a sessão é encerrada após {minutes} minutos sem uso. Você será desconectado em {time}.',
+      unsaved: 'Alterações não salvas serão perdidas.',
+      stay: 'Continuar conectado',
+      signedOut: 'Sua sessão foi encerrada após {minutes} minutos sem uso. Entre novamente para continuar.',
+    },
   },
   home: {
     plansTitle: 'Planos',
