@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { refreshSession, session } from '../api/client.js';
 import { authApi } from '../api/endpoints.js';
+import { clearActivity, idleExpired, markActivity } from './idle.js';
 
 const AuthContext = createContext(null);
 
@@ -13,6 +14,7 @@ export function AuthProvider({ children }) {
 
   const applySession = useCallback((result) => {
     session.set(result);
+    markActivity();
     setSignedOutByUser(false);
     setUser(result.user);
     setStatus('authenticated');
@@ -30,8 +32,15 @@ export function AuthProvider({ children }) {
     let cancelled = false;
     (async () => {
       if (!session.refreshToken) return setStatus('anonymous');
+      // passou do prazo sem uso (ex.: fechou o navegador e voltou depois): não restaura e revoga na API
+      if (idleExpired()) {
+        authApi.logout({ refreshToken: session.refreshToken }).catch(() => {});
+        clearActivity();
+        return signOutLocally();
+      }
       try {
         await refreshSession();
+        markActivity();
         const me = await authApi.me();
         if (!cancelled) {
           setUser(me);
@@ -69,13 +78,15 @@ export function AuthProvider({ children }) {
         setUser(me);
         return me;
       },
-      logout: async ({ allDevices = false } = {}) => {
+      // idle: encerrada por inatividade (não pedida pelo usuário), então o login volta à página atual
+      logout: async ({ allDevices = false, idle = false } = {}) => {
         try {
           await authApi.logout(allDevices ? { allDevices: true } : { refreshToken: session.refreshToken });
         } catch {
           // mesmo se a API falhar, a sessão local é encerrada
         }
-        setSignedOutByUser(true);
+        clearActivity();
+        setSignedOutByUser(!idle);
         signOutLocally();
       },
       signOutLocally,

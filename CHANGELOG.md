@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.15.0 — 2026-11-27
+
+### Adicionado
+- Diagnóstico de dados › Relatório › **5. Mapeamento dos fluxos de dados**: botões **Importar CSV** e **Baixar modelo
+  CSV** no cabeçalho da seção. O modelo traz o cabeçalho com as colunas da tabela no idioma do app e os fluxos de
+  exemplo. A importação lê o arquivo no navegador (separador `;`, `,` ou tabulação), aceita cabeçalhos em português,
+  inglês ou espanhol e, em "Método de integração" e "Monitorado?", a chave ou o rótulo em qualquer idioma (ex.:
+  `ETL / ELT`, `Upload manual`, `Sim`). Mostra a prévia e os ajustes (opção desconhecida fica em branco; texto acima do
+  limite da API é cortado), permite manter e acrescentar ou substituir as linhas existentes e respeita o máximo de
+  300 fluxos. As linhas entram na tabela e são gravadas ao salvar o documento (sem mudança na API).
+- **Sessão encerrada por inatividade**: sem interação (clique, tecla, toque, roda ou movimento do mouse) por
+  **7 minutos**, o app encerra a sessão (revoga o refresh token na API) e volta ao login, que retorna à mesma página.
+  Aos **6 minutos** aparece um aviso com a contagem regressiva; qualquer interação antes dos 7 minutos fecha o aviso e
+  zera o contador. A última interação é compartilhada entre as abas e vale também ao reabrir o navegador: depois do
+  prazo a sessão não é restaurada.
+
+### Alterado
+- O download de CSV (`downloadCsv`) passou para `src/lib/csv.js` e é usado pelos dois modelos (datasets e fluxos).
+
 ## 2.14.0 — 2026-11-13
 
 ### Adicionado

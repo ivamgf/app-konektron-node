@@ -8,6 +8,7 @@ import { AccessibilityLink } from './Accessibility.jsx';
 import { useToast } from './Toasts.jsx';
 import { BrandMark, Loading } from './ui.jsx';
 import { UnsavedProvider } from './unsaved.jsx';
+import IdleLogout from './IdleLogout.jsx';
 
 const API_DOCS_URL = `${API_BASE_URL}/docs/`;
 export const SITE_URL = 'www.orkneytech-lab.com';
@@ -436,6 +437,7 @@ export default function Layout() {
         </main>
         <Footer />
         <SideMenu open={menuOpen} onClose={closeMenu} />
+        {status === 'authenticated' && <IdleLogout />}
         <BackToTop />
         <ScrollRestoration />
       </div>
